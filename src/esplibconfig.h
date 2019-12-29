@@ -21,5 +21,5 @@
 //config reference
 #define XSTR_(M) #M
 #define XSTR(M) XSTR_(M)
-#define MARLIN_PATH(PATH) XSTR(../../../Marlin/src/PATH)
-#include MARLIN_PATH(/inc/MarlinConfigPre.h)
+#define MARLIN_PATH(PATH) XSTR(../../../../../Marlin/src/PATH)
+#include MARLIN_PATH(inc/MarlinConfigPre.h)
