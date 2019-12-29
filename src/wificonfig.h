@@ -19,7 +19,8 @@
 */
 
 //Services that need to be used
-#include "../../inc/MarlinConfigPre.h"
+#include "../../../Marlin/src/inc/MarlinConfigPre.h"
+
 #define ENABLE_MDNS
 #define ENABLE_OTA
 #define ENABLE_HTTP

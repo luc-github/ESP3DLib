@@ -25,6 +25,7 @@
 
 */
 #include "esp3dlib.h"
+#include "wificonfig.h"
 
 void WiFiTaskfn( void * parameter )
 {
@@ -46,7 +47,7 @@ Esp3DLib::Esp3DLib()
 }
 
 //Begin which setup everything
-void Esp3D::init()
+void Esp3DLib::init()
 {
 
     xTaskCreatePinnedToCore(
