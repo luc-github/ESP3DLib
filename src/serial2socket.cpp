@@ -21,7 +21,7 @@
 
 #ifdef ARDUINO_ARCH_ESP32
 
-#include "../../../Marlin/src/inc/MarlinConfigPre.h"
+#include "esplibconfig.h"
 
 #if ENABLED(WIFISUPPORT)
 #include "serial2socket.h"

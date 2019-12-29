@@ -19,7 +19,7 @@
 */
 
 //Services that need to be used
-#include "../../../Marlin/src/inc/MarlinConfigPre.h"
+#include "esplibconfig.h"
 
 #define ENABLE_MDNS
 #define ENABLE_OTA

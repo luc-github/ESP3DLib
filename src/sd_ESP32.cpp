@@ -21,12 +21,12 @@
  */
  
 #ifdef ARDUINO_ARCH_ESP32
-#include "../../../Marlin/src/inc/MarlinConfigPre.h"
+#include "esplibconfig.h"
 #if ENABLED(SDSUPPORT)
-#include "../../../Marlin/src/sd/cardreader.h"
-#include "../../../Marlin/src/sd/SdVolume.h"
-#include "../../../Marlin/src/sd/SdFatStructs.h"
-#include "../../../Marlin/src/sd/SdFile.h"
+#include MARLIN_PATH(sd/cardreader.h)
+#include MARLIN_PATH(sd/SdVolume.h)
+#include MARLIN_PATH(sd/SdFatStructs.h)
+#include MARLIN_PATH(sd/SdFile.h)
 #include "sd_ESP32.h"
 
 
