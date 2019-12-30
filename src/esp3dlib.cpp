@@ -25,6 +25,7 @@
 
 */
 #include "esp3dlib.h"
+#if ENABLED(ESP3D_WIFISUPPORT)
 #include "wificonfig.h"
 
 void WiFiTaskfn( void * parameter )
@@ -37,7 +38,7 @@ void WiFiTaskfn( void * parameter )
     vTaskDelete( NULL );
 }
 
-
+#endif //ESP3D_WIFISUPPORT
 
 
 //Contructor

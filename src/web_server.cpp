@@ -23,7 +23,7 @@
 #include "esplibconfig.h"
 
 
-#if ENABLED(WIFISUPPORT)
+#if ENABLED(WIFISUPPORT) && ENABLED(ESP3D_WIFISUPPORT)
 
 #include "wificonfig.h"
 

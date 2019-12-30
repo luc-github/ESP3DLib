@@ -22,7 +22,7 @@
  
 #ifdef ARDUINO_ARCH_ESP32
 #include "esplibconfig.h"
-#if ENABLED(SDSUPPORT)
+#if ENABLED(SDSUPPORT) && ENABLED(ESP3D_WIFISUPPORT)
 #include MARLIN_PATH(sd/cardreader.h)
 #include MARLIN_PATH(sd/SdVolume.h)
 #include MARLIN_PATH(sd/SdFatStructs.h)
