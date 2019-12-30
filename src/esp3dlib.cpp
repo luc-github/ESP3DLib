@@ -30,6 +30,8 @@
 #include "esp3dlib.h"
 #include "wificonfig.h"
 
+Esp3DLib esp3dlib;
+
 void WiFiTaskfn( void * parameter )
 {
     WiFiConfig::begin();

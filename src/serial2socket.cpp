@@ -23,7 +23,7 @@
 
 #include "esplibconfig.h"
 
-#if ENABLED(WIFISUPPORT) && ENABLED(ESP3D_WIFISUPPORT)
+#if ENABLED(ESP3D_WIFISUPPORT)
 #include "serial2socket.h"
 #include "wificonfig.h"
 #include <WebSocketsServer.h>

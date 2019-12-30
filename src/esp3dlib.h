@@ -24,12 +24,13 @@
 #if !defined(ARDUINO_ARCH_ESP32)
 #error Oops!  Make sure you have 'ESP32' compatible board selected
 #endif
-
-#include "Arduino.h"
+#include "serial2socket.h"
 class Esp3DLib
 {
 public:
     Esp3DLib();
     void init();
 };
+
+extern Esp3DLib esp3dlib;
 #endif

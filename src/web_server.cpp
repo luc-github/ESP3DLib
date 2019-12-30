@@ -23,18 +23,19 @@
 #include "esplibconfig.h"
 
 
-#if ENABLED(WIFISUPPORT) && ENABLED(ESP3D_WIFISUPPORT)
+#if ENABLED(ESP3D_WIFISUPPORT)
 
 #include "wificonfig.h"
 
 #if defined (ENABLE_HTTP)
-#include "HAL.h"
-#include "../../gcode/queue.h"
+#include MARLIN_PATH(gcode/queue.h)
+#include MARLIN_PATH(inc/Version.h)
+#undef DISABLED
+#undef _BV
 #include "wifiservices.h"
 #include "serial2socket.h"
 #include "web_server.h"
 #include <WebSocketsServer.h>
-#include "../../inc/Version.h"
 #include <WiFi.h>
 #include <FS.h>
 #include <SPIFFS.h>

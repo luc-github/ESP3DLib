@@ -22,8 +22,7 @@
 
 #include "esplibconfig.h"
 
-#if ENABLED(WIFISUPPORT) && ENABLED(ESP3D_WIFISUPPORT)
-#include "HAL.h"
+#if ENABLED(ESP3D_WIFISUPPORT)
 #include <WiFi.h>
 #include <esp_wifi.h>
 #include <ESPmDNS.h>
@@ -32,7 +31,6 @@
 #include <Preferences.h>
 #include "wificonfig.h"
 #include "wifiservices.h"
-
 
 #ifdef __cplusplus
 extern "C" {

@@ -23,3 +23,8 @@
 #define XSTR(M) XSTR_(M)
 #define MARLIN_PATH(PATH) XSTR(../../../../../Marlin/src/PATH)
 #include MARLIN_PATH(inc/MarlinConfigPre.h)
+#undef DISABLED
+#undef _BV
+#include MARLIN_PATH(HAL/HAL_ESP32/FlushableHardwareSerial.h)
+#define MYSERIAL0 flushableSerial
+
