@@ -24,8 +24,10 @@
     Main author: luc lebosse
 
 */
-#include "esp3dlib.h"
+#include "esplibconfig.h"
+
 #if ENABLED(ESP3D_WIFISUPPORT)
+#include "esp3dlib.h"
 #include "wificonfig.h"
 
 void WiFiTaskfn( void * parameter )
