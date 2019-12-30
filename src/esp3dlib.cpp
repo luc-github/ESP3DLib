@@ -40,8 +40,6 @@ void WiFiTaskfn( void * parameter )
     vTaskDelete( NULL );
 }
 
-#endif //ESP3D_WIFISUPPORT
-
 
 //Contructor
 Esp3DLib::Esp3DLib()
@@ -63,3 +61,4 @@ void Esp3DLib::init()
         0 	 /* Core to run the task */
     );
 }
+#endif //ESP3D_WIFISUPPORT
