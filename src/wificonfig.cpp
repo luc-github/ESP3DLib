@@ -147,10 +147,12 @@ bool WiFiConfig::isValidIP(const char * string){
  */
 void WiFiConfig::wait(uint32_t milliseconds){
     uint32_t timeout = millis();
+    vTaskDelay(1 / portTICK_RATE_MS);  // Yield to other tasks
     esp_task_wdt_reset(); //for a wait 0;
     //wait feeding WDT
     while ( (millis() - timeout) < milliseconds) {
        esp_task_wdt_reset();
+       vTaskDelay(1 / portTICK_RATE_MS);  // Yield to other tasks
     }
 }
 
