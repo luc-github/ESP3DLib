@@ -30,6 +30,7 @@ class Esp3DLib
 public:
     Esp3DLib();
     void init();
+    bool parse(char * cmd);
 };
 
 extern Esp3DLib esp3dlib;

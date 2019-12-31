@@ -29,11 +29,13 @@
 #if ENABLED(ESP3D_WIFISUPPORT)
 #include "esp3dlib.h"
 #include "wificonfig.h"
+#include MARLIN_PATH(core/serial.h)
 
 Esp3DLib esp3dlib;
 
 void WiFiTaskfn( void * parameter )
 {
+    wifi_config.wait(100);  // Yield to other tasks
     WiFiConfig::begin();
     for(;;) {
         wifi_config.handle();
@@ -52,7 +54,6 @@ Esp3DLib::Esp3DLib()
 //Begin which setup everything
 void Esp3DLib::init()
 {
-
     xTaskCreatePinnedToCore(
         WiFiTaskfn, /* Task function. */
         "WiFi Task", /* name of task. */
@@ -62,5 +63,18 @@ void Esp3DLib::init()
         NULL, /* Task handle to keep track of created task */
         0 	 /* Core to run the task */
     );
+}
+//Parse command
+bool Esp3DLib::parse(char * cmd)
+{
+	String scmd = cmd;
+	if (scmd.startsWith("[ESP")) {
+		SERIAL_ECHO_START();
+		SERIAL_ECHOLNPAIR("it is ESP command:", cmd);
+		return true;
+	} else {
+		return false;
+	}
+	
 }
 #endif //ESP3D_WIFISUPPORT
