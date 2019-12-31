@@ -59,7 +59,6 @@ bool WiFiServices::begin(){
     prefs.begin(NAMESPACE, true);
     h = prefs.getString(HOSTNAME_ENTRY, defV);
     prefs.end();
-    WiFi.scanNetworks (true);
     //Start SPIFFS
     SPIFFS.begin(true);
 

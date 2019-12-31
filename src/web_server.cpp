@@ -913,10 +913,8 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
             if (auth_type == LEVEL_GUEST) return false;
 #endif
         espresponse->print("{\"AP_LIST\":[");
-        int n = WiFi.scanComplete();
-        if (n == -2) {
-            WiFi.scanNetworks (true);
-        } else if (n) {	
+        int n = WiFi.scanNetworks();
+        if (n > 0) {	
             for (int i = 0; i < n; ++i) {
                 if (i > 0) {
                     espresponse->print (",");
@@ -933,13 +931,15 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
                     espresponse->print ("1");
                 }
                 espresponse->print ("\"}");
+                wifi_config.wait(0); 
                 }
-            }
-            WiFi.scanDelete();      
-            if (WiFi.scanComplete() == -2) {
-                WiFi.scanNetworks (true);
+            WiFi.scanDelete(); 
             }
        espresponse->print ("]}");
+       //Ugly fix for the AP mode
+       if (WiFi.getMode() == WIFI_AP_STA) {
+           WiFi.enableSTA (false);
+        }
     }
     break;
         //Get ESP current status 
