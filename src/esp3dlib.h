@@ -34,18 +34,22 @@ public:
        */
     Esp3DLib();
     /**
-       * To init the task use ESP3D.
+       * @brief Initializes the task used by \link esp3dlib \endlink.
        */
     void init();
     /**
-       * Parser for commmand
+       * Parser for commmand.
        * @param[in] cmd - the string to parse
        * 
-       * @return true - if it is seen as ESP command
-       * @return false - if not ESP command
+       * @return true - if it is seen as ESP command.
+       * @return false - if not ESP command.
        */
     bool parse(char * cmd);
 };
 
+/**
+ * @brief You must call esp3dlib.init() before using this variable.
+ */
 extern Esp3DLib esp3dlib;
+
 #endif
