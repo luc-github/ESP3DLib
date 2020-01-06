@@ -25,11 +25,25 @@
 #error Oops!  Make sure you have 'ESP32' compatible board selected
 #endif
 #include "serial2socket.h"
+/*! Esp3DLib main class */
 class Esp3DLib
 {
 public:
+	/**
+       * Constructor.
+       */
     Esp3DLib();
+    /**
+       * To init the task use ESP3D.
+       */
     void init();
+    /**
+       * Parser for commmand
+       * @param[in] cmd - the string to parse
+       * 
+       * @return true - if it is seen as ESP command
+       * @return false - if not ESP command
+       */
     bool parse(char * cmd);
 };
 
