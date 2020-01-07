@@ -19,37 +19,7 @@
 */
 
 //Services that need to be used
-#include "esplibconfig.h"
-
-#define ENABLE_MDNS
-#define ENABLE_OTA
-#define ENABLE_HTTP
-#define ENABLE_SSDP
-#define ENABLE_CAPTIVE_PORTAL
-//Authentication flag is now in Configuration_adv.h
-//#define ENABLE_AUTHENTICATION
-#define ENABLE_SERIAL2SOCKET_OUT
-
-#define ENABLE_SERIAL2SOCKET_IN
-
-//Preferences entries
-#define NAMESPACE "MARLIN"
-#define HOSTNAME_ENTRY "ESP_HOSTNAME"
-#define STA_SSID_ENTRY "STA_SSID"
-#define STA_PWD_ENTRY "STA_PWD"
-#define STA_IP_ENTRY "STA_IP"
-#define STA_GW_ENTRY "STA_GW"
-#define STA_MK_ENTRY "STA_MK"
-#define ESP_WIFI_MODE "WIFI_MODE"
-#define AP_SSID_ENTRY "AP_SSID"
-#define AP_PWD_ENTRY "AP_PWD"
-#define AP_IP_ENTRY "AP_IP"
-#define AP_CHANNEL_ENTRY "AP_CHANNEL"
-#define HTTP_ENABLE_ENTRY "HTTP_ON"
-#define HTTP_PORT_ENTRY "HTTP_PORT"
-#define TELNET_ENABLE_ENTRY "TELNET_ON"
-#define TELNET_PORT_ENTRY "TELNET_PORT"
-#define STA_IP_MODE_ENTRY "STA_IP_MODE"
+#include "esp3dlibconfig.h"
 
 //Wifi Mode
 #define ESP_WIFI_OFF 0
@@ -58,10 +28,6 @@
 
 #define DHCP_MODE   0
 #define STATIC_MODE   0
-
-//Switch 
-#define ESP_SAVE_ONLY 0
-#define ESP_APPLY_NOW 1
 
 //defaults values
 #define DEFAULT_HOSTNAME "marlinesp"

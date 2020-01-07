@@ -19,11 +19,9 @@
 */
 
 
-#ifdef ARDUINO_ARCH_ESP32
+#include "esp3dlibconfig.h"
 
-#include "esplibconfig.h"
-
-#if ENABLED(ESP3D_WIFISUPPORT)
+#if defined(ESP3D_WIFISUPPORT)
 #include "serial2socket.h"
 #include "wificonfig.h"
 #include <WebSocketsServer.h>
@@ -165,6 +163,4 @@ void Serial_2_Socket::flush(void){
     }
 }
 
-#endif // ENABLE_WIFI
-
-#endif // ARDUINO_ARCH_ESP32
+#endif // ESP3D_WIFISUPPORT

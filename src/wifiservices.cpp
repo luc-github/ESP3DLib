@@ -18,27 +18,25 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifdef ARDUINO_ARCH_ESP32
+#include "esp3dlibconfig.h"
 
-#include "esplibconfig.h"
-
-#if ENABLED(ESP3D_WIFISUPPORT)
-
+#if defined(ESP3D_WIFISUPPORT)
 #include <WiFi.h>
 #include <FS.h>
 #include <SPIFFS.h>
+#include "espcom.h"
 #include <Preferences.h>
 #include "wificonfig.h"
 #include "wifiservices.h"
-#ifdef ENABLE_MDNS
+#ifdef MDNS_FEATURE
 #include <ESPmDNS.h>
-#endif
-#ifdef ENABLE_OTA
+#endif //MDNS_FEATURE
+#ifdef OTA_FEATURE
 #include <ArduinoOTA.h>
-#endif
-#ifdef ENABLE_HTTP
+#endif //OTA_FEATURE
+#ifdef HTTP_FEATURE
 #include "web_server.h"
-#endif
+#endif //HTTP_FEATURE
 
 WiFiServices wifi_services;
 
@@ -62,79 +60,85 @@ bool WiFiServices::begin(){
     //Start SPIFFS
     SPIFFS.begin(true);
 
-#ifdef ENABLE_OTA
+#ifdef OTA_FEATURE
     ArduinoOTA
     .onStart([]() {
-      String type;
+      String type = "OTA:Start OTA updating ";
       if (ArduinoOTA.getCommand() == U_FLASH)
-        type = "sketch";
+        type += "sketch";
       else {// U_SPIFFS
         // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-        type = "filesystem";
+        type += "filesystem";
         SPIFFS.end();
         }
-      MYSERIAL0.printf("OTA:Start OTA updating %s]\r\n", type.c_str());
+       Esp3DCom::echo(type.c_str());
     })
     .onEnd([]() {
-      MYSERIAL0.println("OTA:End");
+      Esp3DCom::echo("OTA:End");
       
     })
     .onProgress([](unsigned int progress, unsigned int total) {
-      MYSERIAL0.printf("OTA:OTA Progress: %u%%]\r\n", (progress / (total / 100)));
+	  String tmp = "OTA:OTA Progress:";
+	  tmp += String(progress / (total / 100));
+	  tmp +="%%";
+      Esp3DCom::echo(tmp.c_str());
     })
     .onError([](ota_error_t error) {
-      MYSERIAL0.printf("OTA: Error(%u)\r\n", error);
-      if (error == OTA_AUTH_ERROR) MYSERIAL0.println("OTA:Auth Failed]");
-      else if (error == OTA_BEGIN_ERROR) MYSERIAL0.println("OTA:Begin Failed");
-      else if (error == OTA_CONNECT_ERROR) MYSERIAL0.println("OTA:Connect Failed");
-      else if (error == OTA_RECEIVE_ERROR) MYSERIAL0.println("OTA:Receive Failed");
-      else if (error == OTA_END_ERROR) MYSERIAL0.println("OTA:End Failed]");
+	  String tmp = "OTA: Error(";
+	  tmp += String(error) + ")";
+	  Esp3DCom::echo(tmp.c_str());
+      if (error == OTA_AUTH_ERROR) Esp3DCom::echo("OTA:Auth Failed");
+      else if (error == OTA_BEGIN_ERROR) Esp3DCom::echo("OTA:Begin Failed");
+      else if (error == OTA_CONNECT_ERROR) Esp3DCom::echo("OTA:Connect Failed");
+      else if (error == OTA_RECEIVE_ERROR) Esp3DCom::echo("OTA:Receive Failed");
+      else if (error == OTA_END_ERROR) Esp3DCom::echo("OTA:End Failed");
     });
   ArduinoOTA.begin();
+  Esp3DCom::echo("OTA service started");
 #endif
-#ifdef ENABLE_MDNS
+#ifdef MDNS_FEATURE
      //no need in AP mode
      if(WiFi.getMode() == WIFI_STA){
         //start mDns
         if (!MDNS.begin(h.c_str())) {
-            MYSERIAL0.println("Cannot start mDNS");
+            Esp3DCom::echo("Cannot start mDNS");
             no_error = false;
         } else {
-            MYSERIAL0.printf("Start mDNS with hostname:%s\r\n",h.c_str());
+			String tmp = "mDNS service (" + h;
+			tmp+=") started";
+            Esp3DCom::echo(tmp.c_str());
         }
     }
-#endif
-#ifdef ENABLE_HTTP
+#endif //MDNS_FEATURE
+#ifdef HTTP_FEATURE
     web_server.begin();
-#endif
+#endif //HTTP_FEATURE
     return no_error;
 }
 void WiFiServices::end(){
-#ifdef ENABLE_HTTP
+#ifdef HTTP_FEATURE
     web_server.end();
 #endif
     //stop OTA
-#ifdef ENABLE_OTA
+#ifdef OTA_FEATURE
     ArduinoOTA.end();
-#endif
+#endif //OTA_FEATURE
     //Stop SPIFFS
     SPIFFS.end();
     
-#ifdef ENABLE_MDNS
+#ifdef MDNS_FEATURE
     //Stop mDNS
     //MDNS.end();
-#endif 
+#endif //MDNS_FEATURE
 }
 
 void WiFiServices::handle(){
-#ifdef ENABLE_OTA
+#ifdef OTA_FEATURE
     ArduinoOTA.handle();
-#endif
-#ifdef ENABLE_HTTP
+#endif //OTA_FEATURE
+#ifdef HTTP_FEATURE
     web_server.handle();
-#endif
+#endif //HTTP_FEATURE
 }
 
 #endif // ENABLE_WIFI
-
-#endif // ARDUINO_ARCH_ESP32

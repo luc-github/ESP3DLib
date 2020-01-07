@@ -18,16 +18,10 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifdef ARDUINO_ARCH_ESP32
-
-#include "esplibconfig.h"
-
-
-#if ENABLED(ESP3D_WIFISUPPORT)
-
+#include "esp3dlibconfig.h"
+#if defined(ESP3D_WIFISUPPORT) && defined(HTTP_FEATURE)
+#include "espcom.h"
 #include "wificonfig.h"
-
-#if defined (ENABLE_HTTP)
 #include MARLIN_PATH(gcode/queue.h)
 #include MARLIN_PATH(inc/Version.h)
 #undef DISABLED
@@ -39,7 +33,7 @@
 #include <WiFi.h>
 #include <FS.h>
 #include <SPIFFS.h>
-#if ENABLED(SDSUPPORT)
+#if defined(SDSUPPORT)
 #include "sd_ESP32.h"
 #endif
 #include <Preferences.h>
@@ -49,17 +43,17 @@
 #include <Update.h>
 #include <esp_wifi.h>
 #include <esp_wifi_types.h>
-#ifdef ENABLE_MDNS
+#ifdef MDNS_FEATURE
 #include <ESPmDNS.h>
-#endif
-#ifdef ENABLE_SSDP
+#endif //MDNS_FEATURE
+#ifdef SSDP_FEATURE
 #include <ESP32SSDP.h>
-#endif
-#ifdef ENABLE_CAPTIVE_PORTAL
+#endif //SSDP_FEATURE
+#ifdef CAPTIVE_PORTAL_FEATURE
 #include <DNSServer.h>
 const byte DNS_PORT = 53;
 DNSServer dnsServer;
-#endif
+#endif //CAPTIVE_PORTAL_FEATURE
 
 //embedded response file if no files on SPIFFS
 #include "nofile.h"
@@ -73,7 +67,7 @@ typedef enum {
     UPLOAD_STATUS_ONGOING  = 4
 } upload_status_type;
 
-#ifdef ENABLE_AUTHENTICATION
+#ifdef AUTHENTICATION_FEATURE
 #define DEFAULT_ADMIN_PWD "admin"
 #define DEFAULT_USER_PWD  "user";
 #define DEFAULT_ADMIN_LOGIN  "admin"
@@ -99,7 +93,7 @@ long Web_Server::_id_connection = 0;
 uint8_t Web_Server::_upload_status = UPLOAD_STATUS_NONE;
 WebServer * Web_Server::_webserver = NULL;
 WebSocketsServer * Web_Server::_socket_server = NULL;
-#ifdef ENABLE_AUTHENTICATION
+#ifdef AUTHENTICATION_FEATURE
 auth_ip * Web_Server::_head = NULL;
 uint8_t Web_Server::_nb_ip = 0;
 #define MAX_AUTH_IP 10
@@ -131,7 +125,7 @@ bool Web_Server::begin(){
     if (penabled == 0) return false;
     //create instance
     _webserver= new WebServer(_port);
-#ifdef ENABLE_AUTHENTICATION
+#ifdef AUTHENTICATION_FEATURE
     //here the list of headers to be recorded
     const char * headerkeys[] = {"Cookie"} ;
     size_t headerkeyssize = sizeof (headerkeys) / sizeof (char*);
@@ -166,12 +160,12 @@ bool Web_Server::begin(){
     //web update
     _webserver->on ("/updatefw", HTTP_ANY, handleUpdate, WebUpdateUpload);
         
-#if ENABLED(SDSUPPORT)   
+#if defined(SDSUPPORT)   
     //Direct SD management
     _webserver->on("/upload", HTTP_ANY, handle_direct_SDFileList,SDFile_direct_upload);
 #endif
     
-#ifdef ENABLE_CAPTIVE_PORTAL
+#ifdef CAPTIVE_PORTAL_FEATURE
      if(WiFi.getMode() == WIFI_AP){
         // if DNSServer is started with "*" for domain name, it will reply with
         // provided IP to all DNS request
@@ -181,9 +175,9 @@ bool Web_Server::begin(){
         //do not forget the / at the end
         _webserver->on ("/fwlink/", HTTP_ANY, handle_root);
      }
-#endif
+#endif //CAPTIVE_PORTAL_FEATURE
     
-#ifdef ENABLE_SSDP
+#ifdef SSDP_FEATURE
     //SSDP service presentation
     if(WiFi.getMode() == WIFI_STA){
         _webserver->on ("/description.xml", HTTP_GET, handle_SSDP);
@@ -202,32 +196,32 @@ bool Web_Server::begin(){
         */
             
         //Start SSDP
-        MYSERIAL0.println("SSDP Started");
+        Esp3DCom::echo("SSDP service started");
         SSDP.begin();
     }
-#endif
-    MYSERIAL0.println("HTTP Started");
+#endif //SSDP_FEATURE
+    Esp3DCom::echo("HTTP server started");
     //start webserver
     _webserver->begin();
-#ifdef ENABLE_MDNS
+#ifdef MDNS_FEATURE
     //add mDNS
     if(WiFi.getMode() == WIFI_STA){
         MDNS.addService("http","tcp",_port);
     }
-#endif
+#endif //MDNS_FEATURE
     _setupdone = true;
    return no_error;
 }
 
 void Web_Server::end(){
     _setupdone = false;
-#ifdef ENABLE_SSDP
+#ifdef SSDP_FEATURE
     SSDP.end();
-#endif
-#ifdef ENABLE_MDNS
+#endif //SSDP_FEATURE
+#ifdef MDNS_FEATURE
     //remove mDNS
     mdns_service_remove("_http", "_tcp");
-#endif
+#endif //MDNS_FEATURE
     if (_socket_server) {
         delete _socket_server;
         _socket_server = NULL;
@@ -236,7 +230,7 @@ void Web_Server::end(){
         delete _webserver;
         _webserver = NULL;
     }
-#ifdef ENABLE_AUTHENTICATION
+#ifdef AUTHENTICATION_FEATURE
     while (_head) {
         auth_ip * current = _head;
         _head = _head->_next;
@@ -281,7 +275,7 @@ void Web_Server:: handle_not_found()
     String contentType =  getContentType(path);
     String pathWithGz = path + ".gz";
 
-#if ENABLED(SDSUPPORT)
+#if defined(SDSUPPORT)
     if ((path.substring(0,4) == "/SD/")) {
         //remove /SD
         path = path.substring(3);
@@ -328,7 +322,7 @@ void Web_Server:: handle_not_found()
         }
 
     if (page_not_found ) {
-#ifdef ENABLE_CAPTIVE_PORTAL
+#ifdef CAPTIVE_PORTAL_FEATURE
         if (WiFi.getMode()!=WIFI_STA ) {
             String content=PAGE_CAPTIVE;
             String stmp = WiFi.softAPIP().toString();
@@ -345,7 +339,7 @@ void Web_Server:: handle_not_found()
             _webserver->send(200,"text/html",content);
             return;
         }
-#endif
+#endif //CAPTIVE_PORTAL_FEATURE
         path = "/404.htm";
         contentType =  getContentType(path);
         pathWithGz =  path + ".gz";
@@ -379,7 +373,7 @@ void Web_Server:: handle_not_found()
         }
     }
 }
-#ifdef ENABLE_SSDP
+#ifdef SSDP_FEATURE
 //http SSDP xml presentation
 void Web_Server::handle_SSDP ()
 {
@@ -426,7 +420,7 @@ void Web_Server::handle_SSDP ()
     }
 }
 
-#endif
+#endif //SSDP_FEATURE
 
 //Handle web command query and send answer//////////////////////////////
 void Web_Server::handle_web_command ()
@@ -588,7 +582,7 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
             {
             if (!espresponse) return false;
             String resp = "No SD card";
-#if ENABLED(SDSUPPORT)
+#if defined(SDSUPPORT)
             ESP_SD card;
             int8_t state = card.card_status();
             if (state == -1)resp="Busy";
@@ -606,7 +600,7 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
             String defV;
             Preferences prefs;
             if (!espresponse) return false;
-#ifdef ENABLE_AUTHENTICATION
+#ifdef AUTHENTICATION_FEATURE
             if (auth_type == LEVEL_GUEST) return false;
 #endif
             int8_t vi;
@@ -793,7 +787,7 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
         //[ESP401]P=<position> T=<type> V=<value> pwd=<user/admin password>
         case 401:    
             {
-#ifdef ENABLE_AUTHENTICATION
+#ifdef AUTHENTICATION_FEATURE
             if (auth_type != LEVEL_ADMIN) return false;
 #endif
             //check validity of parameters
@@ -909,7 +903,7 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
     //[ESP410]
     case 410: {
         if (!espresponse)return false;
-#ifdef ENABLE_AUTHENTICATION
+#ifdef AUTHENTICATION_FEATURE
             if (auth_type == LEVEL_GUEST) return false;
 #endif
         espresponse->print("{\"AP_LIST\":[");
@@ -945,7 +939,7 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
         //Get ESP current status 
        case 420:
             {
-#ifdef ENABLE_AUTHENTICATION
+#ifdef AUTHENTICATION_FEATURE
             if (auth_type == LEVEL_GUEST) return false;
 #endif
             if (!espresponse)return false;
@@ -1146,17 +1140,14 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
          //[ESP444]<cmd>
       case 444:
             parameter = get_param(cmd_params,"", true);
-#ifdef ENABLE_AUTHENTICATION
+#ifdef AUTHENTICATION_FEATURE
             if (auth_type != LEVEL_ADMIN) {
                 response = false;
             } else
 #endif
             {
                 if (parameter=="RESTART") {
-                 MYSERIAL0.println("Restart ongoing");
-#if NUM_SERIAL > 1
-                 MYSERIAL1.println("Restart ongoing");
-#endif
+                 Esp3DCom::echo("Restart ongoing");
                  wifi_config.restart_ESP();
                 } else response = false;
             }
@@ -1166,7 +1157,7 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
                  if (espresponse)espresponse->println ("ok");
             }
             break;
-#ifdef ENABLE_AUTHENTICATION
+#ifdef AUTHENTICATION_FEATURE
     //Change / Reset user password
     //[ESP555]<password>
     case 555: {
@@ -1205,7 +1196,7 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
 #endif
     //[ESP700]<filename>
     case 700: { //read local file
-#ifdef ENABLE_AUTHENTICATION
+#ifdef AUTHENTICATION_FEATURE
             if (auth_type == LEVEL_GUEST) return false;
 #endif
         cmd_params.trim() ;
@@ -1260,11 +1251,11 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
     //Format SPIFFS
     //[ESP710]FORMAT pwd=<admin password>
     case 710:
-#ifdef ENABLE_AUTHENTICATION
+#ifdef AUTHENTICATION_FEATURE
             if (auth_type != LEVEL_ADMIN) return false;
 #endif
         parameter = get_param (cmd_params, "", true);
-#ifdef ENABLE_AUTHENTICATION
+#ifdef AUTHENTICATION_FEATURE
         if (auth_type != LEVEL_ADMIN) {
             espresponse->println ("error");
             response = false;
@@ -1291,13 +1282,13 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
             resp = "FW version:";
             resp += SHORT_BUILD_VERSION;
             resp += " # FW target:marlin-embedded  # FW HW:";
-            #if ENABLED(SDSUPPORT)
+            #if defined(SDSUPPORT)
             resp += "Direct SD";
             #else
             resp += "No SD";
             #endif
             resp += "  # primary sd:/sd # secondary sd:none # authentication:";
-            #ifdef ENABLE_AUTHENTICATION
+            #ifdef AUTHENTICATION_FEATURE
             resp += "yes";
             #else
             resp += "no";
@@ -1321,7 +1312,7 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
 //login status check
 void Web_Server::handle_login()
 {
-#ifdef ENABLE_AUTHENTICATION
+#ifdef AUTHENTICATION_FEATURE
     String smsg;
     String sUser,sPassword;
     String auths;
@@ -1683,10 +1674,7 @@ void Web_Server::SPIFFSFileupload ()
     //Guest cannot upload - only admin
     if (auth_level == LEVEL_GUEST) {
         _upload_status = UPLOAD_STATUS_CANCELLED;
-        MYSERIAL0.println("Upload rejected");
-#if NUM_SERIAL > 1
-        MYSERIAL1.println("Upload rejected");
-#endif
+        Esp3DCom::echo("Upload rejected");
         _webserver->client().stop();
         return;
     }
@@ -1721,10 +1709,7 @@ void Web_Server::SPIFFSFileupload ()
         } else {
             //if no set cancel flag
             _upload_status=UPLOAD_STATUS_CANCELLED;
-            MYSERIAL0.println("Upload error");
-#if NUM_SERIAL > 1
-            MYSERIAL1.println("Upload error");
-#endif
+            Esp3DCom::echo("Upload error");
             _webserver->client().stop();
         }
         //Upload write
@@ -1742,10 +1727,7 @@ void Web_Server::SPIFFSFileupload ()
                 SPIFFS.remove (filename);
             }
             _webserver->client().stop();
-            MYSERIAL0.println("Upload error");
-#if NUM_SERIAL > 1
-            MYSERIAL1.println("Upload error");
-#endif
+            Esp3DCom::echo("Upload error");
         }
         //Upload end
         //**************
@@ -1768,10 +1750,7 @@ void Web_Server::SPIFFSFileupload ()
             if (_upload_status == UPLOAD_STATUS_ONGOING) {
                 _upload_status = UPLOAD_STATUS_SUCCESSFUL;
             } else {
-                MYSERIAL0.println("Upload error");
-#if NUM_SERIAL > 1
-                MYSERIAL1.println("Upload error");
-#endif
+                Esp3DCom::echo("Upload error");
             }
         } else {
             //we have a problem set flag UPLOAD_STATUS_CANCELLED
@@ -1780,10 +1759,7 @@ void Web_Server::SPIFFSFileupload ()
             if (SPIFFS.exists (filename) ) {
                 SPIFFS.remove (filename);
                 }
-            MYSERIAL0.println("Upload error");
-#if NUM_SERIAL > 1
-            MYSERIAL1.println("Upload error");
-#endif
+            Esp3DCom::echo("Upload error");
         }
         //Upload cancelled
         //**************
@@ -1795,10 +1771,7 @@ void Web_Server::SPIFFSFileupload ()
             if (SPIFFS.exists (filename) ) {
                 SPIFFS.remove (filename);
             }
-            MYSERIAL0.println("Upload error");
-#if NUM_SERIAL > 1
-            MYSERIAL1.println("Upload error");
-#endif
+            Esp3DCom::echo("Upload error");
     }
     wifi_config.wait(0);
 }
@@ -1835,11 +1808,8 @@ void Web_Server::WebUpdateUpload ()
     //only admin can update FW
     if (is_authenticated() != LEVEL_ADMIN) {
         _upload_status = UPLOAD_STATUS_CANCELLED;
-       _webserver->client().stop();
-        MYSERIAL0.println("Upload rejected");
-#if NUM_SERIAL > 1
-        MYSERIAL1.println("Upload rejected");
-#endif
+        _webserver->client().stop();
+        Esp3DCom::echo("Upload rejected");
         return;
     }
     
@@ -1848,10 +1818,7 @@ void Web_Server::WebUpdateUpload ()
     //Upload start
     //**************
     if(upload.status == UPLOAD_FILE_START) {
-        MYSERIAL0.println("Update Firmware");
-#if NUM_SERIAL > 1
-        MYSERIAL1.println("Update Firmware");
-#endif
+        Esp3DCom::echo("Update Firmware");
         _upload_status= UPLOAD_STATUS_ONGOING;
 
         //Not sure can do OTA on 2Mb board
@@ -1859,17 +1826,11 @@ void Web_Server::WebUpdateUpload ()
         last_upload_update = 0;
         if(!Update.begin(maxSketchSpace)) { //start with max available size
             _upload_status=UPLOAD_STATUS_CANCELLED;
-            MYSERIAL0.println("Update cancelled");
-#if NUM_SERIAL > 1
-            MYSERIAL1.println("Update cancelled");
-#endif
+            Esp3DCom::echo("Update cancelled");
             _webserver->client().stop();
             return;
         } else {
-            MYSERIAL0.println("Update 0%");
-#if NUM_SERIAL > 1
-            MYSERIAL1.println("Update 0%");
-#endif
+            Esp3DCom::echo("Update 0%");
         }
         //Upload write
         //**************
@@ -1882,10 +1843,7 @@ void Web_Server::WebUpdateUpload ()
                 String s = "Update ";
                 s+= String(last_upload_update);
                 s+="%";
-                MYSERIAL0.println(s.c_str());
-#if NUM_SERIAL > 1
-                MYSERIAL1.println(s.c_str());
-#endif
+                Esp3DCom::echo(s.c_str());
             }
             if(Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
                 _upload_status=UPLOAD_STATUS_CANCELLED;
@@ -1896,17 +1854,11 @@ void Web_Server::WebUpdateUpload ()
     } else if(upload.status == UPLOAD_FILE_END) {
         if(Update.end(true)) { //true to set the size to the current progress
             //Now Reboot
-            MYSERIAL0.println("Update 100%");
-#if NUM_SERIAL > 1
-            MYSERIAL1.println("Update 100%");
-#endif
+            Esp3DCom::echo("Update 100%");
             _upload_status=UPLOAD_STATUS_SUCCESSFUL;
         }
     } else if(upload.status == UPLOAD_FILE_ABORTED) {
-        MYSERIAL0.println("Update failed");
-#if NUM_SERIAL > 1
-        MYSERIAL1.println("Update failed");
-#endif
+        Esp3DCom::echo("Update failed");
         Update.end();
         _upload_status=UPLOAD_STATUS_CANCELLED;
     }
@@ -1914,7 +1866,7 @@ void Web_Server::WebUpdateUpload ()
 }
 
 
-#if ENABLED(SDSUPPORT)
+#if defined(SDSUPPORT)
 
 //direct SD files list//////////////////////////////////////////////////
 void Web_Server::handle_direct_SDFileList()
@@ -2106,10 +2058,7 @@ void Web_Server::SDFile_direct_upload()
         upload_filename=  sdfile.makepath83(upload_filename);
         if ( sdfile.card_status() != 1) {
             _upload_status=UPLOAD_STATUS_CANCELLED;
-            MYSERIAL0.println("Upload cancelled");
-#if NUM_SERIAL > 1
-            MYSERIAL1.println("Upload cancelled");
-#endif
+            Esp3DCom::echo("Upload cancelled");
            _webserver->client().stop();
             return;
         }
@@ -2119,10 +2068,7 @@ void Web_Server::SDFile_direct_upload()
         
         if (sdfile.isopen())sdfile.close();
         if (!sdfile.open (upload_filename.c_str(),false)) {
-            MYSERIAL0.println("Upload cancelled");
-#if NUM_SERIAL > 1
-            MYSERIAL1.println("Upload cancelled");
-#endif
+            Esp3DCom::echo("Upload cancelled");
             _webserver->client().stop();
             _upload_status = UPLOAD_STATUS_FAILED;
             return ;
@@ -2135,10 +2081,7 @@ void Web_Server::SDFile_direct_upload()
         //we need to check SD is inside
         if ( sdfile.card_status() != 1) {
                 sdfile.close();
-               MYSERIAL0.println("Upload failed");
-    #if NUM_SERIAL > 1
-                MYSERIAL1.println("Upload failed");
-    #endif
+               Esp3DCom::echo("Upload failed");
             if (sdfile.exists (upload_filename.c_str()) ) {
                     sdfile.remove (upload_filename.c_str());
                 } 
@@ -2158,10 +2101,7 @@ void Web_Server::SDFile_direct_upload()
             String  sizeargname  = upload.filename + "S";
             if (_webserver->hasArg (sizeargname.c_str()) ) {
                 if (_webserver->arg (sizeargname.c_str()) != String(filesize)) {
-                    MYSERIAL0.println("Upload failed");
-    #if NUM_SERIAL > 1
-                    MYSERIAL1.println("Upload failed");
-    #endif
+                    Esp3DCom::echo("Upload failed");
                     _upload_status = UPLOAD_STATUS_FAILED;
                     }
                 } 
@@ -2170,11 +2110,7 @@ void Web_Server::SDFile_direct_upload()
             }
     } else {//Upload cancelled
         _upload_status=UPLOAD_STATUS_FAILED;
-
-        MYSERIAL0.println("Upload failed");
-#if NUM_SERIAL > 1
-        MYSERIAL1.println("Upload failed");
-#endif
+        Esp3DCom::echo("Upload failed");
         _webserver->client().stop();
         sdfile.close();
         if (sdfile.exists (upload_filename.c_str()) ) {
@@ -2187,11 +2123,11 @@ void Web_Server::SDFile_direct_upload()
 
 void Web_Server::handle(){
 static uint32_t timeout = millis();
-#ifdef ENABLE_CAPTIVE_PORTAL
+#ifdef CAPTIVE_PORTAL_FEATURE
     if(WiFi.getMode() == WIFI_AP){
         dnsServer.processNextRequest();
     }
-#endif
+#endif //CAPTIVE_PORTAL_FEATURE
     if (_webserver)_webserver->handleClient();
     if (_socket_server && _setupdone) {
         Serial2Socket.handle_flush();
@@ -2331,7 +2267,7 @@ String Web_Server::getContentType (String filename)
 //check authentification
 level_authenticate_type Web_Server::is_authenticated()
 {
-#ifdef ENABLE_AUTHENTICATION
+#ifdef AUTHENTICATION_FEATURE
     if (_webserver->hasHeader ("Cookie") ) {
         String cookie = _webserver->header ("Cookie");
         int pos = cookie.indexOf ("ESPSESSIONID=");
@@ -2349,7 +2285,7 @@ level_authenticate_type Web_Server::is_authenticated()
 #endif
 }
 
-#ifdef ENABLE_AUTHENTICATION
+#ifdef AUTHENTICATION_FEATURE
 
 bool Web_Server::isLocalPasswordValid (const char * password)
 {
@@ -2560,8 +2496,4 @@ void ESPResponseStream::flush(){
 
 }
 
-#endif // Enable HTTP
-
-#endif // ENABLE_WIFI
-
-#endif // ARDUINO_ARCH_ESP32
+#endif // ESP3D_WIFISUPPORT && HTTP_FEATURE

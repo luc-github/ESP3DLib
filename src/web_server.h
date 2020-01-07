@@ -34,7 +34,7 @@ typedef enum {
     LEVEL_ADMIN = 2
 } level_authenticate_type;
 
-#ifdef ENABLE_AUTHENTICATION
+#ifdef AUTHENTICATION_FEATURE
 struct auth_ip {
     IPAddress ip;
     level_authenticate_type level;
@@ -83,7 +83,7 @@ class Web_Server {
     static String getContentType (String filename);
     static String get_Splited_Value(String data, char separator, int index);
     static level_authenticate_type  is_authenticated();
-#ifdef ENABLE_AUTHENTICATION
+#ifdef AUTHENTICATION_FEATURE
     static auth_ip * _head;
     static uint8_t _nb_ip;
     static bool AddAuthIP (auth_ip * item);
@@ -95,9 +95,9 @@ class Web_Server {
 #endif
     static String get_param (String & cmd_params, const char * id, bool withspace);
     static bool execute_internal_command (int cmd, String cmd_params, level_authenticate_type auth_level,  ESPResponseStream  *espresponse);
-#ifdef ENABLE_SSDP
+#ifdef SSDP_FEATURE
     static void handle_SSDP ();
-#endif
+#endif //SSDP_FEATURE
     static void handle_root();
     static void handle_login();
     static void handle_not_found ();
@@ -108,7 +108,7 @@ class Web_Server {
     static void handleFileList ();
     static void handleUpdate ();
     static void WebUpdateUpload ();
-#if ENABLED(SDSUPPORT)
+#if defined(SDSUPPORT)
     static void handle_direct_SDFileList();
     static void SDFile_direct_upload();
 #endif

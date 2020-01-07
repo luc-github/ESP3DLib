@@ -19,10 +19,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
- 
-#ifdef ARDUINO_ARCH_ESP32
-#include "esplibconfig.h"
-#if ENABLED(SDSUPPORT) && ENABLED(ESP3D_WIFISUPPORT)
+#include "esp3dlibconfig.h"
+#if defined(SDSUPPORT) && defined(ESP3D_WIFISUPPORT)
 #include MARLIN_PATH(sd/cardreader.h)
 #include MARLIN_PATH(sd/SdVolume.h)
 #include MARLIN_PATH(sd/SdFatStructs.h)
@@ -295,6 +293,5 @@ bool SD_file_timestamp(const char * path, uint8_t flag, uint16_t year, uint8_t m
                  uint8_t hour, uint8_t minute, uint8_t second){
 }**/
 
-#endif
+#endif// SDSUPPORT && ESP3D_WIFISUPPORT
 
-#endif

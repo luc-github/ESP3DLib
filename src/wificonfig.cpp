@@ -18,16 +18,15 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifdef ARDUINO_ARCH_ESP32
+#include "esp3dlibconfig.h"
 
-#include "esplibconfig.h"
-
-#if ENABLED(ESP3D_WIFISUPPORT)
+#if defined(ESP3D_WIFISUPPORT)
 #include <WiFi.h>
 #include <esp_wifi.h>
 #include <ESPmDNS.h>
 #include <FS.h>
 #include <SPIFFS.h>
+#include "espcom.h"
 #include <Preferences.h>
 #include "wificonfig.h"
 #include "wifiservices.h"
@@ -190,11 +189,11 @@ void WiFiConfig::WiFiEvent(WiFiEvent_t event)
  switch (event)
     {
     case SYSTEM_EVENT_STA_GOT_IP:
-        MYSERIAL0.println ("Connected");
-        MYSERIAL0.println(WiFi.localIP());
+        Esp3DCom::echo ("Connected");
+        Esp3DCom::echo(WiFi.localIP().toString().c_str());
         break;
     case SYSTEM_EVENT_STA_DISCONNECTED:
-        MYSERIAL0.println("WiFi lost connection");
+        Esp3DCom::echo("WiFi lost connection");
         break;
     default:
         break;
@@ -245,7 +244,7 @@ bool WiFiConfig::ConnectSTA2AP(){
                 dot++;
                 break;
         }
-        MYSERIAL0.println(msg.c_str());
+        Esp3DCom::echo(msg.c_str());
         wait (500);
         count++;
         status = WiFi.status();
@@ -296,11 +295,12 @@ bool WiFiConfig::StartSTA(){
         WiFi.config(ip, gateway,mask);
     }
     if (WiFi.begin(SSID.c_str(), (password.length() > 0)?password.c_str():NULL)){
-        MYSERIAL0.print("\nClient Started\nConnecting ");
-        MYSERIAL0.println(SSID.c_str());
+        Esp3DCom::echo("WiFi station started");
+        SSID = "Connecting " + SSID;
+        Esp3DCom::echo(SSID.c_str());
         return ConnectSTA2AP();
     } else {
-        MYSERIAL0.println("\nStarting client failed");
+        Esp3DCom::echo("Starting station failed");
         return false;
     }
 }
@@ -345,11 +345,11 @@ bool WiFiConfig::StartAP(){
     WiFi.softAPConfig(ip, ip, mask);
     //Start AP
     if(WiFi.softAP(SSID.c_str(), (password.length() > 0)?password.c_str():NULL, channel)) {
-        MYSERIAL0.print("\nAP Started ");
-        MYSERIAL0.println(WiFi.softAPIP().toString());
+        Esp3DCom::echo("AP started ");
+        Esp3DCom::echo(WiFi.softAPIP().toString().c_str());
         return true;
     } else {
-        MYSERIAL0.println("\nStarting AP failed");
+        Esp3DCom::echo("Starting AP failed");
         return false;
     }
 }
@@ -364,7 +364,7 @@ void WiFiConfig::StopWiFi(){
     if((WiFi.getMode() == WIFI_AP) || (WiFi.getMode() == WIFI_AP_STA))WiFi.softAPdisconnect(true);
     wifi_services.end();
     WiFi.mode(WIFI_OFF);
-    MYSERIAL0.println("\nWiFi Off");
+    Esp3DCom::echo("WiFi Off");
 }
 
 /**
@@ -386,7 +386,7 @@ void WiFiConfig::begin() {
        wifi_services.begin();
    } else if (wifiMode == ESP_WIFI_STA){
        if(!StartSTA()){
-           MYSERIAL0.println("\nCannot connect to AP");
+           Esp3DCom::echo("Cannot connect to AP");
            StartAP();
        }
        //start services
@@ -425,5 +425,3 @@ void WiFiConfig::handle() {
 
 
 #endif // ENABLE_WIFI
-
-#endif // ARDUINO_ARCH_ESP32

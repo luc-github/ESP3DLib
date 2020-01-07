@@ -24,11 +24,12 @@
     Main author: luc lebosse
 
 */
-#include "esplibconfig.h"
+#include "esp3dlibconfig.h"
 
-#if ENABLED(ESP3D_WIFISUPPORT)
+#if defined(ESP3D_WIFISUPPORT)
 #include "esp3dlib.h"
 #include "wificonfig.h"
+
 #include MARLIN_PATH(core/serial.h)
 
 Esp3DLib esp3dlib;
@@ -69,8 +70,7 @@ bool Esp3DLib::parse(char * cmd)
 {
 	String scmd = cmd;
 	if (scmd.startsWith("[ESP")) {
-		SERIAL_ECHO_START();
-		SERIAL_ECHOLNPAIR("it is ESP command:", cmd);
+		
 		return true;
 	} else {
 		return false;

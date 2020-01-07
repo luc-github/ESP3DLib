@@ -1,5 +1,5 @@
 /*
-  esp3dlibconfig.h -  esp3dlib functions class
+  espcom.h - esp3d communication serial/tcp/etc... class
 
   Copyright (c) 2014 Luc Lebosse. All rights reserved.
 
@@ -18,13 +18,12 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-//config reference
-#define XSTR_(M) #M
-#define XSTR(M) XSTR_(M)
-#define MARLIN_PATH(PATH) XSTR(../../../../../Marlin/src/PATH)
-#include MARLIN_PATH(inc/MarlinConfigPre.h)
-#undef DISABLED
-#undef _BV
-#include MARLIN_PATH(HAL/HAL_ESP32/FlushableHardwareSerial.h)
-#define MYSERIAL0 flushableSerial
+#ifndef ESPCOM_H
+#define ESPCOM_H
 
+class Esp3DCom
+{
+public:
+    static void echo(const char * data);
+};
+#endif //ESPCOM_H
