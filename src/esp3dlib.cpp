@@ -30,17 +30,15 @@
 #include "esp3dlib.h"
 #include "wificonfig.h"
 
-#include MARLIN_PATH(core/serial.h)
-
 Esp3DLib esp3dlib;
 
 void WiFiTaskfn( void * parameter )
 {
-    wifi_config.wait(100);  // Yield to other tasks
+    Esp3DLibConfig::wait(100);  // Yield to other tasks
     WiFiConfig::begin();
     for(;;) {
-        wifi_config.handle();
-        wifi_config.wait(0);  // Yield to other tasks
+        WiFiConfig::handle();
+        Esp3DLibConfig::wait(0);  // Yield to other tasks
     }
     vTaskDelete( NULL );
 }

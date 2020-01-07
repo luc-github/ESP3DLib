@@ -81,4 +81,14 @@
 #define ESP_SAVE_ONLY 0
 #define ESP_APPLY_NOW 1
 
-
+#ifndef ESP3DLIBCONFIG_H
+#define ESP3DLIBCONFIG_H
+class Esp3DLibConfig {
+public:
+    static void wait(uint32_t milliseconds);
+    static void restart_ESP();
+    static void handle();
+private:
+	static bool restart_ESP_module;
+};
+#endif //ESP3DLIBCONFIG_H

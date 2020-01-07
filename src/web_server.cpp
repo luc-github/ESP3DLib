@@ -294,7 +294,7 @@ void Web_Server:: handle_not_found()
                     while(len > 0) {
                         c.write(buf, len);
                         len = SD_card.read( buf, 1200);
-                        wifi_config.wait(0);   
+                        Esp3DLibConfig::wait(0);   
                         handle();             
                     }
                   SD_card.close(); 
@@ -707,7 +707,7 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
             espresponse->print ("{\"F\":\"network\",\"P\":\"");
             espresponse->print (STA_IP_ENTRY);
             espresponse->print ("\",\"T\":\"A\",\"V\":\"");
-            espresponse->print (wifi_config.IP_string_from_int(prefs.getInt(STA_IP_ENTRY, 0)).c_str());
+            espresponse->print (WiFiConfig::IP_string_from_int(prefs.getInt(STA_IP_ENTRY, 0)).c_str());
             espresponse->print ("\",\"H\":\"Station Static IP\"}");
             espresponse->print (",");
 
@@ -715,7 +715,7 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
             espresponse->print ("{\"F\":\"network\",\"P\":\"");
             espresponse->print (STA_GW_ENTRY);
             espresponse->print ("\",\"T\":\"A\",\"V\":\"");
-            espresponse->print (wifi_config.IP_string_from_int(prefs.getInt(STA_GW_ENTRY, 0)).c_str());
+            espresponse->print (WiFiConfig::IP_string_from_int(prefs.getInt(STA_GW_ENTRY, 0)).c_str());
             espresponse->print ("\",\"H\":\"Station Static Gateway\"}");
             espresponse->print (",");
 
@@ -723,7 +723,7 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
             espresponse->print ("{\"F\":\"network\",\"P\":\"");
             espresponse->print (STA_MK_ENTRY);
             espresponse->print ("\",\"T\":\"A\",\"V\":\"");
-            espresponse->print (wifi_config.IP_string_from_int(prefs.getInt(STA_MK_ENTRY, 0)).c_str());
+            espresponse->print (WiFiConfig::IP_string_from_int(prefs.getInt(STA_MK_ENTRY, 0)).c_str());
             espresponse->print ("\",\"H\":\"Station Static Mask\"}");
             espresponse->print (",");
             
@@ -757,7 +757,7 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
             espresponse->print (AP_IP_ENTRY);
             espresponse->print ("\",\"T\":\"A\",\"V\":\"");
             defV = DEFAULT_AP_IP;
-            espresponse->print (wifi_config.IP_string_from_int(prefs.getInt(AP_IP_ENTRY, wifi_config.IP_int_from_string(defV))).c_str());
+            espresponse->print (WiFiConfig::IP_string_from_int(prefs.getInt(AP_IP_ENTRY, WiFiConfig::IP_int_from_string(defV))).c_str());
             espresponse->print ("\",\"H\":\"AP Static IP\"}");
             espresponse->print (",");
             
@@ -871,7 +871,7 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
                 }
                 //IP address
                 if (styp == "A") {
-                    if (prefs.putInt(spos.c_str(), wifi_config.IP_int_from_string(sval)) == 0) {
+                    if (prefs.putInt(spos.c_str(), WiFiConfig::IP_int_from_string(sval)) == 0) {
                         response = false;
                     } else {
                         if (spos == STA_IP_ENTRY){
@@ -916,7 +916,7 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
                 espresponse->print ("{\"SSID\":\"");
                 espresponse->print (WiFi.SSID (i).c_str());
                 espresponse->print ("\",\"SIGNAL\":\"");
-                espresponse->print (String(wifi_config.getSignal (WiFi.RSSI (i) )).c_str());
+                espresponse->print (String(WiFiConfig::getSignal (WiFi.RSSI (i) )).c_str());
                 espresponse->print ("\",\"IS_PROTECTED\":\"");
                 
                 if (WiFi.encryptionType (i) == WIFI_AUTH_OPEN) {
@@ -925,7 +925,7 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
                     espresponse->print ("1");
                 }
                 espresponse->print ("\"}");
-                wifi_config.wait(0); 
+                Esp3DLibConfig::wait(0); 
                 }
             WiFi.scanDelete(); 
             }
@@ -1010,7 +1010,7 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
                      espresponse->print (WiFi.SSID().c_str());
                      espresponse->print ("\n");
                      espresponse->print ("Signal: ");
-                     espresponse->print ( String(wifi_config.getSignal (WiFi.RSSI())).c_str());
+                     espresponse->print ( String(WiFiConfig::getSignal (WiFi.RSSI())).c_str());
                      espresponse->print ("%");
                      espresponse->print ("\n");
                      uint8_t PhyMode;
@@ -1148,7 +1148,7 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
             {
                 if (parameter=="RESTART") {
                  Esp3DCom::echo("Restart ongoing");
-                 wifi_config.restart_ESP();
+                 Esp3DLibConfig::restart_ESP();
                 } else response = false;
             }
             if (!response) {
@@ -1235,9 +1235,9 @@ bool Web_Server::execute_internal_command (int cmd, String cmd_params, level_aut
                             Serial2Socket.push(currentline.c_str());
                             //GCodeQueue::enqueue_one_now(currentline.c_str());
                         }
-                        wifi_config.wait (1);
+                        Esp3DLibConfig::wait (1);
                     }
-                wifi_config.wait (1);
+                Esp3DLibConfig::wait (1);
                 }
             }
             currentfile.close();
@@ -1773,7 +1773,7 @@ void Web_Server::SPIFFSFileupload ()
             }
             Esp3DCom::echo("Upload error");
     }
-    wifi_config.wait(0);
+    Esp3DLibConfig::wait(0);
 }
 
 //Web Update handler 
@@ -1793,8 +1793,8 @@ void Web_Server::handleUpdate ()
     _webserver->send(200, "application/json", jsonfile);
     //if success restart
     if (_upload_status == UPLOAD_STATUS_SUCCESSFUL) {
-        wifi_config.wait(1000);
-        wifi_config.restart_ESP();
+        Esp3DLibConfig::wait(1000);
+        Esp3DLibConfig::restart_ESP();
     } else {
         _upload_status = UPLOAD_STATUS_NONE;
     }
@@ -1862,7 +1862,7 @@ void Web_Server::WebUpdateUpload ()
         Update.end();
         _upload_status=UPLOAD_STATUS_CANCELLED;
     }
-    wifi_config.wait(0);
+    Esp3DLibConfig::wait(0);
 }
 
 
@@ -2002,7 +2002,7 @@ void Web_Server::handle_direct_SDFileList()
             //TODO datatime
             jsonfile+="\"}";
             i++;
-            wifi_config.wait(1);
+            Esp3DLibConfig::wait(1);
         }
         jsonfile+="],\"path\":\"";
         jsonfile+=path + "\",";
@@ -2117,7 +2117,7 @@ void Web_Server::SDFile_direct_upload()
             sdfile.remove (upload_filename.c_str());
         } 
     }
-    wifi_config.wait(0);
+    Esp3DLibConfig::wait(0);
 }
 #endif
 

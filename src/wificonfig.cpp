@@ -31,25 +31,6 @@
 #include "wificonfig.h"
 #include "wifiservices.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-esp_err_t esp_task_wdt_reset();
-#ifdef __cplusplus
-}
-#endif
-
-WiFiConfig wifi_config;
-
-bool WiFiConfig::restart_ESP_module = false;
-
-WiFiConfig::WiFiConfig(){
-}
-    
-WiFiConfig::~WiFiConfig(){
-    end();
-}
-
 /**
  * Helper to convert  IP string to int
  */
@@ -141,19 +122,6 @@ bool WiFiConfig::isValidIP(const char * string){
     return ip.fromString(string);
 }
 
-/*
- * delay is to avoid with asyncwebserver and may need to wait sometimes
- */
-void WiFiConfig::wait(uint32_t milliseconds){
-    uint32_t timeout = millis();
-    vTaskDelay(1 / portTICK_RATE_MS);  // Yield to other tasks
-    esp_task_wdt_reset(); //for a wait 0;
-    //wait feeding WDT
-    while ( (millis() - timeout) < milliseconds) {
-       esp_task_wdt_reset();
-       vTaskDelay(1 / portTICK_RATE_MS);  // Yield to other tasks
-    }
-}
 
 /**
  * WiFi events 
@@ -245,7 +213,7 @@ bool WiFiConfig::ConnectSTA2AP(){
                 break;
         }
         Esp3DCom::echo(msg.c_str());
-        wait (500);
+        Esp3DLibConfig::wait (500);
         count++;
         status = WiFi.status();
      }
@@ -401,23 +369,13 @@ void WiFiConfig::end() {
     StopWiFi();
 }
 
-/**
- * Restart ESP
- */
-void WiFiConfig::restart_ESP(){
-    restart_ESP_module=true;
-}
 
 /**
  * Handle not critical actions that must be done in sync environement
  */
 void WiFiConfig::handle() {
     //in case of restart requested
-    if (restart_ESP_module) {
-        end();
-        ESP.restart();
-        while (1) {};
-    }
+     Esp3DLibConfig::handle();
     
     //Services
     wifi_services.handle();

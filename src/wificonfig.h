@@ -70,9 +70,6 @@
 
 class WiFiConfig {
 public:
-    WiFiConfig();
-    ~WiFiConfig();
-    static void wait(uint32_t milliseconds);
     static bool isValidIP(const char * string);
     static bool isPasswordValid (const char * password);
     static bool isSSIDValid (const char * ssid);
@@ -87,14 +84,9 @@ public:
     static void begin();
     static void end();
     static void handle();
-    static void restart_ESP();
-
     private :
     static bool ConnectSTA2AP();
     static void WiFiEvent(WiFiEvent_t event);
-    static bool restart_ESP_module;
 };
-
-extern WiFiConfig wifi_config;
 
 #endif

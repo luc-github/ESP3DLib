@@ -20,5 +20,47 @@
 
 #include "esp3dlibconfig.h"
 #if defined(ESP3D_WIFISUPPORT)
+#include <Arduino.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+esp_err_t esp_task_wdt_reset();
+#ifdef __cplusplus
+}
+#endif
+
+bool Esp3DLibConfig::restart_ESP_module = false;
+
+/*
+ * delay is to avoid sometimes and may not enough neither
+ */
+void Esp3DLibConfig::wait(uint32_t milliseconds){
+    uint32_t timeout = millis();
+    vTaskDelay(1 / portTICK_RATE_MS);  // Yield to other tasks
+    esp_task_wdt_reset(); //for a wait 0;
+    //wait feeding WDT
+    while ( (millis() - timeout) < milliseconds) {
+       esp_task_wdt_reset();
+       vTaskDelay(1 / portTICK_RATE_MS);  // Yield to other tasks
+    }
+}
+
+/**
+ * Restart ESP
+ */
+void Esp3DLibConfig::restart_ESP(){
+    restart_ESP_module=true;
+}
+
+/**
+ * Handle not critical actions that must be done in sync environement
+ */
+void Esp3DLibConfig::handle() {
+    //in case of restart requested
+    if (restart_ESP_module) {
+        ESP.restart();
+        while (1) {};
+    }
+}
 
 #endif // ESP3D_WIFISUPPORT
