@@ -29,7 +29,8 @@
 #if defined(ESP3D_WIFISUPPORT)
 #include "esp3dlib.h"
 #include "wificonfig.h"
-
+#include "espcom.h"
+#include "command.h"
 Esp3DLib esp3dlib;
 
 void WiFiTaskfn( void * parameter )
@@ -67,9 +68,27 @@ void Esp3DLib::init()
 bool Esp3DLib::parse(char * cmd)
 {
 	String scmd = cmd;
-	if (scmd.startsWith("[ESP")) {
-		
-		return true;
+	int ESPpos = scmd.indexOf ("[ESP");
+    if (ESPpos > -1) {
+		int ESPpos2 = scmd.indexOf("]",ESPpos);
+        if (ESPpos2>-1) {
+            //Split in command and parameters
+            String cmd_part1=scmd.substring(ESPpos+4,ESPpos2);
+            String cmd_part2="";
+            //is there space for parameters?
+            if (ESPpos2<scmd.length()) {
+                cmd_part2=scmd.substring(ESPpos2+1);
+            }
+            //if command is a valid number then execute command
+            if(cmd_part1.toInt() >=0) {
+                ESPResponseStream response(SERIAL_PIPE); 
+                level_authenticate_type auth_type = LEVEL_ADMIN; //we do not care serial authentication
+                COMMAND::execute_internal_command (cmd_part1.toInt(), cmd_part2, auth_type,  &response);
+                return true;
+            } else {
+				return false;
+			}
+		} else return false;
 	} else {
 		return false;
 	}

@@ -21,16 +21,107 @@
 #include "esp3dlibconfig.h"
 
 #if defined(ESP3D_WIFISUPPORT)
-
 #include MARLIN_PATH(HAL/HAL_ESP32/FlushableHardwareSerial.h)
 #include MARLIN_PATH(HAL/HAL_ESP32/HAL.h)
 #include "espcom.h"
-
+#if defined(HTTP_FEATURE)
+//#include "web_server.h"
+#include <WebServer.h>
+#endif //HTTP_FEATURE
 void Esp3DCom::echo(const char * data)
 {
 	SERIAL_ECHO_START();
 	SERIAL_ECHOLNPAIR("", data);
 }
+long ESPResponseStream::baudRate()
+{
+	long br = flushableSerial.baudRate();
+	//workaround for ESP32
+	if (br == 115201) {
+		br = 115200;
+	}
+	if (br == 230423) {
+		br = 230400;
+	}
+	return br;
+}
+#if defined(HTTP_FEATURE)
+ESPResponseStream::ESPResponseStream(WebServer * webserver){
+    _header_sent=false;
+    _webserver = webserver;
+    _pipe = WEB_PIPE;
+}
+#endif //HTTP_FEATURE
+ESPResponseStream::ESPResponseStream(tpipe pipe){
+	_pipe = pipe;
+}
 
+void ESPResponseStream::println(const char *data){
+    print(data);
+    print("\n");
+}
+
+void ESPResponseStream::print(const char *data){
+#if defined(HTTP_FEATURE)
+	if (_pipe == WEB_PIPE){
+		if (!_header_sent) {
+			 _webserver->setContentLength(CONTENT_LENGTH_UNKNOWN);
+			 _webserver->sendHeader("Content-Type","text/html");
+			 _webserver->sendHeader("Cache-Control","no-cache");
+			 _webserver->send(200);
+			 _header_sent = true;
+			}
+		_buffer+=data;
+		if (_buffer.length() > 1200) {
+			//send data
+			_webserver->sendContent(_buffer);
+			//reset buffer
+			_buffer = "";
+		}
+	}
+#endif //HTTP_FEATURE
+	if (_pipe == SERIAL_PIPE) {
+		SERIAL_ECHOPAIR_F("", data);
+	}
+}
+
+void ESPResponseStream::flush(){
+#if defined(HTTP_FEATURE)
+	if (_pipe == WEB_PIPE){
+		if(_header_sent) {
+			//send data
+			if(_buffer.length() > 0)_webserver->sendContent(_buffer);
+			//close connection
+			_webserver->sendContent("");
+			}
+		_header_sent = false;
+		_buffer = "";
+	}
+#endif //HTTP_FEATURE
+}
+
+//just simple helper to convert mac address to string
+char * ESPResponseStream::mac2str (uint8_t mac [8])
+{
+    static char macstr [18];
+    if (0 > sprintf (macstr, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]) ) {
+        strcpy (macstr, "00:00:00:00:00:00");
+    }
+    return macstr;
+}
+
+//helper to format size to readable string
+String ESPResponseStream::formatBytes (uint32_t bytes)
+{
+    if (bytes < 1024) {
+        return String (bytes) + " B";
+    } else if (bytes < (1024 * 1024) ) {
+        return String (bytes / 1024.0) + " KB";
+    } else if (bytes < (1024 * 1024 * 1024) ) {
+        return String (bytes / 1024.0 / 1024.0) + " MB";
+    } else {
+        return String (bytes / 1024.0 / 1024.0 / 1024.0) + " GB";
+    }
+}
 
 #endif //ESP3D_WIFISUPPORT

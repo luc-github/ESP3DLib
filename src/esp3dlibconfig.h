@@ -25,7 +25,7 @@
 #undef DISABLED
 #undef _BV
 //version
-#define LIB_VERSION "1.0.0"
+#define LIB_VERSION "0.9.0"
 
 //Editable configuration part
 
@@ -66,7 +66,7 @@
 #define STA_IP_ENTRY "STA_IP"
 #define STA_GW_ENTRY "STA_GW"
 #define STA_MK_ENTRY "STA_MK"
-#define ESP_WIFI_MODE "WIFI_MODE"
+#define ESP_RADIO_MODE "WIFI_MODE"
 #define AP_SSID_ENTRY "AP_SSID"
 #define AP_PWD_ENTRY "AP_PWD"
 #define AP_IP_ENTRY "AP_IP"
@@ -77,9 +77,47 @@
 #define TELNET_PORT_ENTRY "TELNET_PORT"
 #define STA_IP_MODE_ENTRY "STA_IP_MODE"
 
-//Switch 
-#define ESP_SAVE_ONLY 0
-#define ESP_APPLY_NOW 1
+//Wifi Mode
+#define ESP_RADIO_OFF 0
+#define ESP_WIFI_STA 1
+#define ESP_WIFI_AP  2
+
+#define DHCP_MODE   0
+#define STATIC_MODE   0
+
+//defaults values
+#define DEFAULT_HOSTNAME "marlinesp"
+#define DEFAULT_STA_SSID "MARLIN_ESP"
+#define DEFAULT_STA_PWD "12345678"
+#define DEFAULT_STA_IP "0.0.0.0"
+#define DEFAULT_STA_GW "0.0.0.0"
+#define DEFAULT_STA_MK "0.0.0.0"
+#define DEFAULT_STA_IP_MODE DHCP_MODE
+#define DEFAULT_RADIO_MODE ESP_WIFI_AP
+#define DEFAULT_AP_SSID "MARLIN_ESP"
+#define DEFAULT_AP_PWD "12345678"
+#define DEFAULT_AP_IP "192.168.0.1"
+#define DEFAULT_AP_MK "255.255.255.0"
+#define DEFAULT_AP_CHANNEL 1
+#define DEFAULT_WEBSERVER_PORT 80
+#define DEFAULT_HTTP_STATE 1
+#define HIDDEN_PASSWORD "********"
+
+//boundaries
+#define MAX_SSID_LENGTH         32
+#define MIN_SSID_LENGTH         1
+#define MAX_PASSWORD_LENGTH     64
+//min size of password is 0 or upper than 8 char
+//so let set min is 8
+#define MIN_PASSWORD_LENGTH     8
+#define MAX_HOSTNAME_LENGTH     32
+#define MIN_HOSTNAME_LENGTH     1
+#define MAX_HTTP_PORT			65001
+#define MIN_HTTP_PORT			1
+#define MAX_TELNET_PORT			65001
+#define MIN_TELNET_PORT			1
+#define MIN_CHANNEL			1
+#define MAX_CHANNEL			14
 
 #ifndef ESP3DLIBCONFIG_H
 #define ESP3DLIBCONFIG_H
@@ -88,6 +126,7 @@ public:
     static void wait(uint32_t milliseconds);
     static void restart_ESP();
     static void handle();
+    static void reset_settings();
 private:
 	static bool restart_ESP_module;
 };

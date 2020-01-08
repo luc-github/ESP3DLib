@@ -1,5 +1,5 @@
 /*
-  wificonfig.h -  wifi functions class
+  command.h - ESP3D command class
 
   Copyright (c) 2014 Luc Lebosse. All rights reserved.
 
@@ -18,33 +18,21 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-//Services that need to be used
+#ifndef COMMAND_h
+#define COMMAND_h
 #include "esp3dlibconfig.h"
+#include <Arduino.h>
+#include "espcom.h"
 
-#ifndef _WIFI_CONFIG_H
-#define _WIFI_CONFIG_H
 
-#include <WiFi.h>
-
-class WiFiConfig {
+class COMMAND
+{
 public:
-    static bool isValidIP(const char * string);
-    static bool isPasswordValid (const char * password);
-    static bool isSSIDValid (const char * ssid);
-    static bool isHostnameValid (const char * hostname);
-    static uint32_t IP_int_from_string(String & s);
-    static String IP_string_from_int(uint32_t ip_int);
-
-    static bool StartAP();
-    static bool StartSTA();
-    static void StopWiFi();
-    static int32_t getSignal (int32_t RSSI);
-    static void begin();
-    static void end();
-    static void handle();
-    private :
-    static bool ConnectSTA2AP();
-    static void WiFiEvent(WiFiEvent_t event);
+//   static bool check_command (String buffer, tpipe output, bool executecmd = true);
+    static bool execute_internal_command (int cmd, String cmd_params, level_authenticate_type auth_level,  ESPResponseStream  *espresponse);
+    static String get_param (String & cmd_params, const char * id, bool withspace = false);
+//    static bool isadmin (String & cmd_params);
+//    static bool isuser (String & cmd_params);
 };
 
 #endif

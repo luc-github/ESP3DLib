@@ -246,7 +246,7 @@ bool WiFiConfig::StartSTA(){
     //password
     defV = DEFAULT_STA_PWD;
     String password = prefs.getString(STA_PWD_ENTRY, defV);
-    int8_t IP_mode = prefs.getChar(STA_IP_MODE_ENTRY, DHCP_MODE);
+    int8_t IP_mode = prefs.getChar(STA_IP_MODE_ENTRY, DEFAULT_STA_IP_MODE);
     //IP
     defV = DEFAULT_STA_IP;
     int32_t IP = prefs.getInt(STA_IP_ENTRY, IP_int_from_string(defV));
@@ -346,7 +346,7 @@ void WiFiConfig::begin() {
    WiFi.onEvent(WiFiConfig::WiFiEvent);
    //open preferences as read-only
    prefs.begin(NAMESPACE, true);
-   int8_t wifiMode = prefs.getChar(ESP_WIFI_MODE, DEFAULT_WIFI_MODE);
+   int8_t wifiMode = prefs.getChar(ESP_RADIO_MODE, DEFAULT_RADIO_MODE);
    prefs.end();
    if (wifiMode == ESP_WIFI_AP) {
        StartAP();
