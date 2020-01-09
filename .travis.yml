@@ -1,0 +1,37 @@
+dist: xenial
+sudo: require
+
+language: python
+
+python:
+  - "3.7"
+
+os:
+  - linux
+  
+cache:
+  pip: true
+  directories:
+  - "~/.platformio"
+  
+install:
+  - pip install -U platformio
+
+before_script:
+  - platformio update
+  - git clone -b esp3d-integration https://github.com/luc-github/Marlin.git Marlin
+  - cd Marlin
+  - sed -i "s/#define WIFISUPPORT/\/\/#define WIFISUPPORT/g" ./Marlin/Configuration_adv.h
+  - sed -i "s/\/\/#define ESP3D_WIFISUPPORT/#define ESP3D_WIFISUPPORT/g" ./Marlin/Configuration_adv.h
+  - sed -i "s/\/\/#define WEBSUPPORT/#define WEBSUPPORT/g" ./Marlin/Configuration_adv.h
+  - sed -i "s/\/\/#define OTASUPPORT/#define OTASUPPORT/g" ./Marlin/Configuration_adv.h
+  - sed -i "s/\/\/#define CUSTOM_COMMAND/#define CUSTOM_COMMAND/g" ./Marlin/Configuration_adv.h
+  - sed -i "s/#define MOTHERBOARD BOARD_RAMPS_14_EFB/#define MOTHERBOARD BOARD_MRR_ESPE/g" ./Marlin/Configuration.h
+  - cat ./Marlin/Configuration.h
+script:
+  - platformio run -e esp32 
+
+notifications:
+  email:
+    on_success: always
+    on_failure: always
