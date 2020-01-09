@@ -19,11 +19,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
- 
+
 #ifndef _ESP_SD_H_
 #define _ESP_SD_H_
-class ESP_SD{
-    public:
+class ESP_SD
+{
+public:
     ESP_SD();
     ~ESP_SD();
     int8_t card_status();
@@ -48,12 +49,12 @@ class ESP_SD{
     bool openDir(String path);
     bool readDir(char name[13], uint32_t * size, bool * isFile);
     bool * isFile;
-    private:
+private:
     void * _sdfile;
     uint32_t _size;
     uint32_t _pos;
     bool _readonly;
     String get_path_part(String data, int index);
-    
+
 };
 #endif

@@ -100,19 +100,23 @@ auth_ip * Web_Server::_head = NULL;
 uint8_t Web_Server::_nb_ip = 0;
 #define MAX_AUTH_IP 10
 #endif
-Web_Server::Web_Server(){
-    
+Web_Server::Web_Server()
+{
+
 }
-Web_Server::~Web_Server(){
+Web_Server::~Web_Server()
+{
     end();
 }
 
-long Web_Server::get_client_ID() {
+long Web_Server::get_client_ID()
+{
     return  _id_connection;
 }
 
-bool Web_Server::begin(){
-   
+bool Web_Server::begin()
+{
+
     bool no_error = true;
     _setupdone = false;
     Preferences prefs;
@@ -124,7 +128,9 @@ bool Web_Server::begin(){
     String defV = DEFAULT_HOSTNAME;
     _hostname = prefs.getString(HOSTNAME_ENTRY, defV);
     prefs.end();
-    if (penabled == 0) return false;
+    if (penabled == 0) {
+        return false;
+    }
     //create instance
     _webserver= new WebServer(_port);
 #ifdef AUTHENTICATION_FEATURE
@@ -138,37 +144,37 @@ bool Web_Server::begin(){
     _socket_server->begin();
     _socket_server->onEvent(handle_Websocket_Event);
 
-    
+
     //Websocket output
-     Serial2Socket.attachWS(_socket_server);
-   
+    Serial2Socket.attachWS(_socket_server);
+
     //Web server handlers
     //trick to catch command line on "/" before file being processed
     _webserver->on("/",HTTP_ANY, handle_root);
-    
+
     //Page not found handler
     _webserver->onNotFound (handle_not_found);
-    
+
     //need to be there even no authentication to say to UI no authentication
     _webserver->on("/login", HTTP_ANY, handle_login);
-    
+
     //web commands
     _webserver->on ("/command", HTTP_ANY, handle_web_command);
     _webserver->on ("/command_silent", HTTP_ANY, handle_web_command_silent);
-    
+
     //SPIFFS
     _webserver->on ("/files", HTTP_ANY, handleFileList, SPIFFSFileupload);
-    
+
     //web update
     _webserver->on ("/updatefw", HTTP_ANY, handleUpdate, WebUpdateUpload);
-        
-#if defined(SDSUPPORT)   
+
+#if defined(SDSUPPORT)
     //Direct SD management
     _webserver->on("/upload", HTTP_ANY, handle_direct_SDFileList,SDFile_direct_upload);
 #endif
-    
+
 #ifdef CAPTIVE_PORTAL_FEATURE
-     if(WiFi.getMode() == WIFI_AP){
+    if(WiFi.getMode() == WIFI_AP) {
         // if DNSServer is started with "*" for domain name, it will reply with
         // provided IP to all DNS request
         dnsServer.start(DNS_PORT, "*", WiFi.softAPIP());
@@ -176,12 +182,12 @@ bool Web_Server::begin(){
         _webserver->on ("/gconnectivitycheck.gstatic.com", HTTP_ANY, handle_root);
         //do not forget the / at the end
         _webserver->on ("/fwlink/", HTTP_ANY, handle_root);
-     }
+    }
 #endif //CAPTIVE_PORTAL_FEATURE
-    
+
 #ifdef SSDP_FEATURE
     //SSDP service presentation
-    if(WiFi.getMode() == WIFI_STA){
+    if(WiFi.getMode() == WIFI_STA) {
         _webserver->on ("/description.xml", HTTP_GET, handle_SSDP);
         //Add specific for SSDP
         SSDP.setSchemaURL ("description.xml");
@@ -196,7 +202,7 @@ bool Web_Server::begin(){
         SSDP.setManufacturer (ESP_MANUFACTURER_NAME);
         SSDP.setManufacturerURL (ESP_MANUFACTURER_URL);
         */
-            
+
         //Start SSDP
         Esp3DCom::echo("SSDP service started");
         SSDP.begin();
@@ -207,15 +213,16 @@ bool Web_Server::begin(){
     _webserver->begin();
 #ifdef MDNS_FEATURE
     //add mDNS
-    if(WiFi.getMode() == WIFI_STA){
+    if(WiFi.getMode() == WIFI_STA) {
         MDNS.addService("http","tcp",_port);
     }
 #endif //MDNS_FEATURE
     _setupdone = true;
-   return no_error;
+    return no_error;
 }
 
-void Web_Server::end(){
+void Web_Server::end()
+{
     _setupdone = false;
 #ifdef SSDP_FEATURE
     SSDP.end();
@@ -254,7 +261,7 @@ void Web_Server::handle_root()
         if(SPIFFS.exists(pathWithGz)) {
             path = pathWithGz;
         }
-		File file = SPIFFS.open(path, FILE_READ);
+        File file = SPIFFS.open(path, FILE_READ);
         _webserver->streamFile(file, contentType);
         file.close();
         return;
@@ -284,7 +291,9 @@ void Web_Server:: handle_not_found()
         ESP_SD SD_card;
         if (SD_card.card_status() == 1) {
             if (SD_card.exists(pathWithGz.c_str()) || SD_card.exists(path.c_str())) {
-                if (!SD_card.exists(path.c_str())) path =  pathWithGz;
+                if (!SD_card.exists(path.c_str())) {
+                    path =  pathWithGz;
+                }
                 if(SD_card.open(path.c_str())) {
                     uint8_t buf[1200];
                     _webserver->setContentLength(SD_card.size());
@@ -292,23 +301,23 @@ void Web_Server:: handle_not_found()
                     _webserver->send(200, "application/octet-stream", "");
 
                     WiFiClient c = _webserver->client();
-                    int16_t len = SD_card.read( buf, 1200); 
+                    int16_t len = SD_card.read( buf, 1200);
                     while(len > 0) {
                         c.write(buf, len);
                         len = SD_card.read( buf, 1200);
-                        Esp3DLibConfig::wait(0);   
-                        handle();             
+                        Esp3DLibConfig::wait(0);
+                        handle();
                     }
-                  SD_card.close(); 
-                  return; 
+                    SD_card.close();
+                    return;
                 }
             }
         }
-        
-      String content = "cannot find ";
-      content+=path;
-      _webserver->send(404,"text/plain",content.c_str());
-      return;
+
+        String content = "cannot find ";
+        content+=path;
+        _webserver->send(404,"text/plain",content.c_str());
+        return;
     } else
 #endif
         if(SPIFFS.exists(pathWithGz) || SPIFFS.exists(path)) {
@@ -352,7 +361,7 @@ void Web_Server:: handle_not_found()
             File file = SPIFFS.open(path, FILE_READ);
             _webserver->streamFile(file, contentType);
             file.close();
-           
+
         } else {
             //if not template use default page
             contentType = PAGE_404;
@@ -470,7 +479,7 @@ void Web_Server::handle_web_command ()
             //if command is a valid number then execute command
             if (cmd_part1.toInt() >= 0) {
                 ESPResponseStream espresponse(_webserver);
-                //commmand is web only 
+                //commmand is web only
                 COMMAND::execute_internal_command (cmd_part1.toInt(), cmd_part2, auth_level, &espresponse);
                 //flush
                 espresponse.flush();
@@ -487,7 +496,7 @@ void Web_Server::handle_web_command ()
         String res = "Ok";
         uint8_t sindex = 0;
         scmd = get_Splited_Value(cmd,'\n', sindex);
-        while ( scmd != "" ){
+        while ( scmd != "" ) {
             scmd+="\n";
             Serial2Socket.push(scmd.c_str());
             //GCodeQueue::enqueue_one_now(scmd.c_str());
@@ -500,15 +509,15 @@ void Web_Server::handle_web_command ()
 //Handle web command query and send answer//////////////////////////////
 void Web_Server::handle_web_command_silent ()
 {
-     //to save time if already disconnected
-     //if (_webserver->hasArg ("PAGEID") ) {
-     //   if (_webserver->arg ("PAGEID").length() > 0 ) {
-     //      if (_webserver->arg ("PAGEID").toInt() != _id_connection) {
-     //      _webserver->send (200, "text/plain", "Invalid command");
-     //      return;
-     //      }
-     //   }
-     //}
+    //to save time if already disconnected
+    //if (_webserver->hasArg ("PAGEID") ) {
+    //   if (_webserver->arg ("PAGEID").length() > 0 ) {
+    //      if (_webserver->arg ("PAGEID").toInt() != _id_connection) {
+    //      _webserver->send (200, "text/plain", "Invalid command");
+    //      return;
+    //      }
+    //   }
+    //}
     level_authenticate_type auth_level = is_authenticated();
     String cmd = "";
     if (_webserver->hasArg ("plain") || _webserver->hasArg ("commandText") ) {
@@ -542,9 +551,12 @@ void Web_Server::handle_web_command_silent ()
             }
             //if command is a valid number then execute command
             if (cmd_part1.toInt() >= 0) {
-                //commmand is web only 
-                if(COMMAND::execute_internal_command (cmd_part1.toInt(), cmd_part2, auth_level, NULL)) _webserver->send (200, "text/plain", "ok");
-                else  _webserver->send (200, "text/plain", "error");
+                //commmand is web only
+                if(COMMAND::execute_internal_command (cmd_part1.toInt(), cmd_part2, auth_level, NULL)) {
+                    _webserver->send (200, "text/plain", "ok");
+                } else {
+                    _webserver->send (200, "text/plain", "error");
+                }
             }
             //if not is not a valid [ESPXXX] command
         }
@@ -558,7 +570,7 @@ void Web_Server::handle_web_command_silent ()
         uint8_t sindex = 0;
         scmd = get_Splited_Value(cmd,'\n', sindex);
         String res = "Ok";
-        while (scmd != "" ){
+        while (scmd != "" ) {
             scmd+="\n";
             Serial2Socket.push(scmd.c_str());
             //GCodeQueue::enqueue_one_now(scmd.c_str());
@@ -586,7 +598,7 @@ void Web_Server::handle_login()
         if (pos!= -1) {
             int pos2 = cookie.indexOf(";",pos);
             sessionID = cookie.substring(pos+strlen("ESPSESSIONID="),pos2);
-            }
+        }
         ClearAuthIP(_webserver->client().remoteIP(), sessionID.c_str());
         _webserver->sendHeader("Set-Cookie","ESPSESSIONID=0");
         _webserver->sendHeader("Cache-Control","no-cache");
@@ -597,10 +609,15 @@ void Web_Server::handle_login()
     }
 
     level_authenticate_type auth_level = is_authenticated();
-   if (auth_level == LEVEL_GUEST) auths = "guest";
-    else if (auth_level == LEVEL_USER) auths = "user";
-    else if (auth_level == LEVEL_ADMIN) auths = "admin";
-    else auths = "???";
+    if (auth_level == LEVEL_GUEST) {
+        auths = "guest";
+    } else if (auth_level == LEVEL_USER) {
+        auths = "user";
+    } else if (auth_level == LEVEL_ADMIN) {
+        auths = "admin";
+    } else {
+        auths = "???";
+    }
 
     //check is it is a submission or a query
     if (_webserver->hasArg("SUBMIT")) {
@@ -644,15 +661,18 @@ void Web_Server::handle_login()
             String newpassword =  _webserver->arg("NEWPASSWORD");
             if (isLocalPasswordValid(newpassword.c_str())) {
                 String spos;
-                if(sUser == DEFAULT_ADMIN_LOGIN) spos = ADMIN_PWD_ENTRY;
-                else spos = USER_PWD_ENTRY;
-                
+                if(sUser == DEFAULT_ADMIN_LOGIN) {
+                    spos = ADMIN_PWD_ENTRY;
+                } else {
+                    spos = USER_PWD_ENTRY;
+                }
+
                 Preferences prefs;
                 prefs.begin(NAMESPACE, false);
                 if (prefs.putString(spos.c_str(), newpassword) != newpassword.length()) {
-                     msg_alert_error = true;
-                     smsg = "Error: Cannot apply changes";
-                     code = 500;
+                    msg_alert_error = true;
+                    smsg = "Error: Cannot apply changes";
+                    code = 500;
                 }
                 prefs.end();
             } else {
@@ -661,77 +681,79 @@ void Web_Server::handle_login()
                 code = 500;
             }
         }
-   if ((code == 200) || (code == 500)) {
-      level_authenticate_type current_auth_level;
-      if(sUser == DEFAULT_ADMIN_LOGIN) {
-            current_auth_level = LEVEL_ADMIN;
-        } else  if(sUser == DEFAULT_USER_LOGIN){
-            current_auth_level = LEVEL_USER;
-        } else {
-            current_auth_level = LEVEL_GUEST;
-        }
-        //create Session
-        if ((current_auth_level != auth_level) || (auth_level== LEVEL_GUEST)) {
-            auth_ip * current_auth = new auth_ip;
-            current_auth->level = current_auth_level;
-            current_auth->ip=_webserver->client().remoteIP();
-            strcpy(current_auth->sessionID,create_session_ID());
-            strcpy(current_auth->userID,sUser.c_str());
-            current_auth->last_time=millis();
-            if (AddAuthIP(current_auth)) {
-                String tmps ="ESPSESSIONID=";
-                tmps+=current_auth->sessionID;
-                _webserver->sendHeader("Set-Cookie",tmps);
-                _webserver->sendHeader("Cache-Control","no-cache");
-                switch(current_auth->level) {
+        if ((code == 200) || (code == 500)) {
+            level_authenticate_type current_auth_level;
+            if(sUser == DEFAULT_ADMIN_LOGIN) {
+                current_auth_level = LEVEL_ADMIN;
+            } else  if(sUser == DEFAULT_USER_LOGIN) {
+                current_auth_level = LEVEL_USER;
+            } else {
+                current_auth_level = LEVEL_GUEST;
+            }
+            //create Session
+            if ((current_auth_level != auth_level) || (auth_level== LEVEL_GUEST)) {
+                auth_ip * current_auth = new auth_ip;
+                current_auth->level = current_auth_level;
+                current_auth->ip=_webserver->client().remoteIP();
+                strcpy(current_auth->sessionID,create_session_ID());
+                strcpy(current_auth->userID,sUser.c_str());
+                current_auth->last_time=millis();
+                if (AddAuthIP(current_auth)) {
+                    String tmps ="ESPSESSIONID=";
+                    tmps+=current_auth->sessionID;
+                    _webserver->sendHeader("Set-Cookie",tmps);
+                    _webserver->sendHeader("Cache-Control","no-cache");
+                    switch(current_auth->level) {
                     case LEVEL_ADMIN:
                         auths = "admin";
                         break;
-                     case LEVEL_USER:
+                    case LEVEL_USER:
                         auths = "user";
                         break;
                     default:
                         auths = "guest";
                         break;
                     }
-            } else {
-                delete current_auth;
-                msg_alert_error=true;
-                code = 500;
-                smsg = "Error: Too many connections";
+                } else {
+                    delete current_auth;
+                    msg_alert_error=true;
+                    code = 500;
+                    smsg = "Error: Too many connections";
+                }
             }
         }
-   }
-    if (code == 200) smsg = "Ok";
+        if (code == 200) {
+            smsg = "Ok";
+        }
 
-    //build  JSON
-    String buffer2send = "{\"status\":\"" + smsg + "\",\"authentication_lvl\":\"";
-    buffer2send += auths;
-    buffer2send += "\"}";
-    _webserver->send(code, "application/json", buffer2send);
+        //build  JSON
+        String buffer2send = "{\"status\":\"" + smsg + "\",\"authentication_lvl\":\"";
+        buffer2send += auths;
+        buffer2send += "\"}";
+        _webserver->send(code, "application/json", buffer2send);
     } else {
-    if (auth_level != LEVEL_GUEST) {
-        String cookie = _webserver->header("Cookie");
-        int pos = cookie.indexOf("ESPSESSIONID=");
-        String sessionID;
-        if (pos!= -1) {
-            int pos2 = cookie.indexOf(";",pos);
-            sessionID = cookie.substring(pos+strlen("ESPSESSIONID="),pos2);
-            auth_ip * current_auth_info = GetAuth(_webserver->client().remoteIP(), sessionID.c_str());
-            if (current_auth_info != NULL){
+        if (auth_level != LEVEL_GUEST) {
+            String cookie = _webserver->header("Cookie");
+            int pos = cookie.indexOf("ESPSESSIONID=");
+            String sessionID;
+            if (pos!= -1) {
+                int pos2 = cookie.indexOf(";",pos);
+                sessionID = cookie.substring(pos+strlen("ESPSESSIONID="),pos2);
+                auth_ip * current_auth_info = GetAuth(_webserver->client().remoteIP(), sessionID.c_str());
+                if (current_auth_info != NULL) {
                     sUser = current_auth_info->userID;
                 }
+            }
         }
-    }
-    String buffer2send = "{\"status\":\"200\",\"authentication_lvl\":\"";
-    buffer2send += auths;
-    buffer2send += "\",\"user\":\"";
-    buffer2send += sUser;
-    buffer2send +="\"}";
-    _webserver->send(code, "application/json", buffer2send);
+        String buffer2send = "{\"status\":\"200\",\"authentication_lvl\":\"";
+        buffer2send += auths;
+        buffer2send += "\",\"user\":\"";
+        buffer2send += sUser;
+        buffer2send +="\"}";
+        _webserver->send(code, "application/json", buffer2send);
     }
 #else
-	_webserver->sendHeader("Cache-Control","no-cache");
+    _webserver->sendHeader("Cache-Control","no-cache");
     _webserver->send(200, "application/json", "{\"status\":\"Ok\",\"authentication_lvl\":\"admin\"}");
 #endif
 }
@@ -929,7 +951,7 @@ void Web_Server::handleFileList ()
 //SPIFFS files uploader handle
 void Web_Server::SPIFFSFileupload ()
 {
-     //get authentication status
+    //get authentication status
     level_authenticate_type auth_level= is_authenticated();
     //Guest cannot upload - only admin
     if (auth_level == LEVEL_GUEST) {
@@ -940,20 +962,23 @@ void Web_Server::SPIFFSFileupload ()
     }
     static String filename;
     static File fsUploadFile = (File)0;
-    
+
     HTTPUpload& upload = _webserver->upload();
     //Upload start
     //**************
     if(upload.status == UPLOAD_FILE_START) {
         String upload_filename = upload.filename;
-        if (upload_filename[0] != '/') filename = "/" + upload_filename;
-        else filename = upload.filename;
+        if (upload_filename[0] != '/') {
+            filename = "/" + upload_filename;
+        } else {
+            filename = upload.filename;
+        }
         //according User or Admin the root is different as user is isolate to /user when admin has full access
         if(auth_level != LEVEL_ADMIN) {
             upload_filename = filename;
             filename = "/user" + upload_filename;
         }
-        
+
         if (SPIFFS.exists (filename) ) {
             SPIFFS.remove (filename);
         }
@@ -996,7 +1021,7 @@ void Web_Server::SPIFFSFileupload ()
         if(fsUploadFile) {
             //close it
             fsUploadFile.close();
-            //check size 
+            //check size
             String  sizeargname  = upload.filename + "S";
             fsUploadFile = SPIFFS.open (filename, FILE_READ);
             uint32_t filesize = fsUploadFile.size();
@@ -1006,7 +1031,7 @@ void Web_Server::SPIFFSFileupload ()
                     _upload_status = UPLOAD_STATUS_FAILED;
                     SPIFFS.remove (filename);
                 }
-            } 
+            }
             if (_upload_status == UPLOAD_STATUS_ONGOING) {
                 _upload_status = UPLOAD_STATUS_SUCCESSFUL;
             } else {
@@ -1018,25 +1043,27 @@ void Web_Server::SPIFFSFileupload ()
             _webserver->client().stop();
             if (SPIFFS.exists (filename) ) {
                 SPIFFS.remove (filename);
-                }
+            }
             Esp3DCom::echo("Upload error");
         }
         //Upload cancelled
         //**************
     } else {
-            if (_upload_status == UPLOAD_STATUS_ONGOING) {
-                _upload_status = UPLOAD_STATUS_CANCELLED;
-            }
-            if(fsUploadFile)fsUploadFile.close();
-            if (SPIFFS.exists (filename) ) {
-                SPIFFS.remove (filename);
-            }
-            Esp3DCom::echo("Upload error");
+        if (_upload_status == UPLOAD_STATUS_ONGOING) {
+            _upload_status = UPLOAD_STATUS_CANCELLED;
+        }
+        if(fsUploadFile) {
+            fsUploadFile.close();
+        }
+        if (SPIFFS.exists (filename) ) {
+            SPIFFS.remove (filename);
+        }
+        Esp3DCom::echo("Upload error");
     }
     Esp3DLibConfig::wait(0);
 }
 
-//Web Update handler 
+//Web Update handler
 void Web_Server::handleUpdate ()
 {
     level_authenticate_type auth_level = is_authenticated();
@@ -1072,7 +1099,7 @@ void Web_Server::WebUpdateUpload ()
         Esp3DCom::echo("Upload rejected");
         return;
     }
-    
+
     //get current file ID
     HTTPUpload& upload = _webserver->upload();
     //Upload start
@@ -1137,7 +1164,7 @@ void Web_Server::handle_direct_SDFileList()
         _webserver->send(401, "application/json", "{\"status\":\"Authentication failed!\"}");
         return;
     }
-    
+
 
     String path="/";
     String sstatus="Ok";
@@ -1148,7 +1175,7 @@ void Web_Server::handle_direct_SDFileList()
     bool list_files = true;
     ESP_SD card;
     int8_t state = card.card_status();
-    if (state != 1){
+    if (state != 1) {
         _webserver->sendHeader("Cache-Control","no-cache");
         _webserver->send(200, "application/json", "{\"status\":\"No SD Card\"}");
         return;
@@ -1161,7 +1188,7 @@ void Web_Server::handle_direct_SDFileList()
     //to have a clean path
     path.trim();
     path.replace("//","/");
-    
+
     //check if query need some action
     if(_webserver->hasArg("action")) {
         //delete a file
@@ -1171,7 +1198,7 @@ void Web_Server::handle_direct_SDFileList()
             filename = path + shortname;
             shortname.replace("/","");
             filename.replace("//","/");
-            
+
             if(!card.exists(filename.c_str())) {
                 sstatus = shortname + " does not exist!";
             } else {
@@ -1209,7 +1236,7 @@ void Web_Server::handle_direct_SDFileList()
         //create a directory
         if( _webserver->arg("action")=="createdir" &&  _webserver->hasArg("filename")) {
             String filename;
-            String shortname =  _webserver->arg("filename"); 
+            String shortname =  _webserver->arg("filename");
             filename = path + shortname;
             shortname.replace("/","");
             filename.replace("//","/");
@@ -1223,9 +1250,9 @@ void Web_Server::handle_direct_SDFileList()
                     sstatus = shortname + " created";
                 }
             }
-        }  
+        }
     }
-  
+
     //check if no need build file list
     if( _webserver->hasArg("dontlist")) {
         if( _webserver->arg("dontlist") == "yes") {
@@ -1234,7 +1261,7 @@ void Web_Server::handle_direct_SDFileList()
     }
     String jsonfile = "{" ;
     jsonfile+="\"files\":[";
-    if (!card.openDir(path)){
+    if (!card.openDir(path)) {
         String s =  "{\"status\":\" ";
         s += path;
         s+=  " does not exist on SD Card\"}";
@@ -1247,7 +1274,7 @@ void Web_Server::handle_direct_SDFileList()
         uint32_t size;
         bool isFile;
         uint i = 0;
-        while (card.readDir(name,&size ,&isFile)) {
+        while (card.readDir(name,&size,&isFile)) {
             if (i>0) {
                 jsonfile+=",";
             }
@@ -1256,9 +1283,12 @@ void Web_Server::handle_direct_SDFileList()
             jsonfile+="\",\"shortname\":\"";
             jsonfile+=name;
             jsonfile+="\",\"size\":\"";
-            if (isFile)jsonfile+=ESPResponseStream::formatBytes(size);
-            else jsonfile+="-1";
-            jsonfile+="\",\"datetime\":\""; 
+            if (isFile) {
+                jsonfile+=ESPResponseStream::formatBytes(size);
+            } else {
+                jsonfile+="-1";
+            }
+            jsonfile+="\",\"datetime\":\"";
             //TODO datatime
             jsonfile+="\"}";
             i++;
@@ -1269,15 +1299,15 @@ void Web_Server::handle_direct_SDFileList()
     }
     static uint32_t volTotal = card.card_total_space();
     static uint32_t volUsed = card.card_used_space();;
-    //TODO 
+    //TODO
     //Get right values
     uint32_t  occupedspace = (volUsed/volTotal)*100;
     jsonfile+="\"total\":\"";
     if ( (occupedspace <= 1) && (volTotal!=volUsed)) {
-            occupedspace=1;
-        }
+        occupedspace=1;
+    }
     jsonfile+= ESPResponseStream::formatBytes(volTotal); ;
-    
+
     jsonfile+="\",\"used\":\"";
     jsonfile+= ESPResponseStream::formatBytes(volUsed); ;
     jsonfile+="\",\"occupation\":\"";
@@ -1288,7 +1318,7 @@ void Web_Server::handle_direct_SDFileList()
     jsonfile+= "\"status\":\"";
     jsonfile+=sstatus + "\"";
     jsonfile+= "}";
-    
+
     _webserver->sendHeader("Cache-Control","no-cache");
     _webserver->send (200, "application/json", jsonfile.c_str());
     _upload_status=UPLOAD_STATUS_NONE;
@@ -1307,7 +1337,7 @@ void Web_Server::SDFile_direct_upload()
     }
     //retrieve current file id
     HTTPUpload& upload = _webserver->upload();
-    
+
     //Upload start
     //**************
     if(upload.status == UPLOAD_FILE_START) {
@@ -1319,14 +1349,16 @@ void Web_Server::SDFile_direct_upload()
         if ( sdfile.card_status() != 1) {
             _upload_status=UPLOAD_STATUS_CANCELLED;
             Esp3DCom::echo("Upload cancelled");
-           _webserver->client().stop();
+            _webserver->client().stop();
             return;
         }
         if (sdfile.exists (upload_filename.c_str()) ) {
             sdfile.remove (upload_filename.c_str());
-        } 
-        
-        if (sdfile.isopen())sdfile.close();
+        }
+
+        if (sdfile.isopen()) {
+            sdfile.close();
+        }
         if (!sdfile.open (upload_filename.c_str(),false)) {
             Esp3DCom::echo("Upload cancelled");
             _webserver->client().stop();
@@ -1340,14 +1372,14 @@ void Web_Server::SDFile_direct_upload()
     } else if(upload.status == UPLOAD_FILE_WRITE) {
         //we need to check SD is inside
         if ( sdfile.card_status() != 1) {
-                sdfile.close();
-               Esp3DCom::echo("Upload failed");
+            sdfile.close();
+            Esp3DCom::echo("Upload failed");
             if (sdfile.exists (upload_filename.c_str()) ) {
-                    sdfile.remove (upload_filename.c_str());
-                } 
-                _webserver->client().stop();
-                return;
+                sdfile.remove (upload_filename.c_str());
             }
+            _webserver->client().stop();
+            return;
+        }
         if (sdfile.isopen()) {
             if ( (_upload_status = UPLOAD_STATUS_ONGOING) && (upload.currentSize > 0)) {
                 sdfile.write (upload.buf, upload.currentSize);
@@ -1356,18 +1388,18 @@ void Web_Server::SDFile_direct_upload()
         //Upload end
         //**************
     } else if(upload.status == UPLOAD_FILE_END) {
-            sdfile.close();
-            uint32_t filesize = sdfile.size();
-            String  sizeargname  = upload.filename + "S";
-            if (_webserver->hasArg (sizeargname.c_str()) ) {
-                if (_webserver->arg (sizeargname.c_str()) != String(filesize)) {
-                    Esp3DCom::echo("Upload failed");
-                    _upload_status = UPLOAD_STATUS_FAILED;
-                    }
-                } 
-            if (_upload_status == UPLOAD_STATUS_ONGOING) {
-                _upload_status = UPLOAD_STATUS_SUCCESSFUL;
+        sdfile.close();
+        uint32_t filesize = sdfile.size();
+        String  sizeargname  = upload.filename + "S";
+        if (_webserver->hasArg (sizeargname.c_str()) ) {
+            if (_webserver->arg (sizeargname.c_str()) != String(filesize)) {
+                Esp3DCom::echo("Upload failed");
+                _upload_status = UPLOAD_STATUS_FAILED;
             }
+        }
+        if (_upload_status == UPLOAD_STATUS_ONGOING) {
+            _upload_status = UPLOAD_STATUS_SUCCESSFUL;
+        }
     } else {//Upload cancelled
         _upload_status=UPLOAD_STATUS_FAILED;
         Esp3DCom::echo("Upload failed");
@@ -1375,28 +1407,31 @@ void Web_Server::SDFile_direct_upload()
         sdfile.close();
         if (sdfile.exists (upload_filename.c_str()) ) {
             sdfile.remove (upload_filename.c_str());
-        } 
+        }
     }
     Esp3DLibConfig::wait(0);
 }
 #endif
 
-void Web_Server::handle(){
-static uint32_t timeout = millis();
+void Web_Server::handle()
+{
+    static uint32_t timeout = millis();
 #ifdef CAPTIVE_PORTAL_FEATURE
-    if(WiFi.getMode() == WIFI_AP){
+    if(WiFi.getMode() == WIFI_AP) {
         dnsServer.processNextRequest();
     }
 #endif //CAPTIVE_PORTAL_FEATURE
-    if (_webserver)_webserver->handleClient();
+    if (_webserver) {
+        _webserver->handleClient();
+    }
     if (_socket_server && _setupdone) {
         Serial2Socket.handle_flush();
         _socket_server->loop();
     }
     if ((millis() - timeout) > 10000) {
-        if (_socket_server){
-             String s = "PING:";
-             s+=String(_id_connection);
+        if (_socket_server) {
+            String s = "PING:";
+            s+=String(_id_connection);
             _socket_server->broadcastTXT(s);
             timeout=millis();
         }
@@ -1404,61 +1439,61 @@ static uint32_t timeout = millis();
 }
 
 
-void Web_Server::handle_Websocket_Event(uint8_t num, uint8_t type, uint8_t * payload, size_t length) {
+void Web_Server::handle_Websocket_Event(uint8_t num, uint8_t type, uint8_t * payload, size_t length)
+{
 
     switch(type) {
-        case WStype_DISCONNECTED:
-            //USE_SERIAL.printf("[%u] Disconnected!\n", num);
-            break;
-        case WStype_CONNECTED:
-            {
-                IPAddress ip = _socket_server->remoteIP(num);
-                //USE_SERIAL.printf("[%u] Connected from %d.%d.%d.%d url: %s\n", num, ip[0], ip[1], ip[2], ip[3], payload);
-                String s = "CURRENT_ID:" + String(num);
-                // send message to client
-                _id_connection = num;
-                _socket_server->sendTXT(_id_connection, s);
-                s = "ACTIVE_ID:" + String(_id_connection);
-                _socket_server->broadcastTXT(s);
-            }
-            break;
-        case WStype_TEXT:
-            //USE_SERIAL.printf("[%u] get Text: %s\n", num, payload);
+    case WStype_DISCONNECTED:
+        //USE_SERIAL.printf("[%u] Disconnected!\n", num);
+        break;
+    case WStype_CONNECTED: {
+        IPAddress ip = _socket_server->remoteIP(num);
+        //USE_SERIAL.printf("[%u] Connected from %d.%d.%d.%d url: %s\n", num, ip[0], ip[1], ip[2], ip[3], payload);
+        String s = "CURRENT_ID:" + String(num);
+        // send message to client
+        _id_connection = num;
+        _socket_server->sendTXT(_id_connection, s);
+        s = "ACTIVE_ID:" + String(_id_connection);
+        _socket_server->broadcastTXT(s);
+    }
+    break;
+    case WStype_TEXT:
+        //USE_SERIAL.printf("[%u] get Text: %s\n", num, payload);
 
-            // send message to client
-            // webSocket.sendTXT(num, "message here");
+        // send message to client
+        // webSocket.sendTXT(num, "message here");
 
-            // send data to all connected clients
-            // webSocket.broadcastTXT("message here");
-            break;
-        case WStype_BIN:
-            //USE_SERIAL.printf("[%u] get binary length: %u\n", num, length);
-            //hexdump(payload, length);
+        // send data to all connected clients
+        // webSocket.broadcastTXT("message here");
+        break;
+    case WStype_BIN:
+        //USE_SERIAL.printf("[%u] get binary length: %u\n", num, length);
+        //hexdump(payload, length);
 
-            // send message to client
-            // webSocket.sendBIN(num, payload, length);
-            break;
-        default:
-            break;
+        // send message to client
+        // webSocket.sendBIN(num, payload, length);
+        break;
+    default:
+        break;
     }
 
 }
 
 String Web_Server::get_Splited_Value(String data, char separator, int index)
 {
-  int found = 0;
-  int strIndex[] = {0, -1};
-  int maxIndex = data.length()-1;
+    int found = 0;
+    int strIndex[] = {0, -1};
+    int maxIndex = data.length()-1;
 
-  for(int i=0; i<=maxIndex && found<=index; i++){
-    if(data.charAt(i)==separator || i==maxIndex){
-        found++;
-        strIndex[0] = strIndex[1]+1;
-        strIndex[1] = (i == maxIndex) ? i+1 : i;
+    for(int i=0; i<=maxIndex && found<=index; i++) {
+        if(data.charAt(i)==separator || i==maxIndex) {
+            found++;
+            strIndex[0] = strIndex[1]+1;
+            strIndex[1] = (i == maxIndex) ? i+1 : i;
+        }
     }
-  }
 
-  return found>index ? data.substring(strIndex[0], strIndex[1]) : "";
+    return found>index ? data.substring(strIndex[0], strIndex[1]) : "";
 }
 
 

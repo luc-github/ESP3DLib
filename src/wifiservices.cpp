@@ -40,16 +40,21 @@
 
 WiFiServices wifi_services;
 
-WiFiServices::WiFiServices(){
+WiFiServices::WiFiServices()
+{
 }
-WiFiServices::~WiFiServices(){
+WiFiServices::~WiFiServices()
+{
     end();
 }
 
-bool WiFiServices::begin(){
+bool WiFiServices::begin()
+{
     bool no_error = true;
     //Sanity check
-    if(WiFi.getMode() == WIFI_OFF) return false;
+    if(WiFi.getMode() == WIFI_OFF) {
+        return false;
+    }
     String h;
     Preferences prefs;
     //Get hostname
@@ -63,49 +68,55 @@ bool WiFiServices::begin(){
 #ifdef OTA_FEATURE
     ArduinoOTA
     .onStart([]() {
-      String type = "OTA:Start OTA updating ";
-      if (ArduinoOTA.getCommand() == U_FLASH)
-        type += "sketch";
-      else {// U_SPIFFS
-        // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-        type += "filesystem";
-        SPIFFS.end();
+        String type = "OTA:Start OTA updating ";
+        if (ArduinoOTA.getCommand() == U_FLASH) {
+            type += "sketch";
+        } else { // U_SPIFFS
+            // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
+            type += "filesystem";
+            SPIFFS.end();
         }
-       Esp3DCom::echo(type.c_str());
+        Esp3DCom::echo(type.c_str());
     })
     .onEnd([]() {
-      Esp3DCom::echo("OTA:End");
-      
+        Esp3DCom::echo("OTA:End");
+
     })
     .onProgress([](unsigned int progress, unsigned int total) {
-	  String tmp = "OTA:OTA Progress:";
-	  tmp += String(progress / (total / 100));
-	  tmp +="%%";
-      Esp3DCom::echo(tmp.c_str());
+        String tmp = "OTA:OTA Progress:";
+        tmp += String(progress / (total / 100));
+        tmp +="%%";
+        Esp3DCom::echo(tmp.c_str());
     })
     .onError([](ota_error_t error) {
-	  String tmp = "OTA: Error(";
-	  tmp += String(error) + ")";
-	  Esp3DCom::echo(tmp.c_str());
-      if (error == OTA_AUTH_ERROR) Esp3DCom::echo("OTA:Auth Failed");
-      else if (error == OTA_BEGIN_ERROR) Esp3DCom::echo("OTA:Begin Failed");
-      else if (error == OTA_CONNECT_ERROR) Esp3DCom::echo("OTA:Connect Failed");
-      else if (error == OTA_RECEIVE_ERROR) Esp3DCom::echo("OTA:Receive Failed");
-      else if (error == OTA_END_ERROR) Esp3DCom::echo("OTA:End Failed");
+        String tmp = "OTA: Error(";
+        tmp += String(error) + ")";
+        Esp3DCom::echo(tmp.c_str());
+        if (error == OTA_AUTH_ERROR) {
+            Esp3DCom::echo("OTA:Auth Failed");
+        } else if (error == OTA_BEGIN_ERROR) {
+            Esp3DCom::echo("OTA:Begin Failed");
+        } else if (error == OTA_CONNECT_ERROR) {
+            Esp3DCom::echo("OTA:Connect Failed");
+        } else if (error == OTA_RECEIVE_ERROR) {
+            Esp3DCom::echo("OTA:Receive Failed");
+        } else if (error == OTA_END_ERROR) {
+            Esp3DCom::echo("OTA:End Failed");
+        }
     });
-  ArduinoOTA.begin();
-  Esp3DCom::echo("OTA service started");
+    ArduinoOTA.begin();
+    Esp3DCom::echo("OTA service started");
 #endif
 #ifdef MDNS_FEATURE
-     //no need in AP mode
-     if(WiFi.getMode() == WIFI_STA){
+    //no need in AP mode
+    if(WiFi.getMode() == WIFI_STA) {
         //start mDns
         if (!MDNS.begin(h.c_str())) {
             Esp3DCom::echo("Cannot start mDNS");
             no_error = false;
         } else {
-			String tmp = "mDNS service (" + h;
-			tmp+=") started";
+            String tmp = "mDNS service (" + h;
+            tmp+=") started";
             Esp3DCom::echo(tmp.c_str());
         }
     }
@@ -115,7 +126,8 @@ bool WiFiServices::begin(){
 #endif //HTTP_FEATURE
     return no_error;
 }
-void WiFiServices::end(){
+void WiFiServices::end()
+{
 #ifdef HTTP_FEATURE
     web_server.end();
 #endif
@@ -125,14 +137,15 @@ void WiFiServices::end(){
 #endif //OTA_FEATURE
     //Stop SPIFFS
     SPIFFS.end();
-    
+
 #ifdef MDNS_FEATURE
     //Stop mDNS
     //MDNS.end();
 #endif //MDNS_FEATURE
 }
 
-void WiFiServices::handle(){
+void WiFiServices::handle()
+{
 #ifdef OTA_FEATURE
     ArduinoOTA.handle();
 #endif //OTA_FEATURE

@@ -28,7 +28,7 @@ typedef enum {
     LEVEL_ADMIN = 2
 } level_authenticate_type;
 
-//communication pipes 
+//communication pipes
 typedef enum {
     NO_PIPE = 0,
     SERIAL_PIPE = 2,
@@ -46,12 +46,16 @@ typedef enum {
 #if defined(HTTP_FEATURE)
 class WebServer;
 #endif //HTTP_FEATURE
-class ESPResponseStream{
-    public:
+class ESPResponseStream
+{
+public:
     void print(const char *data);
     void println(const char *data);
     void flush();
-    tpipe pipe(){return _pipe;};
+    tpipe pipe()
+    {
+        return _pipe;
+    };
     ESPResponseStream(tpipe pipe);
 #if defined(HTTP_FEATURE)
     ESPResponseStream(WebServer * webserver);
@@ -59,12 +63,12 @@ class ESPResponseStream{
     static char * mac2str (uint8_t mac [8]);
     static String formatBytes (uint32_t bytes);
     static long baudRate();
-    private:
+private:
 #if defined(HTTP_FEATURE)
     bool _header_sent;
     WebServer * _webserver;
 #endif //HTTP_FEATURE
-	tpipe _pipe;
+    tpipe _pipe;
     String _buffer;
 };
 

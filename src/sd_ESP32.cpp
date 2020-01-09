@@ -34,56 +34,82 @@ dir_t dir_info;
 SdVolume sd_volume;
 
 
-ESP_SD::ESP_SD(){
+ESP_SD::ESP_SD()
+{
     _size = 0;
     _pos = 0;
     _readonly=true;
     //ugly Workaround to not expose SdFile class which conflict with Native ESP32 SD class
     _sdfile = new SdFile;
 }
-ESP_SD::~ESP_SD(){
-if (((SdFile *)_sdfile)->isOpen())close();
-if (_sdfile) delete (SdFile *) _sdfile;
+ESP_SD::~ESP_SD()
+{
+    if (((SdFile *)_sdfile)->isOpen()) {
+        close();
+    }
+    if (_sdfile) {
+        delete (SdFile *) _sdfile;
+    }
 }
 
-bool ESP_SD::isopen(){
+bool ESP_SD::isopen()
+{
     return (((SdFile *)_sdfile)->isOpen());
 }
 
-int8_t ESP_SD::card_status(){
-if (!IS_SD_INSERTED() || !card.isMounted()) return 0; //No sd
-if ( card.isPrinting() || card.isFileOpen() ) return -1; // busy
-return 1; //ok
+int8_t ESP_SD::card_status()
+{
+    if (!IS_SD_INSERTED() || !card.isMounted()) {
+        return 0;    //No sd
+    }
+    if ( card.isPrinting() || card.isFileOpen() ) {
+        return -1;    // busy
+    }
+    return 1; //ok
 }
 
-bool ESP_SD::open(const char * path, bool readonly ){
-    if (path == NULL) return false;
+bool ESP_SD::open(const char * path, bool readonly )
+{
+    if (path == NULL) {
+        return false;
+    }
     String fullpath=path;
     String pathname = fullpath.substring(0,fullpath.lastIndexOf("/"));
     String filename = makeshortname(fullpath.substring(fullpath.lastIndexOf("/")+1));
-    if (pathname.length() == 0)pathname="/";
-    if (!openDir(pathname))return false;
+    if (pathname.length() == 0) {
+        pathname="/";
+    }
+    if (!openDir(pathname)) {
+        return false;
+    }
     _pos = 0;
     _readonly = readonly;
     return ((SdFile *)_sdfile)->open(&workDir, filename.c_str(), readonly?O_READ:(O_CREAT | O_APPEND | O_WRITE | O_TRUNC));
 }
 
-uint32_t ESP_SD::size(){
+uint32_t ESP_SD::size()
+{
     if(((SdFile *)_sdfile)->isOpen()) {
         _size = ((SdFile *)_sdfile)->fileSize();
     }
     return _size ;
 }
 
-uint32_t ESP_SD::available(){
-    if(!((SdFile *)_sdfile)->isOpen() || !_readonly) return 0;
+uint32_t ESP_SD::available()
+{
+    if(!((SdFile *)_sdfile)->isOpen() || !_readonly) {
+        return 0;
+    }
     _size = ((SdFile *)_sdfile)->fileSize();
-    if (_size == 0) return 0;
-    
+    if (_size == 0) {
+        return 0;
+    }
+
     return _size - _pos ;
 }
 
-void ESP_SD::close(){
+void ESP_SD::close()
+{
     if(((SdFile *)_sdfile)->isOpen()) {
         ((SdFile *)_sdfile)->sync();
         _size = ((SdFile *)_sdfile)->fileSize();
@@ -91,95 +117,136 @@ void ESP_SD::close(){
     }
 }
 
-int16_t ESP_SD::write(const uint8_t * data, uint16_t len){
+int16_t ESP_SD::write(const uint8_t * data, uint16_t len)
+{
     return ((SdFile *)_sdfile)->write(data, len);
 }
 
-int16_t  ESP_SD::write(const uint8_t byte){
+int16_t  ESP_SD::write(const uint8_t byte)
+{
     return ((SdFile *)_sdfile)->write(&byte, 1);
 }
 
 
-bool ESP_SD::exists(const char * path){
+bool ESP_SD::exists(const char * path)
+{
     bool response = open(path);
-    if (response) close();
+    if (response) {
+        close();
+    }
     return response;
 }
 
-bool ESP_SD::remove(const char * path){
-    if (path == NULL) return false;
+bool ESP_SD::remove(const char * path)
+{
+    if (path == NULL) {
+        return false;
+    }
     String fullpath=path;
     String pathname = fullpath.substring(0,fullpath.lastIndexOf("/"));
     String filename = makeshortname(fullpath.substring(fullpath.lastIndexOf("/")+1));
-    if (pathname.length() == 0)pathname="/";
-    if (!openDir(pathname))return false; 
+    if (pathname.length() == 0) {
+        pathname="/";
+    }
+    if (!openDir(pathname)) {
+        return false;
+    }
     SdFile file;
     return  file.remove(&workDir, filename.c_str());
 }
 
-bool ESP_SD::dir_exists(const char * path){
-    return openDir(path); 
+bool ESP_SD::dir_exists(const char * path)
+{
+    return openDir(path);
 }
 
-bool ESP_SD::rmdir(const char * path){
-    if (path == NULL) return false;
+bool ESP_SD::rmdir(const char * path)
+{
+    if (path == NULL) {
+        return false;
+    }
     String fullpath=path;
-    if (fullpath=="/") return false;
-    if (!openDir(fullpath))return false; 
+    if (fullpath=="/") {
+        return false;
+    }
+    if (!openDir(fullpath)) {
+        return false;
+    }
     return workDir.rmRfStar();
 }
 
-bool ESP_SD::mkdir(const char * path){
-    if (path == NULL) return false;
+bool ESP_SD::mkdir(const char * path)
+{
+    if (path == NULL) {
+        return false;
+    }
     String fullpath=path;
     String pathname = fullpath.substring(0,fullpath.lastIndexOf("/"));
     String filename = makeshortname(fullpath.substring(fullpath.lastIndexOf("/")+1));
-    if (pathname.length() == 0)pathname="/";
-    if (!openDir(pathname))return false; 
+    if (pathname.length() == 0) {
+        pathname="/";
+    }
+    if (!openDir(pathname)) {
+        return false;
+    }
     SdFile file;
     return  file.mkdir(&workDir, filename.c_str());
 }
 
-int16_t ESP_SD::read(){
-    if (!_readonly) return 0;
+int16_t ESP_SD::read()
+{
+    if (!_readonly) {
+        return 0;
+    }
     int16_t v = ((SdFile *)_sdfile)->read();
-    if (v!=-1)_pos++;
+    if (v!=-1) {
+        _pos++;
+    }
     return v;
-    
+
 }
 
-uint16_t ESP_SD::read(uint8_t * buf, uint16_t nbyte){
-    if (!_readonly) return 0;
+uint16_t ESP_SD::read(uint8_t * buf, uint16_t nbyte)
+{
+    if (!_readonly) {
+        return 0;
+    }
     int16_t v = ((SdFile *)_sdfile)->read(buf, nbyte);
-    if (v!=-1)_pos+=v;
+    if (v!=-1) {
+        _pos+=v;
+    }
     return v;
 }
 
-String ESP_SD::get_path_part(String data, int index){
-  int found = 0;
-  int strIndex[] = {0, -1};
-  int maxIndex;
-  String no_res;
-  String s = data;
-  s.trim();
-  if (s.length() == 0) return no_res;
-  maxIndex = s.length()-1;
-  if ((s[0] == '/') && (s.length() > 1)){
-       String s2 = &s[1];
-       s = s2;
+String ESP_SD::get_path_part(String data, int index)
+{
+    int found = 0;
+    int strIndex[] = {0, -1};
+    int maxIndex;
+    String no_res;
+    String s = data;
+    s.trim();
+    if (s.length() == 0) {
+        return no_res;
     }
-  for(int i=0; i<=maxIndex && found<=index; i++){
-    if(s.charAt(i)=='/' || i==maxIndex){
-        found++;
-        strIndex[0] = strIndex[1]+1;
-        strIndex[1] = (i == maxIndex) ? i+1 : i;
+    maxIndex = s.length()-1;
+    if ((s[0] == '/') && (s.length() > 1)) {
+        String s2 = &s[1];
+        s = s2;
     }
-  }
+    for(int i=0; i<=maxIndex && found<=index; i++) {
+        if(s.charAt(i)=='/' || i==maxIndex) {
+            found++;
+            strIndex[0] = strIndex[1]+1;
+            strIndex[1] = (i == maxIndex) ? i+1 : i;
+        }
+    }
 
-  return found>index ? s.substring(strIndex[0], strIndex[1]) : no_res;
+    return found>index ? s.substring(strIndex[0], strIndex[1]) : no_res;
 }
 
-String ESP_SD::makeshortname(String longname, uint8_t index){
+String ESP_SD::makeshortname(String longname, uint8_t index)
+{
     String s = longname;
     String part_name;
     String part_ext;
@@ -206,14 +273,17 @@ String ESP_SD::makeshortname(String longname, uint8_t index){
         part_name = part_name.substring(0,6);
         part_name += "~" + String(index);
     }
-    //remove the possible " " for the trick 
+    //remove the possible " " for the trick
     part_name.replace(" ","");
     //create full short name
-    if (part_ext.length() > 0) part_name+="." + part_ext;
+    if (part_ext.length() > 0) {
+        part_name+="." + part_ext;
+    }
     return part_name;
 }
 
-String ESP_SD::makepath83(String longpath){
+String ESP_SD::makepath83(String longpath)
+{
     String path;
     String tmp;
     int index = 0;
@@ -229,24 +299,29 @@ String ESP_SD::makepath83(String longpath){
 }
 
 
-uint32_t ESP_SD::card_total_space(){
-   
+uint32_t ESP_SD::card_total_space()
+{
+
     return (512.00) * (sd_volume.clusterCount()) * (sd_volume.blocksPerCluster());
 }
-uint32_t ESP_SD::card_used_space(){
+uint32_t ESP_SD::card_used_space()
+{
     return (512.00) * (sd_volume.clusterCount() - sd_volume.freeClusterCount() ) * (sd_volume.blocksPerCluster());
 }
 
-bool ESP_SD::openDir(String path){
+bool ESP_SD::openDir(String path)
+{
     static SdFile root;
     static String name;
     int index = 0;
     //SdFile *parent;
-    if(root.isOpen())root.close();
+    if(root.isOpen()) {
+        root.close();
+    }
     if (!sd_volume.init(&(card.getSd2Card()))) {
         return false;
     }
-    if (!root.openRoot(&sd_volume)){
+    if (!root.openRoot(&sd_volume)) {
         return false;
     }
     root.rewind();
@@ -255,34 +330,37 @@ bool ESP_SD::openDir(String path){
     name = get_path_part(path,index);
     while ((name.length() > 0) && (name!="/")) {
         SdFile newDir;
-         if (!newDir.open(&root, name.c_str(), O_READ)) {
+        if (!newDir.open(&root, name.c_str(), O_READ)) {
             return false;
-            }
-         workDir=newDir;
-         //parent = &workDir;
-         index++;
-         if (index > MAX_DIR_DEPTH) {
+        }
+        workDir=newDir;
+        //parent = &workDir;
+        index++;
+        if (index > MAX_DIR_DEPTH) {
             return false;
-            }
-         name = get_path_part(path,index);
-     }
+        }
+        name = get_path_part(path,index);
+    }
     return true;
 }
 //TODO may be add date and use a struct for all info
-bool ESP_SD::readDir(char name[13], uint32_t * size, bool * isFile){
+bool ESP_SD::readDir(char name[13], uint32_t * size, bool * isFile)
+{
     if ((name == NULL) || (size==NULL)) {
         return false;
-     }
+    }
     * size = 0;
     name[0]= 0;
     * isFile = false;
-    
-    if ((workDir.readDir(&dir_info, NULL)) > 0){
+
+    if ((workDir.readDir(&dir_info, NULL)) > 0) {
         workDir.dirName(dir_info,name);
         * size = dir_info.fileSize;
-        if (DIR_IS_FILE(&dir_info))* isFile = true;
+        if (DIR_IS_FILE(&dir_info)) {
+            * isFile = true;
+        }
         return true;
-    } 
+    }
     return false;
 }
 

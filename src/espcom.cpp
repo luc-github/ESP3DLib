@@ -30,73 +30,80 @@
 #endif //HTTP_FEATURE
 void Esp3DCom::echo(const char * data)
 {
-	SERIAL_ECHO_START();
-	SERIAL_ECHOLNPAIR("", data);
+    SERIAL_ECHO_START();
+    SERIAL_ECHOLNPAIR("", data);
 }
 long ESPResponseStream::baudRate()
 {
-	long br = flushableSerial.baudRate();
-	//workaround for ESP32
-	if (br == 115201) {
-		br = 115200;
-	}
-	if (br == 230423) {
-		br = 230400;
-	}
-	return br;
+    long br = flushableSerial.baudRate();
+    //workaround for ESP32
+    if (br == 115201) {
+        br = 115200;
+    }
+    if (br == 230423) {
+        br = 230400;
+    }
+    return br;
 }
 #if defined(HTTP_FEATURE)
-ESPResponseStream::ESPResponseStream(WebServer * webserver){
+ESPResponseStream::ESPResponseStream(WebServer * webserver)
+{
     _header_sent=false;
     _webserver = webserver;
     _pipe = WEB_PIPE;
 }
 #endif //HTTP_FEATURE
-ESPResponseStream::ESPResponseStream(tpipe pipe){
-	_pipe = pipe;
+ESPResponseStream::ESPResponseStream(tpipe pipe)
+{
+    _pipe = pipe;
 }
 
-void ESPResponseStream::println(const char *data){
+void ESPResponseStream::println(const char *data)
+{
     print(data);
     print("\n");
 }
 
-void ESPResponseStream::print(const char *data){
+void ESPResponseStream::print(const char *data)
+{
 #if defined(HTTP_FEATURE)
-	if (_pipe == WEB_PIPE){
-		if (!_header_sent) {
-			 _webserver->setContentLength(CONTENT_LENGTH_UNKNOWN);
-			 _webserver->sendHeader("Content-Type","text/html");
-			 _webserver->sendHeader("Cache-Control","no-cache");
-			 _webserver->send(200);
-			 _header_sent = true;
-			}
-		_buffer+=data;
-		if (_buffer.length() > 1200) {
-			//send data
-			_webserver->sendContent(_buffer);
-			//reset buffer
-			_buffer = "";
-		}
-	}
+    if (_pipe == WEB_PIPE) {
+        if (!_header_sent) {
+            _webserver->setContentLength(CONTENT_LENGTH_UNKNOWN);
+            _webserver->sendHeader("Content-Type","text/html");
+            _webserver->sendHeader("Cache-Control","no-cache");
+            _webserver->send(200);
+            _header_sent = true;
+        }
+        _buffer+=data;
+        if (_buffer.length() > 1200) {
+            //send data
+            _webserver->sendContent(_buffer);
+            //reset buffer
+            _buffer = "";
+        }
+    }
 #endif //HTTP_FEATURE
-	if (_pipe == SERIAL_PIPE) {
-		SERIAL_ECHOPAIR_F("", data);
-	}
+    if (_pipe == SERIAL_PIPE) {
+        SERIAL_ECHOPAIR_F("", data);
+    }
 }
 
-void ESPResponseStream::flush(){
+void ESPResponseStream::flush()
+{
 #if defined(HTTP_FEATURE)
-	if (_pipe == WEB_PIPE){
-		if(_header_sent) {
-			//send data
-			if(_buffer.length() > 0)_webserver->sendContent(_buffer);
-			//close connection
-			_webserver->sendContent("");
-			}
-		_header_sent = false;
-		_buffer = "";
-	}
+    if (_pipe == WEB_PIPE) {
+        if(_header_sent) {
+            //send data
+            if(_buffer.length() > 0) {
+                _webserver->sendContent(_buffer);
+            }
+            //close connection
+            _webserver->sendContent("");
+        }
+        _header_sent = false;
+        _buffer = "";
+    }
 #endif //HTTP_FEATURE
 }
 

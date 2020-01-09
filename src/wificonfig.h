@@ -26,7 +26,8 @@
 
 #include <WiFi.h>
 
-class WiFiConfig {
+class WiFiConfig
+{
 public:
     static bool isValidIP(const char * string);
     static bool isPasswordValid (const char * password);
@@ -42,7 +43,7 @@ public:
     static void begin();
     static void end();
     static void handle();
-    private :
+private :
     static bool ConnectSTA2AP();
     static void WiFiEvent(WiFiEvent_t event);
 };

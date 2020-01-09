@@ -36,28 +36,31 @@ bool Esp3DLibConfig::restart_ESP_module = false;
 /*
  * delay is to avoid sometimes and may not enough neither
  */
-void Esp3DLibConfig::wait(uint32_t milliseconds){
+void Esp3DLibConfig::wait(uint32_t milliseconds)
+{
     uint32_t timeout = millis();
     vTaskDelay(1 / portTICK_RATE_MS);  // Yield to other tasks
     esp_task_wdt_reset(); //for a wait 0;
     //wait feeding WDT
     while ( (millis() - timeout) < milliseconds) {
-       esp_task_wdt_reset();
-       vTaskDelay(1 / portTICK_RATE_MS);  // Yield to other tasks
+        esp_task_wdt_reset();
+        vTaskDelay(1 / portTICK_RATE_MS);  // Yield to other tasks
     }
 }
 
 /**
  * Restart ESP
  */
-void Esp3DLibConfig::restart_ESP(){
+void Esp3DLibConfig::restart_ESP()
+{
     restart_ESP_module=true;
 }
 
 /**
  * Handle not critical actions that must be done in sync environement
  */
-void Esp3DLibConfig::handle() {
+void Esp3DLibConfig::handle()
+{
     //in case of restart requested
     if (restart_ESP_module) {
         ESP.restart();
@@ -65,35 +68,35 @@ void Esp3DLibConfig::handle() {
     }
 }
 
-void Esp3DLibConfig::reset_settings()
+bool Esp3DLibConfig::reset_settings()
 {
-	Preferences prefs;
+    Preferences prefs;
     prefs.begin(NAMESPACE, false);
     String sval;
     int8_t bbuf;
     int16_t ibuf;
     bool error = false;
     sval = DEFAULT_HOSTNAME;
-    if (prefs.putString(HOSTNAME_ENTRY, sval) == 0){
+    if (prefs.putString(HOSTNAME_ENTRY, sval) == 0) {
         error = true;
     }
     sval = DEFAULT_STA_SSID;
-    if (prefs.putString(STA_SSID_ENTRY, sval) == 0){
+    if (prefs.putString(STA_SSID_ENTRY, sval) == 0) {
         error = true;
     }
     sval = DEFAULT_STA_PWD;
-    if (prefs.putString(STA_PWD_ENTRY, sval) != sval.length()){
+    if (prefs.putString(STA_PWD_ENTRY, sval) != sval.length()) {
         error = true;
     }
     sval = DEFAULT_AP_SSID;
-    if (prefs.putString(AP_SSID_ENTRY, sval) == 0){
+    if (prefs.putString(AP_SSID_ENTRY, sval) == 0) {
         error = true;
     }
     sval = DEFAULT_AP_PWD;
-    if (prefs.putString(AP_PWD_ENTRY, sval) != sval.length()){
+    if (prefs.putString(AP_PWD_ENTRY, sval) != sval.length()) {
         error = true;
     }
-    
+
     bbuf = DEFAULT_AP_CHANNEL;
     if (prefs.putChar(AP_CHANNEL_ENTRY, bbuf) ==0 ) {
         error = true;
@@ -101,11 +104,11 @@ void Esp3DLibConfig::reset_settings()
     bbuf = DEFAULT_STA_IP_MODE;
     if (prefs.putChar(STA_IP_MODE_ENTRY, bbuf) ==0 ) {
         error = true;
-    }  
+    }
     bbuf = DEFAULT_HTTP_STATE;
     if (prefs.putChar(HTTP_ENABLE_ENTRY, bbuf) ==0 ) {
         error = true;
-    } 
+    }
     /*bbuf = DEFAULT_TELNET_STATE;
     if (prefs.putChar(TELNET_ENABLE_ENTRY, bbuf) ==0 ) {
         error = true;
@@ -113,7 +116,7 @@ void Esp3DLibConfig::reset_settings()
     bbuf = DEFAULT_RADIO_MODE;
     if (prefs.putChar(ESP_RADIO_MODE, bbuf) ==0 ) {
         error = true;
-    }  
+    }
     ibuf = DEFAULT_WEBSERVER_PORT;
     if (prefs.putUShort(HTTP_PORT_ENTRY, ibuf) == 0) {
         error = true;
@@ -137,8 +140,9 @@ void Esp3DLibConfig::reset_settings()
     sval = DEFAULT_AP_IP;
     if (prefs.putInt(AP_IP_ENTRY, WiFiConfig::IP_int_from_string(sval)) == 0) {
         error = true;
-    }         
+    }
     prefs.end();
+    return error;
 }
 
 #endif // ESP3D_WIFISUPPORT

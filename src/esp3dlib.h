@@ -29,7 +29,7 @@
 class Esp3DLib
 {
 public:
-	/**
+    /**
        * Constructor.
        */
     Esp3DLib();
@@ -40,7 +40,7 @@ public:
     /**
        * Parser for commmand.
        * @param[in] cmd - the string to parse
-       * 
+       *
        * @return true - if it is seen as ESP command.
        * @return false - if not ESP command.
        */

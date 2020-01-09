@@ -26,8 +26,9 @@
 #define TXBUFFERSIZE 1200
 #define RXBUFFERSIZE 128
 #define FLUSHTIMEOUT 500
-class Serial_2_Socket: public Print{
-    public:
+class Serial_2_Socket: public Print
+{
+public:
     Serial_2_Socket();
     ~Serial_2_Socket();
     size_t write(uint8_t c);
@@ -65,7 +66,7 @@ class Serial_2_Socket: public Print{
     operator bool() const;
     bool attachWS(void * web_socket);
     bool detachWS();
-    private:
+private:
     uint32_t _lastflush;
     void * _web_socket;
     uint8_t _TXbuffer[TXBUFFERSIZE];

@@ -24,8 +24,9 @@
 #define _WIFI_SERVICES_H
 
 
-class WiFiServices {
-    public:
+class WiFiServices
+{
+public:
     WiFiServices();
     ~WiFiServices();
     static bool begin();

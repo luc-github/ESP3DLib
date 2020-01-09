@@ -25,7 +25,7 @@
 #undef DISABLED
 #undef _BV
 //version
-#define LIB_VERSION "0.9.0"
+#define LIB_VERSION "1.0.0"
 
 //Editable configuration part
 
@@ -33,13 +33,13 @@
 //#define AUTHENTICATION_FEATURE
 
 //HTTP_FEATURE: enable Web Server
-//Rely on Configuration_adv.h 
+//Rely on Configuration_adv.h
 #ifdef WEBSUPPORT
 #define HTTP_FEATURE
 #endif //WEBSUPPORT
 
 //OTA_FEATURE: this feature is arduino update over the air
-//Rely on Configuration_adv.h 
+//Rely on Configuration_adv.h
 #ifdef OTASUPPORT
 #define OTA_FEATURE
 #endif //OTASUPPORT
@@ -121,13 +121,14 @@
 
 #ifndef ESP3DLIBCONFIG_H
 #define ESP3DLIBCONFIG_H
-class Esp3DLibConfig {
+class Esp3DLibConfig
+{
 public:
     static void wait(uint32_t milliseconds);
     static void restart_ESP();
     static void handle();
-    static void reset_settings();
+    static bool reset_settings();
 private:
-	static bool restart_ESP_module;
+    static bool restart_ESP_module;
 };
 #endif //ESP3DLIBCONFIG_H

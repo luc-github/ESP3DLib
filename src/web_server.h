@@ -39,15 +39,16 @@ struct auth_ip {
 
 #endif
 
-class Web_Server {
-    public:
+class Web_Server
+{
+public:
     Web_Server();
     ~Web_Server();
     bool begin();
     void end();
     static void handle();
     static long get_client_ID();
-    private:
+private:
     static bool _setupdone;
     static WebServer * _webserver;
     static long _id_connection;
