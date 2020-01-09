@@ -1,12 +1,19 @@
-# ESP3DLib 1.0 (Marlin version)
+# ESP3DLib 1.0 Marlin version
 
-<img src="https://github.com/luc-github/ESP3DLib/blob/master/images/ESP3D_social.png">
-Library for ESP32 boards
+<img src="https://github.com/luc-github/ESP3DLib/blob/master/images/ESP3D_social_mini.png">
+Library for ESP32 boards using Marlin 2.x :     
+
+[MRR_ESPA](https://github.com/maplerainresearch/MRR_ESPA), 
+[MRR_ESPE](https://github.com/maplerainresearch/MRR_ESPE), 
+[ESP32 Controller](https://github.com/simon-jouet/ESP32Controller)
+
+The web interface files has it's own repository [ESP3D-WEBUI](https://github.com/luc-github/ESP3D-WEBUI/tree/2.1).
+
+[Latest development version ![Development Version](https://img.shields.io/badge/Devt-v1.0-yellow?style=plastic) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3DLib/master?style=plastic)](https://github.com/luc-github/ESP3DLib/tree/master) [![Travis (.org) branch](https://img.shields.io/travis/luc-github/ESP3DLib/master?style=plastic)](https://travis-ci.org/luc-github/ESP3D) [![Release Version](https://img.shields.io/github/v/release/luc-github/ESP3D-WEBUI?color=green&include_prereleases&label=WebUI&style=plastic)](https://github.com/luc-github/ESP3D-WEBUI/tree/2.1) ![Marlin](https://img.shields.io/github/release/MarlinFirmware/Marlin.svg?style=plastic&label=Marlin)    
+
+[All releases](https://github.com/luc-github/ESP3DLib/releases)
 
 
-Library should work with any 3D printer using Marlin 2.x
-
-The web interface files are present in data directory but UI has it's own repository [ESP3D-WEBUI](https://github.com/luc-github/ESP3D-WEBUI/tree/2.1).
 
 ## Donate
 Every support is welcome: [<img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG_global.gif" border="0" alt="PayPal – The safer, easier way to pay online.">](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=Y8FFE7NA4LJWQ)    
@@ -41,7 +48,7 @@ User:user
 Password: user   
 
 ## Direct commands:    
-Check wiki :https://raw.githubusercontent.com/luc-github/ESP3DLib/master/docs/Commands.txt
+Check [wiki](https://raw.githubusercontent.com/luc-github/ESP3DLib/master/docs/Commands.txt)
 
 ## Contribution/customization
 * To style the code before pushing PR please use [astyle --style=otbs *.h *.cpp *.ino](http://astyle.sourceforge.net/)   
