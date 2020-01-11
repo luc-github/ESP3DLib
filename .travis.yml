@@ -19,7 +19,7 @@ install:
 
 before_script:
   - platformio update
-  - git clone -b esp3d-integration https://github.com/luc-github/Marlin.git Marlin
+  - git clone -b bugfix-2.0.x https://github.com/MarlinFirmware/Marlin.git Marlin
   - cd Marlin
   - sed -i "s/#define WIFISUPPORT/\/\/#define WIFISUPPORT/g" ./Marlin/Configuration_adv.h
   - sed -i "s/\/\/#define ESP3D_WIFISUPPORT/#define ESP3D_WIFISUPPORT/g" ./Marlin/Configuration_adv.h
