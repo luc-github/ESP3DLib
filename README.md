@@ -41,7 +41,7 @@ and
 #define OTASUPPORT          // Support over-the-air firmware updates
 #define WIFI_CUSTOM_COMMAND // Accept feature config commands (e.g., WiFi ESP3D) from the host
 ```
-For advanced configuration, like enable authentication :
+For advanced configuration (temporary way, soon all will be handled from Marlin Configuration_adv.h), like enable authentication :
 go to your `Marlin-2.0.x\.pio\libdeps\esp32\ESP3DLib\src` directory
 and edit [esp3dlibconfig.h](https://github.com/luc-github/ESP3DLib/blob/master/src/esp3dlibconfig.h#L30-L56)
 
