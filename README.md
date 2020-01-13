@@ -1,7 +1,9 @@
 # ESP3DLib 1.0 Marlin version
 
 <img src="https://github.com/luc-github/ESP3DLib/blob/master/images/ESP3D_social_mini.png">
-Library for ESP32 boards using Marlin 2.x :     
+Library for ESP32 boards using Marlin 2.x : 
+
+:warning:Currently code is in [bugfix2.0.x](https://github.com/MarlinFirmware/Marlin/tree/bugfix-2.0.x) not yet in any release of 2.0.X, please use [bugfix2.0.x](https://github.com/MarlinFirmware/Marlin/tree/bugfix-2.0.x)
 
 [MRR_ESPA](https://github.com/maplerainresearch/MRR_ESPA), 
 [MRR_ESPE](https://github.com/maplerainresearch/MRR_ESPE), 
@@ -29,7 +31,35 @@ Especially if need to buy new modules for testing.
 * Fail safe mode (Access point)is enabled if cannot connect to defined station at boot.  
 * The web ui add even more feature : https://github.com/luc-github/ESP3D-WEBUI/blob/master/README.md#features  
 
- 
+## How to enable ?
+In Marlin configuration file : [Configuration_adv.h](https://github.com/MarlinFirmware/Marlin/blob/bugfix-2.0.x/Marlin/Configuration_adv.h#L2823-L2835)  
+
+enable `#define ESP3D_WIFISUPPORT   // ESP3D Library WiFi management (https://github.com/luc-github/ESP3DLib)`
+and 
+```
+#define WEBSUPPORT          // Start a webserver (which may include auto-discovery)
+#define OTASUPPORT          // Support over-the-air firmware updates
+#define WIFI_CUSTOM_COMMAND // Accept feature config commands (e.g., WiFi ESP3D) from the host
+```
+For advanced configuration, like enable authentication :
+go to your `Marlin-2.0.x\.pio\libdeps\esp32\ESP3DLib\src` directory
+and edit [esp3dlibconfig.h](https://github.com/luc-github/ESP3DLib/blob/master/src/esp3dlibconfig.h#L30-L56)
+
+```
+//AUTHENTICATION_FEATURE: protect pages by login password
+//#define AUTHENTICATION_FEATURE
+
+//MDNS_FEATURE: this feature allow  type the name defined
+//in web browser by default: http:\\marlinesp.local and connect
+#define MDNS_FEATURE
+
+//SSDD_FEATURE: this feature is a discovery protocol, supported on Windows out of the box
+#define SSDP_FEATURE
+
+//CAPTIVE_PORTAL_FEATURE: In SoftAP redirect all unknow call to main page
+#define CAPTIVE_PORTAL_FEATURE
+```
+
 ## Default Configuration      
 Default Settings:    
 AP:MARLIN_ESP    
