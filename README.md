@@ -41,24 +41,30 @@ and
 #define OTASUPPORT          // Support over-the-air firmware updates
 #define WIFI_CUSTOM_COMMAND // Accept feature config commands (e.g., WiFi ESP3D) from the host
 ```
-For advanced configuration (temporary way, soon all will be handled from Marlin Configuration_adv.h), like enable authentication :
-go to your `Marlin-2.0.x\.pio\libdeps\esp32\ESP3DLib\src` directory
-and edit [esp3dlibconfig.h](https://github.com/luc-github/ESP3DLib/blob/master/src/esp3dlibconfig.h#L30-L56)
+For advanced configuration add in same section:
+
+to enable this feature:
+```
+//AUTHENTICATION_FEATURE: protect pages by login password.
+#define AUTHENTICATION_FEATURE
+```
+
+to disable any of these features which are enabled by default:
 
 ```
-//AUTHENTICATION_FEATURE: protect pages by login password
-//#define AUTHENTICATION_FEATURE
-
 //MDNS_FEATURE: this feature allow  type the name defined
 //in web browser by default: http:\\marlinesp.local and connect
-#define MDNS_FEATURE
+#define DISABLE_MDNS_FEATURE
 
 //SSDD_FEATURE: this feature is a discovery protocol, supported on Windows out of the box
-#define SSDP_FEATURE
+//Rely on Configuration_adv.h
+#define DISABLE_SSDP_FEATURE
 
 //CAPTIVE_PORTAL_FEATURE: In SoftAP redirect all unknow call to main page
-#define CAPTIVE_PORTAL_FEATURE
-```
+#define DISABLE_CAPTIVE_PORTAL_FEATURE
+```  
+
+
 
 ## Default Configuration      
 Default Settings:    
