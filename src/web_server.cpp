@@ -69,18 +69,6 @@ typedef enum {
     UPLOAD_STATUS_ONGOING  = 4
 } upload_status_type;
 
-#ifdef AUTHENTICATION_FEATURE
-#define DEFAULT_ADMIN_PWD "admin"
-#define DEFAULT_USER_PWD  "user";
-#define DEFAULT_ADMIN_LOGIN  "admin"
-#define DEFAULT_USER_LOGIN "user"
-#define ADMIN_PWD_ENTRY "ADMIN_PWD"
-#define USER_PWD_ENTRY "USER_PWD"
-#define AUTH_ENTRY_NB 20
-#define MAX_LOCAL_PASSWORD_LENGTH   16
-#define MIN_LOCAL_PASSWORD_LENGTH   1
-#endif
-
 //Default 404
 const char PAGE_404 []  = "<HTML>\n<HEAD>\n<title>Redirecting...</title> \n</HEAD>\n<BODY>\n<CENTER>Unknown page : $QUERY$- you will be redirected...\n<BR><BR>\nif not redirected, <a href='http://$WEB_ADDRESS$'>click here</a>\n<BR><BR>\n<PROGRESS name='prg' id='prg'></PROGRESS>\n\n<script>\nvar i = 0; \nvar x = document.getElementById(\"prg\"); \nx.max=5; \nvar interval=setInterval(function(){\ni=i+1; \nvar x = document.getElementById(\"prg\"); \nx.value=i; \nif (i>5) \n{\nclearInterval(interval);\nwindow.location.href='/';\n}\n},1000);\n</script>\n</CENTER>\n</BODY>\n</HTML>\n\n";
 const char PAGE_CAPTIVE [] = "<HTML>\n<HEAD>\n<title>Captive Portal</title> \n</HEAD>\n<BODY>\n<CENTER>Captive Portal page : $QUERY$- you will be redirected...\n<BR><BR>\nif not redirected, <a href='http://$WEB_ADDRESS$'>click here</a>\n<BR><BR>\n<PROGRESS name='prg' id='prg'></PROGRESS>\n\n<script>\nvar i = 0; \nvar x = document.getElementById(\"prg\"); \nx.max=5; \nvar interval=setInterval(function(){\ni=i+1; \nvar x = document.getElementById(\"prg\"); \nx.value=i; \nif (i>5) \n{\nclearInterval(interval);\nwindow.location.href='/';\n}\n},1000);\n</script>\n</CENTER>\n</BODY>\n</HTML>\n\n";
@@ -659,7 +647,7 @@ void Web_Server::handle_login()
         //change password
         if (_webserver->hasArg("PASSWORD") && _webserver->hasArg("USER") && _webserver->hasArg("NEWPASSWORD") && (msg_alert_error==false) ) {
             String newpassword =  _webserver->arg("NEWPASSWORD");
-            if (isLocalPasswordValid(newpassword.c_str())) {
+            if (COMMAND::isLocalPasswordValid(newpassword.c_str())) {
                 String spos;
                 if(sUser == DEFAULT_ADMIN_LOGIN) {
                     spos = ADMIN_PWD_ENTRY;
@@ -1557,23 +1545,6 @@ level_authenticate_type Web_Server::is_authenticated()
 }
 
 #ifdef AUTHENTICATION_FEATURE
-
-bool Web_Server::isLocalPasswordValid (const char * password)
-{
-    char c;
-    //limited size
-    if ( (strlen (password) > MAX_LOCAL_PASSWORD_LENGTH) ||  (strlen (password) < MIN_LOCAL_PASSWORD_LENGTH) ) {
-        return false;
-    }
-    //no space allowed
-    for (int i = 0; i < strlen (password); i++) {
-        c = password[i];
-        if (c == ' ') {
-            return false;
-        }
-    }
-    return true;
-}
 
 //add the information in the linked list if possible
 bool Web_Server::AddAuthIP (auth_ip * item)

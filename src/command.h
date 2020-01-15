@@ -31,6 +31,10 @@ public:
 //   static bool check_command (String buffer, tpipe output, bool executecmd = true);
     static bool execute_internal_command (int cmd, String cmd_params, level_authenticate_type auth_level,  ESPResponseStream  *espresponse);
     static String get_param (String & cmd_params, const char * id, bool withspace = false);
+#ifdef AUTHENTICATION_FEATURE
+    static bool isLocalPasswordValid (const char * password);
+#endif //AUTHENTICATION_FEATURE
+
 //    static bool isadmin (String & cmd_params);
 //    static bool isuser (String & cmd_params);
 };
