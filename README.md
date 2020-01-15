@@ -34,16 +34,26 @@ Especially if need to buy new modules for testing.
 ## How to enable ?
 In Marlin configuration file : [Configuration_adv.h](https://github.com/MarlinFirmware/Marlin/blob/bugfix-2.0.x/Marlin/Configuration_adv.h#L2823-L2835)  
 
-enable `#define ESP3D_WIFISUPPORT   // ESP3D Library WiFi management (https://github.com/luc-github/ESP3DLib)`
-and 
+enable `#define ESP3D_WIFISUPPORT   // ESP3D Library WiFi management (https://github.com/luc-github/ESP3DLib)`    
+
+Define to which access point your board need to connect to:
+```
+  #define WIFI_SSID "Wifi SSID"
+  #define WIFI_PWD  "Wifi Password"
+```
+if not defined or you left like this the board will act as an Access Point instead.
+
+and finally
 ```
 #define WEBSUPPORT          // Start a webserver (which may include auto-discovery)
 #define OTASUPPORT          // Support over-the-air firmware updates
 #define WIFI_CUSTOM_COMMAND // Accept feature config commands (e.g., WiFi ESP3D) from the host
 ```
+
+
 For advanced configuration add in same section:
 
-to enable this feature:
+to enable this feature which is disabled by default:
 ```
 //AUTHENTICATION_FEATURE: protect pages by login password.
 #define AUTHENTICATION_FEATURE
@@ -67,7 +77,7 @@ to disable any of these features which are enabled by default:
 
 
 ## Default Configuration      
-Default Settings:    
+Default Settings if not modified in Configuration_adv.h:    
 AP:MARLIN_ESP    
 PW:12345678   
 Authentification: WPA     
