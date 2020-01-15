@@ -167,7 +167,7 @@ void WiFiConfig::WiFiEvent(WiFiEvent_t event)
         Esp3DCom::echo(WiFi.localIP().toString().c_str());
         break;
     case SYSTEM_EVENT_STA_DISCONNECTED:
-        Esp3DCom::echo("WiFi lost connection");
+        Esp3DCom::echo("WiFi not connected");
         break;
     default:
         break;

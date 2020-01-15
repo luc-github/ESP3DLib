@@ -121,6 +121,9 @@ bool WiFiServices::begin()
         }
     }
 #endif //MDNS_FEATURE
+#ifdef AUTHENTICATION_FEATURE
+    Esp3DCom::echo("Authentication enabled");
+#endif //AUTHENTICATION_FEATURE
 #ifdef HTTP_FEATURE
     web_server.begin();
 #endif //HTTP_FEATURE

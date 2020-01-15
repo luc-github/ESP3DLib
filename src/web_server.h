@@ -68,8 +68,7 @@ private:
     static bool ClearAuthIP (IPAddress ip, const char * sessionID);
     static auth_ip * GetAuth (IPAddress ip, const char * sessionID);
     static level_authenticate_type ResetAuthIP (IPAddress ip, const char * sessionID);
-    static bool isLocalPasswordValid (const char * password);
-#endif
+#endif //AUTHENTICATION_FEATURE
 #ifdef SSDP_FEATURE
     static void handle_SSDP ();
 #endif //SSDP_FEATURE
@@ -86,7 +85,7 @@ private:
 #if defined(SDSUPPORT)
     static void handle_direct_SDFileList();
     static void SDFile_direct_upload();
-#endif
+#endif //SDSUPPORT
 };
 
 extern Web_Server web_server;

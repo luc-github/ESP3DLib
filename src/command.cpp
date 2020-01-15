@@ -74,6 +74,26 @@ String COMMAND::get_param (String & cmd_params, const char * id, bool withspace)
 }
 
 
+#ifdef AUTHENTICATION_FEATURE
+bool COMMAND::isLocalPasswordValid (const char * password)
+{
+    char c;
+    //limited size
+    if ( (strlen (password) > MAX_LOCAL_PASSWORD_LENGTH) ||  (strlen (password) < MIN_LOCAL_PASSWORD_LENGTH) ) {
+        return false;
+    }
+    //no space allowed
+    for (int i = 0; i < strlen (password); i++) {
+        c = password[i];
+        if (c == ' ') {
+            return false;
+        }
+    }
+    return true;
+}
+#endif //AUTHENTICATION_FEATURE
+
+
 bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authenticate_type auth_level,  ESPResponseStream  *espresponse)
 {
     bool response = true;

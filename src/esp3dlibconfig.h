@@ -25,12 +25,10 @@
 #undef DISABLED
 #undef _BV
 //version
-#define LIB_VERSION "1.0.0"
-
-//Editable configuration part
+#define LIB_VERSION "1.0.1"
 
 //AUTHENTICATION_FEATURE: protect pages by login password
-//#define AUTHENTICATION_FEATURE
+//Rely on Configuration_adv.h
 
 //HTTP_FEATURE: enable Web Server
 //Rely on Configuration_adv.h
@@ -46,13 +44,23 @@
 
 //MDNS_FEATURE: this feature allow  type the name defined
 //in web browser by default: http:\\marlinesp.local and connect
+//Rely on Configuration_adv.h
+#ifndef DISABLE_MDNS_FEATURE
 #define MDNS_FEATURE
+#endif //DISABLE_MDNS_FEATURE
+
 
 //SSDD_FEATURE: this feature is a discovery protocol, supported on Windows out of the box
+//Rely on Configuration_adv.h
+#ifndef DISABLE_SSDP_FEATURE
 #define SSDP_FEATURE
+#endif //DISABLE_SSDP_FEATURE
 
 //CAPTIVE_PORTAL_FEATURE: In SoftAP redirect all unknow call to main page
+//Rely on Configuration_adv.h
+#ifndef DISABLE_CAPTIVE_PORTAL_FEATURE
 #define CAPTIVE_PORTAL_FEATURE
+#endif //DISABLE_CAPTIVE_PORTAL_FEATURE
 
 //for Debug this can be disabled
 #define ENABLE_SERIAL2SOCKET_OUT
@@ -87,13 +95,22 @@
 
 //defaults values
 #define DEFAULT_HOSTNAME "marlinesp"
+#ifndef WIFI_SSID
 #define DEFAULT_STA_SSID "MARLIN_ESP"
+#define DEFAULT_RADIO_MODE ESP_WIFI_AP
+#else
+#define DEFAULT_STA_SSID WIFI_SSID
+#define DEFAULT_RADIO_MODE ESP_WIFI_STA
+#endif //WIFI_SSID
+#ifndef WIFI_PWD
 #define DEFAULT_STA_PWD "12345678"
+#else
+#define DEFAULT_STA_PWD WIFI_PWD
+#endif //WIFI_PWD
 #define DEFAULT_STA_IP "0.0.0.0"
 #define DEFAULT_STA_GW "0.0.0.0"
 #define DEFAULT_STA_MK "0.0.0.0"
 #define DEFAULT_STA_IP_MODE DHCP_MODE
-#define DEFAULT_RADIO_MODE ESP_WIFI_AP
 #define DEFAULT_AP_SSID "MARLIN_ESP"
 #define DEFAULT_AP_PWD "12345678"
 #define DEFAULT_AP_IP "192.168.0.1"
@@ -102,6 +119,18 @@
 #define DEFAULT_WEBSERVER_PORT 80
 #define DEFAULT_HTTP_STATE 1
 #define HIDDEN_PASSWORD "********"
+
+#ifdef AUTHENTICATION_FEATURE
+#define DEFAULT_ADMIN_PWD "admin"
+#define DEFAULT_USER_PWD  "user";
+#define DEFAULT_ADMIN_LOGIN  "admin"
+#define DEFAULT_USER_LOGIN "user"
+#define ADMIN_PWD_ENTRY "ADMIN_PWD"
+#define USER_PWD_ENTRY "USER_PWD"
+#define AUTH_ENTRY_NB 20
+#define MAX_LOCAL_PASSWORD_LENGTH   16
+#define MIN_LOCAL_PASSWORD_LENGTH   1
+#endif
 
 //boundaries
 #define MAX_SSID_LENGTH         32
