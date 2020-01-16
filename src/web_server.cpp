@@ -1387,6 +1387,8 @@ void Web_Server::SDFile_direct_upload()
         }
         if (_upload_status == UPLOAD_STATUS_ONGOING) {
             _upload_status = UPLOAD_STATUS_SUCCESSFUL;
+        } else {
+            sdfile.remove (upload_filename.c_str());
         }
     } else {//Upload cancelled
         _upload_status=UPLOAD_STATUS_FAILED;
