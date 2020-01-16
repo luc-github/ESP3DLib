@@ -43,7 +43,6 @@
 #include <ESP32SSDP.h>
 #include <StreamString.h>
 #include <Update.h>
-//#include <esp_wifi.h>
 #include <esp_wifi_types.h>
 #ifdef MDNS_FEATURE
 #include <ESPmDNS.h>
@@ -56,7 +55,7 @@
 const byte DNS_PORT = 53;
 DNSServer dnsServer;
 #endif //CAPTIVE_PORTAL_FEATURE
-
+#include <esp_ota_ops.h>
 //embedded response file if no files on SPIFFS
 #include "nofile.h"
 
@@ -73,6 +72,15 @@ typedef enum {
 const char PAGE_404 []  = "<HTML>\n<HEAD>\n<title>Redirecting...</title> \n</HEAD>\n<BODY>\n<CENTER>Unknown page : $QUERY$- you will be redirected...\n<BR><BR>\nif not redirected, <a href='http://$WEB_ADDRESS$'>click here</a>\n<BR><BR>\n<PROGRESS name='prg' id='prg'></PROGRESS>\n\n<script>\nvar i = 0; \nvar x = document.getElementById(\"prg\"); \nx.max=5; \nvar interval=setInterval(function(){\ni=i+1; \nvar x = document.getElementById(\"prg\"); \nx.value=i; \nif (i>5) \n{\nclearInterval(interval);\nwindow.location.href='/';\n}\n},1000);\n</script>\n</CENTER>\n</BODY>\n</HTML>\n\n";
 const char PAGE_CAPTIVE [] = "<HTML>\n<HEAD>\n<title>Captive Portal</title> \n</HEAD>\n<BODY>\n<CENTER>Captive Portal page : $QUERY$- you will be redirected...\n<BR><BR>\nif not redirected, <a href='http://$WEB_ADDRESS$'>click here</a>\n<BR><BR>\n<PROGRESS name='prg' id='prg'></PROGRESS>\n\n<script>\nvar i = 0; \nvar x = document.getElementById(\"prg\"); \nx.max=5; \nvar interval=setInterval(function(){\ni=i+1; \nvar x = document.getElementById(\"prg\"); \nx.value=i; \nif (i>5) \n{\nclearInterval(interval);\nwindow.location.href='/';\n}\n},1000);\n</script>\n</CENTER>\n</BODY>\n</HTML>\n\n";
 
+//error codes fo upload
+#define ESP_ERROR_AUTHENTICATION 1
+#define ESP_ERROR_FILE_CREATION  2
+#define ESP_ERROR_FILE_WRITE 3
+#define ESP_ERROR_UPLOAD 4
+#define ESP_ERROR_NOT_ENOUGH_SPACE 5
+#define ESP_ERROR_UPLOAD_CANCELLED 6
+#define ESP_ERROR_FILE_CLOSE 7
+#define ESP_ERROR_NO_SD 8
 
 Web_Server web_server;
 bool Web_Server::_setupdone = false;
@@ -757,9 +765,11 @@ void Web_Server::handleFileList ()
     }
     String path ;
     String status = "Ok";
-    if ( (_upload_status == UPLOAD_STATUS_FAILED) || (_upload_status == UPLOAD_STATUS_CANCELLED) ) {
+    if (_upload_status == UPLOAD_STATUS_FAILED) {
         status = "Upload failed";
+        _upload_status = UPLOAD_STATUS_NONE;
     }
+    _upload_status = UPLOAD_STATUS_NONE;
     //be sure root is correct according authentication
     if (auth_level == LEVEL_ADMIN) {
         path = "/";
@@ -936,117 +946,167 @@ void Web_Server::handleFileList ()
     _upload_status = UPLOAD_STATUS_NONE;
 }
 
+//push error code and message to websocket
+void Web_Server::pushError(int code, const char * st, bool web_error, uint16_t timeout)
+{
+    if (_socket_server && st) {
+        String s = "ERROR:" + String(code) + ":";
+        s+=st;
+        _socket_server->sendTXT(_id_connection, s);
+        if (web_error != 0) {
+            if (_webserver) {
+                if (_webserver->client().available() > 0) {
+                    _webserver->send (web_error, "text/xml", st);
+                }
+            }
+        }
+        uint32_t t = millis();
+        while (millis() - t < timeout) {
+            _socket_server->loop();
+            delay(10);
+        }
+    }
+}
+
+//abort reception of packages
+void Web_Server::cancelUpload()
+{
+    if (_webserver) {
+        if (_webserver->client().available() > 0) {
+            HTTPUpload& upload = _webserver->upload();
+            upload.status = UPLOAD_FILE_ABORTED;
+            errno = ECONNABORTED;
+            _webserver->client().stop();
+            delay(100);
+        }
+    }
+}
+
 //SPIFFS files uploader handle
 void Web_Server::SPIFFSFileupload ()
 {
+    static String filename;
+    static File fsUploadFile = (File)0;
     //get authentication status
     level_authenticate_type auth_level= is_authenticated();
     //Guest cannot upload - only admin
     if (auth_level == LEVEL_GUEST) {
-        _upload_status = UPLOAD_STATUS_CANCELLED;
+        _upload_status = UPLOAD_STATUS_FAILED;
         Esp3DCom::echo("Upload rejected");
-        _webserver->client().stop();
-        return;
-    }
-    static String filename;
-    static File fsUploadFile = (File)0;
+        pushError(ESP_ERROR_AUTHENTICATION, "Upload rejected", 401);
+    } else {
+        HTTPUpload& upload = _webserver->upload();
+        if((_upload_status != UPLOAD_STATUS_FAILED)|| (upload.status == UPLOAD_FILE_START)) {
+            //Upload start
+            //**************
+            if(upload.status == UPLOAD_FILE_START) {
+                _upload_status= UPLOAD_STATUS_ONGOING;
+                String upload_filename = upload.filename;
+                if (upload_filename[0] != '/') {
+                    filename = "/" + upload_filename;
+                } else {
+                    filename = upload.filename;
+                }
+                //according User or Admin the root is different as user is isolate to /user when admin has full access
+                if(auth_level != LEVEL_ADMIN) {
+                    upload_filename = filename;
+                    filename = "/user" + upload_filename;
+                }
 
-    HTTPUpload& upload = _webserver->upload();
-    //Upload start
-    //**************
-    if(upload.status == UPLOAD_FILE_START) {
-        String upload_filename = upload.filename;
-        if (upload_filename[0] != '/') {
-            filename = "/" + upload_filename;
-        } else {
-            filename = upload.filename;
-        }
-        //according User or Admin the root is different as user is isolate to /user when admin has full access
-        if(auth_level != LEVEL_ADMIN) {
-            upload_filename = filename;
-            filename = "/user" + upload_filename;
-        }
-
-        if (SPIFFS.exists (filename) ) {
-            SPIFFS.remove (filename);
-        }
-        if (fsUploadFile ) {
-            fsUploadFile.close();
-        }
-        //create file
-        fsUploadFile = SPIFFS.open(filename, FILE_WRITE);
-        //check If creation succeed
-        if (fsUploadFile) {
-            //if yes upload is started
-            _upload_status= UPLOAD_STATUS_ONGOING;
-        } else {
-            //if no set cancel flag
-            _upload_status=UPLOAD_STATUS_CANCELLED;
-            Esp3DCom::echo("Upload error");
-            _webserver->client().stop();
-        }
-        //Upload write
-        //**************
-    } else if(upload.status == UPLOAD_FILE_WRITE) {
-        //check if file is available and no error
-        if(fsUploadFile && _upload_status == UPLOAD_STATUS_ONGOING) {
-            //no error so write post date
-            fsUploadFile.write(upload.buf, upload.currentSize);
-        } else {
-            //we have a problem set flag UPLOAD_STATUS_CANCELLED
-            _upload_status=UPLOAD_STATUS_CANCELLED;
-            fsUploadFile.close();
-            if (SPIFFS.exists (filename) ) {
-                SPIFFS.remove (filename);
-            }
-            _webserver->client().stop();
-            Esp3DCom::echo("Upload error");
-        }
-        //Upload end
-        //**************
-    } else if(upload.status == UPLOAD_FILE_END) {
-        //check if file is still open
-        if(fsUploadFile) {
-            //close it
-            fsUploadFile.close();
-            //check size
-            String  sizeargname  = upload.filename + "S";
-            fsUploadFile = SPIFFS.open (filename, FILE_READ);
-            uint32_t filesize = fsUploadFile.size();
-            fsUploadFile.close();
-            if (_webserver->hasArg (sizeargname.c_str()) ) {
-                if (_webserver->arg (sizeargname.c_str()) != String(filesize)) {
-                    _upload_status = UPLOAD_STATUS_FAILED;
+                if (SPIFFS.exists (filename) ) {
                     SPIFFS.remove (filename);
                 }
-            }
-            if (_upload_status == UPLOAD_STATUS_ONGOING) {
-                _upload_status = UPLOAD_STATUS_SUCCESSFUL;
+                if (fsUploadFile ) {
+                    fsUploadFile.close();
+                }
+                String  sizeargname  = upload.filename + "S";
+                if (_webserver->hasArg (sizeargname.c_str()) ) {
+                    uint32_t filesize = _webserver->arg (sizeargname.c_str()).toInt();
+                    uint32_t freespace = SPIFFS.totalBytes() - SPIFFS.usedBytes();
+                    if (filesize > freespace) {
+                        _upload_status=UPLOAD_STATUS_FAILED;
+                        Esp3DCom::echo("Upload error");
+                        pushError(ESP_ERROR_NOT_ENOUGH_SPACE, "Upload rejected, not enough space");
+                    }
+
+                }
+                if (_upload_status != UPLOAD_STATUS_FAILED) {
+                    //create file
+                    fsUploadFile = SPIFFS.open(filename, FILE_WRITE);
+                    //check If creation succeed
+                    if (fsUploadFile) {
+                        //if yes upload is started
+                        _upload_status= UPLOAD_STATUS_ONGOING;
+                    } else {
+                        //if no set cancel flag
+                        _upload_status=UPLOAD_STATUS_FAILED;
+                        Esp3DCom::echo("Upload error");
+                        pushError(ESP_ERROR_FILE_CREATION, "File creation failed");
+                    }
+                }
+                //Upload write
+                //**************
+            } else if(upload.status == UPLOAD_FILE_WRITE) {
+                vTaskDelay(1 / portTICK_RATE_MS);
+                //check if file is available and no error
+                if(fsUploadFile && _upload_status == UPLOAD_STATUS_ONGOING) {
+                    //no error so write post date
+                    if (upload.currentSize != fsUploadFile.write(upload.buf, upload.currentSize)) {
+                        _upload_status=UPLOAD_STATUS_FAILED;
+                        Esp3DCom::echo("Upload error");
+                        pushError(ESP_ERROR_FILE_WRITE, "File write failed");
+                    }
+                } else {
+                    //we have a problem set flag UPLOAD_STATUS_FAILED
+                    _upload_status=UPLOAD_STATUS_FAILED;
+                    Esp3DCom::echo("Upload error");
+                    pushError(ESP_ERROR_FILE_WRITE, "File write failed");
+                }
+                //Upload end
+                //**************
+            } else if(upload.status == UPLOAD_FILE_END) {
+                //check if file is still open
+                if(fsUploadFile) {
+                    //close it
+                    fsUploadFile.close();
+                    //check size
+                    String  sizeargname  = upload.filename + "S";
+                    fsUploadFile = SPIFFS.open (filename, FILE_READ);
+                    uint32_t filesize = fsUploadFile.size();
+                    fsUploadFile.close();
+                    if (_webserver->hasArg (sizeargname.c_str()) ) {
+                        if (_webserver->arg (sizeargname.c_str()) != String(filesize)) {
+                            _upload_status = UPLOAD_STATUS_FAILED;
+                        }
+                    }
+                    if (_upload_status == UPLOAD_STATUS_ONGOING) {
+                        _upload_status = UPLOAD_STATUS_SUCCESSFUL;
+                    } else {
+                        Esp3DCom::echo("Upload error");
+                        pushError(ESP_ERROR_UPLOAD, "File upload failed");
+                    }
+                } else {
+                    //we have a problem set flag UPLOAD_STATUS_FAILED
+                    _upload_status=UPLOAD_STATUS_FAILED;
+                    pushError(ESP_ERROR_FILE_CLOSE, "File close failed");
+                    Esp3DCom::echo("Upload error");
+
+                }
+                //Upload cancelled
+                //**************
             } else {
-                Esp3DCom::echo("Upload error");
+                _upload_status = UPLOAD_STATUS_FAILED;
+                //pushError(ESP_ERROR_UPLOAD, "File upload failed");
+                return;
             }
-        } else {
-            //we have a problem set flag UPLOAD_STATUS_CANCELLED
-            _upload_status=UPLOAD_STATUS_CANCELLED;
-            _webserver->client().stop();
-            if (SPIFFS.exists (filename) ) {
-                SPIFFS.remove (filename);
-            }
-            Esp3DCom::echo("Upload error");
         }
-        //Upload cancelled
-        //**************
-    } else {
-        if (_upload_status == UPLOAD_STATUS_ONGOING) {
-            _upload_status = UPLOAD_STATUS_CANCELLED;
-        }
-        if(fsUploadFile) {
-            fsUploadFile.close();
-        }
+    }
+
+    if (_upload_status == UPLOAD_STATUS_FAILED) {
+        cancelUpload();
         if (SPIFFS.exists (filename) ) {
             SPIFFS.remove (filename);
         }
-        Esp3DCom::echo("Upload error");
     }
     Esp3DLibConfig::wait(0);
 }
@@ -1079,63 +1139,92 @@ void Web_Server::handleUpdate ()
 void Web_Server::WebUpdateUpload ()
 {
     static size_t last_upload_update;
-    static uint32_t maxSketchSpace ;
+    static uint32_t maxSketchSpace = 0;
     //only admin can update FW
     if (is_authenticated() != LEVEL_ADMIN) {
-        _upload_status = UPLOAD_STATUS_CANCELLED;
-        _webserver->client().stop();
+        _upload_status = UPLOAD_STATUS_FAILED;
         Esp3DCom::echo("Upload rejected");
-        return;
+        pushError(ESP_ERROR_AUTHENTICATION, "Upload rejected", 401);
+    } else {
+        //get current file ID
+        HTTPUpload& upload = _webserver->upload();
+        if((_upload_status != UPLOAD_STATUS_FAILED)|| (upload.status == UPLOAD_FILE_START)) {
+            //Upload start
+            //**************
+            if(upload.status == UPLOAD_FILE_START) {
+                Esp3DCom::echo("Update Firmware");
+                _upload_status= UPLOAD_STATUS_ONGOING;
+                String  sizeargname  = upload.filename + "S";
+                if (_webserver->hasArg (sizeargname.c_str()) ) {
+                    maxSketchSpace = _webserver->arg (sizeargname).toInt();
+                }
+                //check space
+                size_t flashsize = 0;
+                if (esp_ota_get_running_partition()) {
+                    const esp_partition_t* partition = esp_ota_get_next_update_partition(NULL);
+                    if (partition) {
+                        flashsize = partition->size;
+                    }
+                }
+                if (flashsize < maxSketchSpace) {
+                    pushError(ESP_ERROR_NOT_ENOUGH_SPACE, "Upload rejected, not enough space");
+                    _upload_status=UPLOAD_STATUS_FAILED;
+                    Esp3DCom::echo("Update cancelled");
+                }
+                if (_upload_status != UPLOAD_STATUS_FAILED) {
+                    last_upload_update = 0;
+                    if(!Update.begin()) { //start with max available size
+                        _upload_status=UPLOAD_STATUS_FAILED;
+                        Esp3DCom::echo("Update cancelled");
+                        pushError(ESP_ERROR_NOT_ENOUGH_SPACE, "Upload rejected, not enough space");
+                    } else {
+                        Esp3DCom::echo("Update 0%");
+                    }
+                }
+                //Upload write
+                //**************
+            } else if(upload.status == UPLOAD_FILE_WRITE) {
+                //check if no error
+                if (_upload_status == UPLOAD_STATUS_ONGOING) {
+                    if ( ((100 * upload.totalSize) / maxSketchSpace) !=last_upload_update) {
+                        if ( maxSketchSpace > 0) {
+                            last_upload_update = (100 * upload.totalSize) / maxSketchSpace;
+                        } else {
+                            last_upload_update = upload.totalSize;
+                        }
+                        String s = "Update ";
+                        s+= String(last_upload_update);
+                        s+="%";
+                        Esp3DCom::echo(s.c_str());
+                    }
+                    if(Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
+                        _upload_status=UPLOAD_STATUS_FAILED;
+                        Esp3DCom::echo("Update write failed");
+                        pushError(ESP_ERROR_FILE_WRITE, "File write failed");
+                    }
+                }
+                //Upload end
+                //**************
+            } else if(upload.status == UPLOAD_FILE_END) {
+                if(Update.end(true)) { //true to set the size to the current progress
+                    //Now Reboot
+                    Esp3DCom::echo("Update 100%");
+                    _upload_status=UPLOAD_STATUS_SUCCESSFUL;
+                } else {
+                    _upload_status=UPLOAD_STATUS_FAILED;
+                    Esp3DCom::echo("Update failed");
+                    pushError(ESP_ERROR_UPLOAD, "Update upload failed");
+                }
+            } else if(upload.status == UPLOAD_FILE_ABORTED) {
+                Esp3DCom::echo("Update failed");
+                _upload_status=UPLOAD_STATUS_FAILED;
+                return;
+            }
+        }
     }
-
-    //get current file ID
-    HTTPUpload& upload = _webserver->upload();
-    //Upload start
-    //**************
-    if(upload.status == UPLOAD_FILE_START) {
-        Esp3DCom::echo("Update Firmware");
-        _upload_status= UPLOAD_STATUS_ONGOING;
-
-        //Not sure can do OTA on 2Mb board
-        maxSketchSpace = (ESP.getFlashChipSize() > 0x20000) ? 0x140000 : 0x140000 / 2;
-        last_upload_update = 0;
-        if(!Update.begin(maxSketchSpace)) { //start with max available size
-            _upload_status=UPLOAD_STATUS_CANCELLED;
-            Esp3DCom::echo("Update cancelled");
-            _webserver->client().stop();
-            return;
-        } else {
-            Esp3DCom::echo("Update 0%");
-        }
-        //Upload write
-        //**************
-    } else if(upload.status == UPLOAD_FILE_WRITE) {
-        //check if no error
-        if (_upload_status == UPLOAD_STATUS_ONGOING) {
-            //we do not know the total file size yet but we know the available space so let's use it
-            if ( ((100 * upload.totalSize) / maxSketchSpace) !=last_upload_update) {
-                last_upload_update = (100 * upload.totalSize) / maxSketchSpace;
-                String s = "Update ";
-                s+= String(last_upload_update);
-                s+="%";
-                Esp3DCom::echo(s.c_str());
-            }
-            if(Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
-                _upload_status=UPLOAD_STATUS_CANCELLED;
-            }
-        }
-        //Upload end
-        //**************
-    } else if(upload.status == UPLOAD_FILE_END) {
-        if(Update.end(true)) { //true to set the size to the current progress
-            //Now Reboot
-            Esp3DCom::echo("Update 100%");
-            _upload_status=UPLOAD_STATUS_SUCCESSFUL;
-        }
-    } else if(upload.status == UPLOAD_FILE_ABORTED) {
-        Esp3DCom::echo("Update failed");
+    if (_upload_status == UPLOAD_STATUS_FAILED) {
+        cancelUpload();
         Update.end();
-        _upload_status=UPLOAD_STATUS_CANCELLED;
     }
     Esp3DLibConfig::wait(0);
 }
@@ -1285,8 +1374,8 @@ void Web_Server::handle_direct_SDFileList()
         jsonfile+="],\"path\":\"";
         jsonfile+=path + "\",";
     }
-    static uint32_t volTotal = card.card_total_space();
-    static uint32_t volUsed = card.card_used_space();;
+    static uint64_t volTotal = card.card_total_space();
+    static uint64_t volUsed = card.card_used_space();
     //TODO
     //Get right values
     uint32_t  occupedspace = (volUsed/volTotal)*100;
@@ -1319,81 +1408,97 @@ void Web_Server::SDFile_direct_upload()
     static String upload_filename;
     //this is only for admin and user
     if (is_authenticated() == LEVEL_GUEST) {
-        _upload_status=UPLOAD_STATUS_NONE;
-        _webserver->send(401, "application/json", "{\"status\":\"Authentication failed!\"}");
-        return;
-    }
-    //retrieve current file id
-    HTTPUpload& upload = _webserver->upload();
-
-    //Upload start
-    //**************
-    if(upload.status == UPLOAD_FILE_START) {
-        upload_filename = upload.filename;
-        if (upload_filename[0] != '/') {
-            upload_filename = "/" + upload.filename;
-        }
-        upload_filename=  sdfile.makepath83(upload_filename);
-        if ( sdfile.card_status() != 1) {
-            _upload_status=UPLOAD_STATUS_CANCELLED;
-            Esp3DCom::echo("Upload cancelled");
-            _webserver->client().stop();
-            return;
-        }
-        if (sdfile.exists (upload_filename.c_str()) ) {
-            sdfile.remove (upload_filename.c_str());
-        }
-
-        if (sdfile.isopen()) {
-            sdfile.close();
-        }
-        if (!sdfile.open (upload_filename.c_str(),false)) {
-            Esp3DCom::echo("Upload cancelled");
-            _webserver->client().stop();
-            _upload_status = UPLOAD_STATUS_FAILED;
-            return ;
-        } else {
-            _upload_status = UPLOAD_STATUS_ONGOING;
-        }
-        //Upload write
-        //**************
-    } else if(upload.status == UPLOAD_FILE_WRITE) {
-        //we need to check SD is inside
-        if ( sdfile.card_status() != 1) {
-            sdfile.close();
-            Esp3DCom::echo("Upload failed");
-            if (sdfile.exists (upload_filename.c_str()) ) {
-                sdfile.remove (upload_filename.c_str());
-            }
-            _webserver->client().stop();
-            return;
-        }
-        if (sdfile.isopen()) {
-            if ( (_upload_status = UPLOAD_STATUS_ONGOING) && (upload.currentSize > 0)) {
-                sdfile.write (upload.buf, upload.currentSize);
-            }
-        }
-        //Upload end
-        //**************
-    } else if(upload.status == UPLOAD_FILE_END) {
-        sdfile.close();
-        uint32_t filesize = sdfile.size();
-        String  sizeargname  = upload.filename + "S";
-        if (_webserver->hasArg (sizeargname.c_str()) ) {
-            if (_webserver->arg (sizeargname.c_str()) != String(filesize)) {
-                Esp3DCom::echo("Upload failed");
-                _upload_status = UPLOAD_STATUS_FAILED;
-            }
-        }
-        if (_upload_status == UPLOAD_STATUS_ONGOING) {
-            _upload_status = UPLOAD_STATUS_SUCCESSFUL;
-        } else {
-            sdfile.remove (upload_filename.c_str());
-        }
-    } else {//Upload cancelled
         _upload_status=UPLOAD_STATUS_FAILED;
-        Esp3DCom::echo("Upload failed");
-        _webserver->client().stop();
+        _webserver->send(401, "application/json", "{\"status\":\"Authentication failed!\"}");
+        pushError(ESP_ERROR_AUTHENTICATION, "Upload rejected", 401);
+    } else {
+        //retrieve current file id
+        HTTPUpload& upload = _webserver->upload();
+        if((_upload_status != UPLOAD_STATUS_FAILED) || (upload.status == UPLOAD_FILE_START)) {
+            //Upload start
+            //**************
+            if(upload.status == UPLOAD_FILE_START) {
+                upload_filename = upload.filename;
+                if (upload_filename[0] != '/') {
+                    upload_filename = "/" + upload.filename;
+                }
+                upload_filename=  sdfile.makepath83(upload_filename);
+                if ( sdfile.card_status() != 1) {
+                    _upload_status=UPLOAD_STATUS_FAILED;
+                    Esp3DCom::echo("Upload cancelled");
+                    pushError(ESP_ERROR_UPLOAD_CANCELLED, "Upload cancelled");
+                } else {
+                    if (sdfile.exists (upload_filename.c_str()) ) {
+                        sdfile.remove (upload_filename.c_str());
+                    }
+
+                    if (sdfile.isopen()) {
+                        sdfile.close();
+                    }
+                    String  sizeargname  = upload.filename + "S";
+                    if (_webserver->hasArg (sizeargname.c_str()) ) {
+                        uint32_t filesize = _webserver->arg (sizeargname.c_str()).toInt();
+                        uint64_t freespace = sdfile.card_total_space()-sdfile.card_used_space();;
+                        if (filesize > freespace) {
+                            _upload_status=UPLOAD_STATUS_FAILED;
+                            Esp3DCom::echo("Upload cancelled");
+                            pushError(ESP_ERROR_NOT_ENOUGH_SPACE, "Upload rejected, not enough space");
+                        }
+
+                    }
+                    if (_upload_status != UPLOAD_STATUS_FAILED) {
+                        if (!sdfile.open (upload_filename.c_str(),false)) {
+                            Esp3DCom::echo("Upload failed");
+                            _upload_status = UPLOAD_STATUS_FAILED;
+                            pushError(ESP_ERROR_FILE_CREATION, "File creation failed");
+                        } else {
+                            _upload_status = UPLOAD_STATUS_ONGOING;
+                        }
+                    }
+                }
+                //Upload write
+                //**************
+            } else if(upload.status == UPLOAD_FILE_WRITE) {
+                //we need to check SD is inside
+                if ((sdfile.card_status() == 1)  && (_upload_status == UPLOAD_STATUS_ONGOING) && sdfile.isopen()) {
+                    if (upload.currentSize != sdfile.write(upload.buf, upload.currentSize)) {
+                        _upload_status = UPLOAD_STATUS_FAILED;
+                        Esp3DCom::echo("Upload failed");
+                        pushError(ESP_ERROR_FILE_WRITE, "File write failed");
+                    }
+                } else { //if error set flag UPLOAD_STATUS_FAILED
+                    _upload_status = UPLOAD_STATUS_FAILED;
+                    Esp3DCom::echo("Upload failed");
+                    pushError(ESP_ERROR_FILE_WRITE, "File write failed");
+                }
+                //Upload end
+                //**************
+            } else if(upload.status == UPLOAD_FILE_END) {
+                sdfile.close();
+                uint32_t filesize = sdfile.size();
+                String  sizeargname  = upload.filename + "S";
+                if (_webserver->hasArg (sizeargname.c_str()) ) {
+                    if (_webserver->arg (sizeargname.c_str()) != String(filesize)) {
+                        Esp3DCom::echo("Upload failed");
+                        _upload_status = UPLOAD_STATUS_FAILED;
+                        pushError(ESP_ERROR_UPLOAD, "File upload mismatch");
+                    }
+                }
+                if (_upload_status == UPLOAD_STATUS_ONGOING) {
+                    _upload_status = UPLOAD_STATUS_SUCCESSFUL;
+                } else {
+                    _upload_status = UPLOAD_STATUS_FAILED;
+                    Esp3DCom::echo("Upload failed");
+                    pushError(ESP_ERROR_UPLOAD, "Upload error");
+                }
+            } else {//Upload cancelled
+                _upload_status=UPLOAD_STATUS_FAILED;
+                Esp3DCom::echo("Upload failed");
+            }
+        }
+    }
+    if (_upload_status == UPLOAD_STATUS_FAILED) {
+        cancelUpload();
         sdfile.close();
         if (sdfile.exists (upload_filename.c_str()) ) {
             sdfile.remove (upload_filename.c_str());

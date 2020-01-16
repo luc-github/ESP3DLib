@@ -246,6 +246,7 @@ bool WiFiConfig::StartSTA()
     }
     WiFi.enableAP (false);
     WiFi.mode(WIFI_STA);
+    WiFi.setSleep(false);
     //Get parameters for STA
     prefs.begin(NAMESPACE, true);
     defV = DEFAULT_HOSTNAME;
@@ -306,6 +307,7 @@ bool WiFiConfig::StartAP()
     }
     WiFi.enableSTA (false);
     WiFi.mode(WIFI_AP);
+    WiFi.setSleep(false);
     //Get parameters for AP
     prefs.begin(NAMESPACE, true);
     //SSID
