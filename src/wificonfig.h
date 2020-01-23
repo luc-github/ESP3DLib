@@ -35,7 +35,7 @@ public:
     static bool isHostnameValid (const char * hostname);
     static uint32_t IP_int_from_string(String & s);
     static String IP_string_from_int(uint32_t ip_int);
-
+    static const char * currentIP();
     static bool StartAP();
     static bool StartSTA();
     static void StopWiFi();

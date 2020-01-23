@@ -23,6 +23,7 @@
 #if defined(ESP3D_WIFISUPPORT)
 #include MARLIN_PATH(HAL/HAL_ESP32/FlushableHardwareSerial.h)
 #include MARLIN_PATH(HAL/HAL_ESP32/HAL.h)
+#include MARLIN_PATH(lcd/ultralcd.h)
 #include "espcom.h"
 #if defined(HTTP_FEATURE)
 #include <WebServer.h>
@@ -31,6 +32,11 @@ void Esp3DCom::echo(const char * data)
 {
     SERIAL_ECHO_START();
     SERIAL_ECHOLNPAIR("", data);
+    if (strlen(data)) {
+        ui.set_status(data);
+    } else {
+        ui.reset_status();
+    }
 }
 long ESPResponseStream::baudRate()
 {

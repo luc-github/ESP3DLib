@@ -56,6 +56,22 @@ String WiFiConfig::IP_string_from_int(uint32_t ip_int)
 }
 
 /**
+ * Get current IP
+ */
+const char * WiFiConfig::currentIP()
+{
+    static String ip;
+    if (WiFi.getMode() == WIFI_OFF) {
+        ip = "";
+    } else if (WiFi.getMode() == WIFI_STA) {
+        ip =  WiFi.localIP().toString();
+    } else {
+        ip = WiFi.softAPIP().toString();
+    }
+    return ip.c_str();
+}
+
+/**
  * Check if Hostname string is valid
  */
 

@@ -629,12 +629,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
         if (!espresponse) {
             return false;
         }
-        String currentIP = cmd_params;
-        if (WiFi.getMode() == WIFI_STA) {
-            currentIP += WiFi.localIP().toString();
-        } else {
-            currentIP += WiFi.softAPIP().toString();
-        }
+        String currentIP =  WiFiConfig::currentIP();
         espresponse->println (currentIP.c_str());
     }
     break;

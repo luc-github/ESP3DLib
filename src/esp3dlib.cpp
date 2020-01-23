@@ -96,4 +96,16 @@ bool Esp3DLib::parse(char * cmd)
     }
 
 }
+
+//Idletask when setup is done
+void Esp3DLib::idletask()
+{
+    static bool setupdone = false;
+    if (!setupdone) {
+        if(strlen(WiFiConfig::currentIP())) {
+            Esp3DCom::echo(WiFiConfig::currentIP());
+        }
+        setupdone = true;
+    }
+}
 #endif //ESP3D_WIFISUPPORT
