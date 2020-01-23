@@ -61,7 +61,7 @@ public:
     ESPResponseStream(WebServer * webserver);
 #endif //HTTP_FEATURE
     static char * mac2str (uint8_t mac [8]);
-    static String formatBytes (uint32_t bytes);
+    static String formatBytes (uint64_t bytes);
     static long baudRate();
 private:
 #if defined(HTTP_FEATURE)

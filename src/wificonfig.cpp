@@ -56,6 +56,22 @@ String WiFiConfig::IP_string_from_int(uint32_t ip_int)
 }
 
 /**
+ * Get current IP
+ */
+const char * WiFiConfig::currentIP()
+{
+    static String ip;
+    if (WiFi.getMode() == WIFI_OFF) {
+        ip = "";
+    } else if (WiFi.getMode() == WIFI_STA) {
+        ip =  WiFi.localIP().toString();
+    } else {
+        ip = WiFi.softAPIP().toString();
+    }
+    return ip.c_str();
+}
+
+/**
  * Check if Hostname string is valid
  */
 
@@ -246,6 +262,7 @@ bool WiFiConfig::StartSTA()
     }
     WiFi.enableAP (false);
     WiFi.mode(WIFI_STA);
+    WiFi.setSleep(false);
     //Get parameters for STA
     prefs.begin(NAMESPACE, true);
     defV = DEFAULT_HOSTNAME;
@@ -306,6 +323,7 @@ bool WiFiConfig::StartAP()
     }
     WiFi.enableSTA (false);
     WiFi.mode(WIFI_AP);
+    WiFi.setSleep(false);
     //Get parameters for AP
     prefs.begin(NAMESPACE, true);
     //SSID

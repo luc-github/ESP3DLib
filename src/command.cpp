@@ -629,12 +629,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
         if (!espresponse) {
             return false;
         }
-        String currentIP = cmd_params;
-        if (WiFi.getMode() == WIFI_STA) {
-            currentIP += WiFi.localIP().toString();
-        } else {
-            currentIP += WiFi.softAPIP().toString();
-        }
+        String currentIP =  WiFiConfig::currentIP();
         espresponse->println (currentIP.c_str());
     }
     break;
@@ -1611,20 +1606,35 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
         String resp;
         resp = "FW version:";
         resp += SHORT_BUILD_VERSION;
+        resp += "-";
+        resp += LIB_VERSION;
         resp += " # FW target:marlin-embedded  # FW HW:";
 #if defined(SDSUPPORT)
         resp += "Direct SD";
 #else
         resp += "No SD";
 #endif
-        resp += "  # primary sd:/sd # secondary sd:none # authentication:";
+        resp += " # primary sd:/sd # secondary sd:none # authentication:";
 #ifdef AUTHENTICATION_FEATURE
         resp += "yes";
 #else
         resp += "no";
 #endif
+
+#if defined (HTTP_FEATURE)
         resp += " # webcommunication: Sync: ";
         resp += String(prefs.getUShort(HTTP_PORT_ENTRY, DEFAULT_WEBSERVER_PORT) + 1);
+        resp += ":";
+        if (WiFi.getMode() == WIFI_MODE_AP) {
+            resp += WiFi.softAPIP().toString();
+        } else if (WiFi.getMode() == WIFI_MODE_STA) {
+            resp += WiFi.localIP().toString();
+        } else if (WiFi.getMode() == WIFI_MODE_APSTA) {
+            resp += WiFi.softAPIP().toString();
+        } else {
+            resp += "0.0.0.0";
+        }
+#endif
         resp += "# hostname:";
         String defV = DEFAULT_HOSTNAME;
         resp += prefs.getString(HOSTNAME_ENTRY, defV);;

@@ -45,6 +45,10 @@ public:
        * @return false - if not ESP command.
        */
     bool parse(char * cmd);
+    /**
+       * idletask function.
+       */
+    void idletask();
 };
 
 /**

@@ -59,6 +59,9 @@ bool ESP_SD::isopen()
 
 int8_t ESP_SD::card_status()
 {
+    if(!card.isMounted()) {
+        card.mount();
+    }
     if (!IS_SD_INSERTED() || !card.isMounted()) {
         return 0;    //No sd
     }
@@ -299,12 +302,12 @@ String ESP_SD::makepath83(String longpath)
 }
 
 
-uint32_t ESP_SD::card_total_space()
+uint64_t ESP_SD::card_total_space()
 {
 
     return (512.00) * (sd_volume.clusterCount()) * (sd_volume.blocksPerCluster());
 }
-uint32_t ESP_SD::card_used_space()
+uint64_t ESP_SD::card_used_space()
 {
     return (512.00) * (sd_volume.clusterCount() - sd_volume.freeClusterCount() ) * (sd_volume.blocksPerCluster());
 }

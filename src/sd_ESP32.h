@@ -28,8 +28,8 @@ public:
     ESP_SD();
     ~ESP_SD();
     int8_t card_status();
-    uint32_t card_total_space();
-    uint32_t card_used_space();
+    uint64_t card_total_space();
+    uint64_t card_used_space();
     bool open(const char * path, bool readonly = true );
     void close();
     int16_t write(const uint8_t * data, uint16_t len);

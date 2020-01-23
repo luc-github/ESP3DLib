@@ -23,15 +23,20 @@
 #if defined(ESP3D_WIFISUPPORT)
 #include MARLIN_PATH(HAL/HAL_ESP32/FlushableHardwareSerial.h)
 #include MARLIN_PATH(HAL/HAL_ESP32/HAL.h)
+#include MARLIN_PATH(lcd/ultralcd.h)
 #include "espcom.h"
 #if defined(HTTP_FEATURE)
-//#include "web_server.h"
 #include <WebServer.h>
 #endif //HTTP_FEATURE
 void Esp3DCom::echo(const char * data)
 {
     SERIAL_ECHO_START();
     SERIAL_ECHOLNPAIR("", data);
+    if (strlen(data)) {
+        ui.set_status(data);
+    } else {
+        ui.reset_status();
+    }
 }
 long ESPResponseStream::baudRate()
 {
@@ -118,16 +123,16 @@ char * ESPResponseStream::mac2str (uint8_t mac [8])
 }
 
 //helper to format size to readable string
-String ESPResponseStream::formatBytes (uint32_t bytes)
+String ESPResponseStream::formatBytes (uint64_t bytes)
 {
     if (bytes < 1024) {
-        return String (bytes) + " B";
+        return String ((uint16_t)bytes) + " B";
     } else if (bytes < (1024 * 1024) ) {
-        return String (bytes / 1024.0) + " KB";
+        return String ((float)(bytes / 1024.0),2) + " KB";
     } else if (bytes < (1024 * 1024 * 1024) ) {
-        return String (bytes / 1024.0 / 1024.0) + " MB";
+        return String ((float)(bytes / 1024.0 / 1024.0),2) + " MB";
     } else {
-        return String (bytes / 1024.0 / 1024.0 / 1024.0) + " GB";
+        return String ((float)(bytes / 1024.0 / 1024.0 / 1024.0),2) + " GB";
     }
 }
 

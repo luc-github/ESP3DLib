@@ -82,6 +82,8 @@ private:
     static void handleFileList ();
     static void handleUpdate ();
     static void WebUpdateUpload ();
+    static void pushError(int code, const char * st,  bool web_error = 500, uint16_t timeout = 1000);
+    static void cancelUpload();
 #if defined(SDSUPPORT)
     static void handle_direct_SDFileList();
     static void SDFile_direct_upload();
