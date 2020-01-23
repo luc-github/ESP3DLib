@@ -29,6 +29,7 @@
 #if defined(ESP3D_WIFISUPPORT)
 #include "esp3dlib.h"
 #include "wificonfig.h"
+#include "wifiservices.h"
 #include "espcom.h"
 #include "command.h"
 Esp3DLib esp3dlib;
@@ -102,10 +103,12 @@ void Esp3DLib::idletask()
 {
     static bool setupdone = false;
     if (!setupdone) {
-        if(strlen(WiFiConfig::currentIP())) {
-            Esp3DCom::echo(WiFiConfig::currentIP());
+        if (wifi_services.started()) {
+            if(strlen(WiFiConfig::currentIP())) {
+                Esp3DCom::echo(WiFiConfig::currentIP());
+            }
+            setupdone = true;
         }
-        setupdone = true;
     }
 }
 #endif //ESP3D_WIFISUPPORT
