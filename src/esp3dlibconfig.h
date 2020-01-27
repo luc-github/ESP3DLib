@@ -25,7 +25,7 @@
 #undef DISABLED
 #undef _BV
 //version
-#define LIB_VERSION "1.0.5"
+#define LIB_VERSION "1.0.6"
 
 //AUTHENTICATION_FEATURE: protect pages by login password
 //Rely on Configuration_adv.h
