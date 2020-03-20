@@ -17,15 +17,18 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-//config reference, do not touxh
-#define XSTR_(M) #M
-#define XSTR(M) XSTR_(M)
-#define MARLIN_PATH(PATH) XSTR(../../../../../Marlin/src/PATH)
+//config reference, do not touch
+#ifndef ESP_XSTR
+#define ESP_XSTR_(M) #M
+#define ESP_XSTR(M) ESP_XSTR_(M)
+#endif
+#define MARLIN_HAL_PATH(PATH) HAL_PATH( ../../../../../Marlin/src/HAL, PATH)
+#define MARLIN_PATH(PATH) ESP_XSTR(../../../../../Marlin/src/PATH)
 #include MARLIN_PATH(inc/MarlinConfigPre.h)
 #undef DISABLED
 #undef _BV
 //version
-#define LIB_VERSION "1.0.4"
+#define LIB_VERSION "1.0.5"
 
 //AUTHENTICATION_FEATURE: protect pages by login password
 //Rely on Configuration_adv.h
@@ -141,12 +144,12 @@
 #define MIN_PASSWORD_LENGTH     8
 #define MAX_HOSTNAME_LENGTH     32
 #define MIN_HOSTNAME_LENGTH     1
-#define MAX_HTTP_PORT			65001
-#define MIN_HTTP_PORT			1
-#define MAX_TELNET_PORT			65001
-#define MIN_TELNET_PORT			1
-#define MIN_CHANNEL			1
-#define MAX_CHANNEL			14
+#define MAX_HTTP_PORT           65001
+#define MIN_HTTP_PORT           1
+#define MAX_TELNET_PORT         65001
+#define MIN_TELNET_PORT         1
+#define MIN_CHANNEL         1
+#define MAX_CHANNEL         14
 
 #ifndef ESP3DLIBCONFIG_H
 #define ESP3DLIBCONFIG_H
