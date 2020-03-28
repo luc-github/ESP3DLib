@@ -3,8 +3,6 @@
 <img src="https://github.com/luc-github/ESP3DLib/blob/master/images/ESP3D_social_mini.png">
 Library for ESP32 boards using Marlin 2.x : 
 
-:warning:Currently code is in [bugfix2.0.x](https://github.com/MarlinFirmware/Marlin/tree/bugfix-2.0.x) not yet in any release of 2.0.X, please use [bugfix2.0.x](https://github.com/MarlinFirmware/Marlin/tree/bugfix-2.0.x)
-
 [MRR_ESPA](https://github.com/maplerainresearch/MRR_ESPA), 
 [MRR_ESPE](https://github.com/maplerainresearch/MRR_ESPE), 
 [ESP32 Controller](https://github.com/simon-jouet/ESP32Controller)
