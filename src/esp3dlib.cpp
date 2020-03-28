@@ -29,11 +29,12 @@
 #if defined(ESP3D_WIFISUPPORT)
 #include "esp3dlib.h"
 #include "wificonfig.h"
+#include "wifiservices.h"
 #include "espcom.h"
 #include "command.h"
 Esp3DLib esp3dlib;
 
-void WiFiTaskfn( void * parameter )
+void ESP3DLibTaskfn( void * parameter )
 {
     Esp3DLibConfig::wait(100);  // Yield to other tasks
     WiFiConfig::begin();
@@ -55,13 +56,13 @@ Esp3DLib::Esp3DLib()
 void Esp3DLib::init()
 {
     xTaskCreatePinnedToCore(
-        WiFiTaskfn, /* Task function. */
-        "WiFi Task", /* name of task. */
+        ESP3DLibTaskfn, /* Task function. */
+        "ESP3DLib Task", /* name of task. */
         10000, /* Stack size of task */
         NULL, /* parameter of the task */
-        1, /* priority of the task */
+        ESP3DLIB_RUNNING_PRIORITY, /* priority of the task */
         NULL, /* Task handle to keep track of created task */
-        0 	 /* Core to run the task */
+        ESP3DLIB_RUNNING_CORE 	 /* Core to run the task */
     );
 }
 //Parse command
@@ -102,10 +103,12 @@ void Esp3DLib::idletask()
 {
     static bool setupdone = false;
     if (!setupdone) {
-        if(strlen(WiFiConfig::currentIP())) {
-            Esp3DCom::echo(WiFiConfig::currentIP());
+        if (wifi_services.started()) {
+            if(strlen(WiFiConfig::currentIP())) {
+                Esp3DCom::echo(WiFiConfig::currentIP());
+            }
+            setupdone = true;
         }
-        setupdone = true;
     }
 }
 #endif //ESP3D_WIFISUPPORT

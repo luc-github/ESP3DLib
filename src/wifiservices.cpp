@@ -40,6 +40,8 @@
 
 WiFiServices wifi_services;
 
+bool WiFiServices::_started = false;
+
 WiFiServices::WiFiServices()
 {
 }
@@ -127,10 +129,12 @@ bool WiFiServices::begin()
 #ifdef HTTP_FEATURE
     web_server.begin();
 #endif //HTTP_FEATURE
+    _started = true;
     return no_error;
 }
 void WiFiServices::end()
 {
+    _started = false;
 #ifdef HTTP_FEATURE
     web_server.end();
 #endif

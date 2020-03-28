@@ -32,6 +32,12 @@ public:
     static bool begin();
     static void end();
     static void handle();
+    static bool started()
+    {
+        return _started;
+    }
+private:
+    static bool _started;
 };
 
 extern WiFiServices wifi_services;

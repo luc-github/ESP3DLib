@@ -21,8 +21,11 @@
 #include "esp3dlibconfig.h"
 
 #if defined(ESP3D_WIFISUPPORT)
-#include MARLIN_HAL_PATH (FlushableHardwareSerial.h)
-#include MARLIN_HAL_PATH (HAL.h)
+#include MARLIN_HAL_PATH(FlushableHardwareSerial.h)
+#include MARLIN_HAL_PATH(HAL.h)
+#if HAS_GRAPHICAL_LCD
+#include <U8glib.h>
+#endif
 #include MARLIN_PATH(lcd/ultralcd.h)
 #include "espcom.h"
 #if defined(HTTP_FEATURE)

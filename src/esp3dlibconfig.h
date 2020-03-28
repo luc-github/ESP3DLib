@@ -28,7 +28,17 @@
 #undef DISABLED
 #undef _BV
 //version
-#define LIB_VERSION "1.0.5"
+#define LIB_VERSION "1.0.7"
+
+//Allow to override the default core used by ESP3DLIB
+#ifndef ESP3DLIB_RUNNING_CORE 
+#define  ESP3DLIB_RUNNING_CORE 0
+#endif //ESP3DLIB_RUNNING_CORE
+
+//Allow to override the default priority task used by ESP3DLIB_RUNNING_PRIORITY
+#ifndef ESP3DLIB_RUNNING_PRIORITY 
+#define  ESP3DLIB_RUNNING_PRIORITY 1
+#endif //ESP3DLIB_RUNNING_PRIORITY
 
 //AUTHENTICATION_FEATURE: protect pages by login password
 //Rely on Configuration_adv.h
@@ -51,7 +61,6 @@
 #ifndef DISABLE_MDNS_FEATURE
 #define MDNS_FEATURE
 #endif //DISABLE_MDNS_FEATURE
-
 
 //SSDD_FEATURE: this feature is a discovery protocol, supported on Windows out of the box
 //Rely on Configuration_adv.h
