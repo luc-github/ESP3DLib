@@ -15,6 +15,9 @@ To use development version just add `#devt` at the end of ESP3DLib git address i
 
 `ESP3DLib=https://github.com/luc-github/ESP3DLib.git#devt`   
 
+<h4>:warning: This is not for ESP8266 boards neither standalone ESP3D installation</h4>   
+
+for them go [here](https://github.com/luc-github/ESP3D)
 
 [All releases](https://github.com/luc-github/ESP3DLib/releases)
 
