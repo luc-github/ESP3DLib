@@ -103,7 +103,7 @@
 #define ESP_WIFI_AP  2
 
 #define DHCP_MODE   0
-#define STATIC_MODE   0
+#define STATIC_MODE   1
 
 //defaults values
 #define DEFAULT_HOSTNAME "marlinesp"
