@@ -30,9 +30,9 @@ before_script:
   - sed -i "s/\/\/#define CUSTOM_COMMAND/#define CUSTOM_COMMAND/g" ./Marlin/Configuration_adv.h
   - sed -i "s/#define MOTHERBOARD BOARD_RAMPS_14_EFB/#define MOTHERBOARD BOARD_MRR_ESPE/g" ./Marlin/Configuration.h
   - cat ./Marlin/Configuration.h
-  - cp $TRAVIS_BUILD_DIR/extra_script.py .
+  - cp $TRAVIS_BUILD_DIR/prebuild.sh .
 script:
-  - platformio run -e esp32 || true
+  - sh ./prebuild.sh
   - rm -fr $TRAVIS_BUILD_DIR/Marlin/.pio/libdeps/esp32/ESP3DLib/src
   - cp -r $TRAVIS_BUILD_DIR/src $TRAVIS_BUILD_DIR/Marlin/.pio/libdeps/esp32/ESP3DLib/
   - platformio run -e esp32
