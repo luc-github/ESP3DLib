@@ -1,1 +1,1 @@
-(platformio run -e esp32 &> /dev/null) || true
+platformio run -e esp32 2> /dev/null
