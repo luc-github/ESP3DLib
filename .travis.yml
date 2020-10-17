@@ -22,6 +22,8 @@ before_script:
   - cd $TRAVIS_BUILD_DIR
   - git clone -b bugfix-2.0.x https://github.com/MarlinFirmware/Marlin.git Marlin
   - cd Marlin
+  - sed -i "s/#upload_port   = marlinesp.local/extra_scripts = pre:extra_script.py/g" ./platformio.ini
+  - sed -i "s/default_envs = mega2560/default_envs = esp32/g" ./platformio.ini
   - sed -i "s/#define WIFISUPPORT/\/\/#define WIFISUPPORT/g" ./Marlin/Configuration_adv.h
   - sed -i "s/\/\/#define ESP3D_WIFISUPPORT/#define ESP3D_WIFISUPPORT/g" ./Marlin/Configuration_adv.h
   - sed -i "s/\/\/#define WEBSUPPORT/#define WEBSUPPORT/g" ./Marlin/Configuration_adv.h
@@ -29,9 +31,7 @@ before_script:
   - sed -i "s/\/\/#define CUSTOM_COMMAND/#define CUSTOM_COMMAND/g" ./Marlin/Configuration_adv.h
   - sed -i "s/#define MOTHERBOARD BOARD_RAMPS_14_EFB/#define MOTHERBOARD BOARD_MRR_ESPE/g" ./Marlin/Configuration.h
   - cat ./Marlin/Configuration.h
-  - rm -fr .pio/libdeps/esp32/ESP3DLib/src
-  
-  - mv $TRAVIS_BUILD_DIR/src $TRAVIS_BUILD_DIR/Marlin/.pio/libdeps/esp32/ESP3DLib/
+  - cp $TRAVIS_BUILD_DIR/extra_script.py .
 script:
   - platformio run -e esp32 
 
