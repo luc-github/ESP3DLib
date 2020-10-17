@@ -27,10 +27,10 @@
 #include <U8glib.h>
 #endif
 //for 2.0.x
-/*#if defined __has_include
+#if defined __has_include
 #if __has_include (MARLIN_PATH(lcd/ultralcd.h))
 #include MARLIN_PATH(lcd/ultralcd.h)
-#endif*/
+#endif
 //for bugfix-2.0.x
 #if __has_include (MARLIN_PATH(lcd/marlinui.h))
 #include MARLIN_PATH(lcd/marlinui.h)
