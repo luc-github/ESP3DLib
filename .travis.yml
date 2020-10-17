@@ -32,7 +32,7 @@ before_script:
   - cat ./Marlin/Configuration.h
   - cp $TRAVIS_BUILD_DIR/extra_script.py .
 script:
-  - platformio run -e esp32 &>/dev/null
+  - platformio run -e esp32 || true
   - rm -fr $TRAVIS_BUILD_DIR/Marlin/.pio/libdeps/esp32/ESP3DLib/src
   - cp -r $TRAVIS_BUILD_DIR/src $TRAVIS_BUILD_DIR/Marlin/.pio/libdeps/esp32/ESP3DLib/
   - platformio run -e esp32
