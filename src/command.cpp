@@ -36,6 +36,7 @@
 #include <WebServer.h>
 #endif //HTTP_FEATURE
 #include "serial2socket.h"
+#include <esp_ota_ops.h>
 #include MARLIN_PATH(inc/Version.h)
 
 String COMMAND::get_param (String & cmd_params, const char * id, bool withspace)
@@ -1208,12 +1209,18 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
         espresponse->print (ESPResponseStream::formatBytes (ESP.getFlashChipSize()).c_str());
         espresponse->print ("\n");
         espresponse->print ("Available Size for update: ");
-        //Not OTA on 2Mb board per spec
-        if (ESP.getFlashChipSize() > 0x20000) {
-            espresponse->print (ESPResponseStream::formatBytes (0x140000).c_str());
-        } else {
-            espresponse->print (ESPResponseStream::formatBytes (0x0).c_str());
+        size_t  flashsize = 0;
+        const esp_partition_t* mainpartition = esp_ota_get_running_partition();
+        if (mainpartition) {
+            const esp_partition_t* partition = esp_ota_get_next_update_partition(mainpartition);
+            if (partition) {
+                const esp_partition_t* partition2 = esp_ota_get_next_update_partition(partition);
+                if (partition2 && (partition->address!=partition2->address)) {
+                    flashsize = partition2->size;
+                }
+            }
         }
+        espresponse->print (ESPResponseStream::formatBytes (flashsize).c_str());
         espresponse->print ("\n");
         espresponse->print ("Available Size for SPIFFS: ");
         espresponse->print (ESPResponseStream::formatBytes (SPIFFS.totalBytes()).c_str());

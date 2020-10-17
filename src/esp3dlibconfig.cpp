@@ -38,14 +38,8 @@ bool Esp3DLibConfig::restart_ESP_module = false;
  */
 void Esp3DLibConfig::wait(uint32_t milliseconds)
 {
-    uint32_t timeout = millis();
-    vTaskDelay(1 / portTICK_RATE_MS);  // Yield to other tasks
     esp_task_wdt_reset(); //for a wait 0;
-    //wait feeding WDT
-    while ( (millis() - timeout) < milliseconds) {
-        esp_task_wdt_reset();
-        vTaskDelay(1 / portTICK_RATE_MS);  // Yield to other tasks
-    }
+    vTaskDelay((milliseconds>0?milliseconds:1) / portTICK_RATE_MS);  // Yield to other tasks
 }
 
 /**
