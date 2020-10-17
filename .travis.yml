@@ -28,6 +28,8 @@ before_script:
   - sed -i "s/\/\/#define CUSTOM_COMMAND/#define CUSTOM_COMMAND/g" ./Marlin/Configuration_adv.h
   - sed -i "s/#define MOTHERBOARD BOARD_RAMPS_14_EFB/#define MOTHERBOARD BOARD_MRR_ESPE/g" ./Marlin/Configuration.h
   - cat ./Marlin/Configuration.h
+  - rm -fr .pio/libdeps/esp32/ESP3DLib/src
+  - mv ../src .pio/libdeps/esp32/ESP3DLib/
 script:
   - platformio run -e esp32 
 
