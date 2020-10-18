@@ -58,11 +58,11 @@ void Esp3DLib::init()
     xTaskCreatePinnedToCore(
         ESP3DLibTaskfn, /* Task function. */
         "ESP3DLib Task", /* name of task. */
-        10000, /* Stack size of task */
+        8192, /* Stack size of task */
         NULL, /* parameter of the task */
         ESP3DLIB_RUNNING_PRIORITY, /* priority of the task */
         NULL, /* Task handle to keep track of created task */
-        ESP3DLIB_RUNNING_CORE 	 /* Core to run the task */
+        ESP3DLIB_RUNNING_CORE    /* Core to run the task */
     );
 }
 //Parse command

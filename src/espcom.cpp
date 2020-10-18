@@ -26,7 +26,16 @@
 #if HAS_GRAPHICAL_LCD
 #include <U8glib.h>
 #endif
+//for 2.0.x
+#if defined __has_include
+#if __has_include (MARLIN_PATH(lcd/ultralcd.h))
 #include MARLIN_PATH(lcd/ultralcd.h)
+#endif
+//for bugfix-2.0.x
+#if __has_include (MARLIN_PATH(lcd/marlinui.h))
+#include MARLIN_PATH(lcd/marlinui.h)
+#endif
+#endif
 #include "espcom.h"
 #if defined(HTTP_FEATURE)
 #include <WebServer.h>
@@ -35,11 +44,13 @@ void Esp3DCom::echo(const char * data)
 {
     SERIAL_ECHO_START();
     SERIAL_ECHOLNPAIR("", data);
+#if HAS_DISPLAY
     if (strlen(data)) {
         ui.set_status(data);
     } else {
         ui.reset_status();
     }
+#endif //HAS_DISPLAY
 }
 long ESPResponseStream::baudRate()
 {

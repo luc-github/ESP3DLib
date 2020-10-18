@@ -28,15 +28,15 @@
 #undef DISABLED
 #undef _BV
 //version
-#define LIB_VERSION "1.0.7"
+#define LIB_VERSION "1.0.8"
 
 //Allow to override the default core used by ESP3DLIB
-#ifndef ESP3DLIB_RUNNING_CORE 
+#ifndef ESP3DLIB_RUNNING_CORE
 #define  ESP3DLIB_RUNNING_CORE 0
 #endif //ESP3DLIB_RUNNING_CORE
 
 //Allow to override the default priority task used by ESP3DLIB_RUNNING_PRIORITY
-#ifndef ESP3DLIB_RUNNING_PRIORITY 
+#ifndef ESP3DLIB_RUNNING_PRIORITY
 #define  ESP3DLIB_RUNNING_PRIORITY 1
 #endif //ESP3DLIB_RUNNING_PRIORITY
 
