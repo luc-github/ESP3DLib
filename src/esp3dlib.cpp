@@ -34,9 +34,13 @@
 #include "command.h"
 Esp3DLib esp3dlib;
 
+#ifndef DELAY_START_ESP3D 
+#define DELAY_START_ESP3D 100
+#endif //DELAY_START_ESP3D
+
 void ESP3DLibTaskfn( void * parameter )
 {
-    Esp3DLibConfig::wait(100);  // Yield to other tasks
+    Esp3DLibConfig::wait(DELAY_START_ESP3D);  // Yield to other tasks
     WiFiConfig::begin();
     for(;;) {
         WiFiConfig::handle();

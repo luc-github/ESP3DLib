@@ -28,7 +28,7 @@
 #undef DISABLED
 #undef _BV
 //version
-#define LIB_VERSION "1.0.8"
+#define LIB_VERSION "1.0.9"
 
 //Allow to override the default core used by ESP3DLIB
 #ifndef ESP3DLIB_RUNNING_CORE
