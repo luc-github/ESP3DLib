@@ -57,9 +57,9 @@ bool ESP_SD::isopen()
     return (((SdFile *)_sdfile)->isOpen());
 }
 
-int8_t ESP_SD::card_status()
+int8_t ESP_SD::card_status(bool forcemount)
 {
-    if(!card.isMounted()) {
+    if(!card.isMounted() || forcemount) {
         card.mount();
     }
     if (!IS_SD_INSERTED() || !card.isMounted()) {
