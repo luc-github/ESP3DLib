@@ -27,7 +27,7 @@ class ESP_SD
 public:
     ESP_SD();
     ~ESP_SD();
-    int8_t card_status();
+    int8_t card_status(bool forcemount = false);
     uint64_t card_total_space();
     uint64_t card_used_space();
     bool open(const char * path, bool readonly = true );

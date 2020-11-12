@@ -1255,7 +1255,7 @@ void Web_Server::handle_direct_SDFileList()
     }
     bool list_files = true;
     ESP_SD card;
-    int8_t state = card.card_status();
+    int8_t state = card.card_status(true);
     if (state != 1) {
         _webserver->sendHeader("Cache-Control","no-cache");
         _webserver->send(200, "application/json", "{\"status\":\"No SD Card\"}");
@@ -1427,7 +1427,7 @@ void Web_Server::SDFile_direct_upload()
                     upload_filename = "/" + upload.filename;
                 }
                 upload_filename=  sdfile.makepath83(upload_filename);
-                if ( sdfile.card_status() != 1) {
+                if ( sdfile.card_status(true) != 1) {
                     _upload_status=UPLOAD_STATUS_FAILED;
                     Esp3DCom::echo("Upload cancelled");
                     pushError(ESP_ERROR_UPLOAD_CANCELLED, "Upload cancelled");
