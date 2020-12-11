@@ -109,10 +109,11 @@ Check [wiki](https://raw.githubusercontent.com/luc-github/ESP3DLib/master/docs/C
 * The current UI is located [here](https://github.com/luc-github/ESP3D-WEBUI)
  
 # :question:Any question ?   
-Check [Wiki](https://github.com/luc-github/ESP3DLib/wiki) or Join the chat at [Discord server](https://discord.gg/Z4ujTwE)   
+Check [Wiki](https://github.com/luc-github/ESP3DLib/wiki) or Join the chat at [Discord server](https://discord.gg/Z4ujTwE)
+you can also check [discussions panel](https://github.com/luc-github/ESP3DLib/discussions) 
 
-## :exclamation:Any issue/feedback ?    
-Check [FAQ](https://github.com/luc-github/ESP3DLib/issues?utf8=%E2%9C%93&q=label%3AFAQ+) or [submit ticket](https://github.com/luc-github/ESP3DLib/issues)    
+## :exclamation:Any issue ?    
+[submit ticket](https://github.com/luc-github/ESP3DLib/issues)    
 
 
 ## TODO/On going  :   
