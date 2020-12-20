@@ -18,6 +18,7 @@ install:
   - pip install -U platformio
 
 before_script:
+  - export AUTHOR_NAME="$(git log -1 $TRAVIS_COMMIT --pretty="%aN")"
   - platformio update
   - cd $TRAVIS_BUILD_DIR
   - git clone -b bugfix-2.0.x https://github.com/MarlinFirmware/Marlin.git Marlin
@@ -37,7 +38,16 @@ script:
   - cp -r $TRAVIS_BUILD_DIR/src $TRAVIS_BUILD_DIR/Marlin/.pio/libdeps/esp32/ESP3DLib/
   - platformio run -e esp32
 
+after_success:
+  - chmod +x success.sh
+  - ./success.sh
+after_failure:
+  - chmod +x fail.sh
+  - ./fail.sh
+
 notifications:
   email:
+    recipients:
+      - luc@tech-hunters.com
     on_success: always
     on_failure: always
