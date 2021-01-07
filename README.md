@@ -39,7 +39,21 @@ Especially if need to buy new modules for testing.
 * The web ui add even more feature : https://github.com/luc-github/ESP3D-WEBUI/blob/master/README.md#features  
 
 ## How to enable ?
-In Marlin configuration file : [Configuration_adv.h](https://github.com/MarlinFirmware/Marlin/blob/bugfix-2.0.x/Marlin/Configuration_adv.h#L2823-L2835)  
+In Marlin configuration files :  
+[Configuration.h](https://github.com/MarlinFirmware/Marlin/blob/bugfix-2.0.x/Marlin/Configuration.h) 
+
+Select an ESP32 based board.   
+
+Uncomment the second serial port to allow esp3d to get all printer feedback 
+```
+/**
+ * Select a secondary serial port on the board to use for communication with the host.
+ * :[-1, 0, 1, 2, 3, 4, 5, 6, 7]
+ */
+#define SERIAL_PORT_2 -1
+```
+
+[Configuration_adv.h](https://github.com/MarlinFirmware/Marlin/blob/bugfix-2.0.x/Marlin/Configuration_adv.h)  
 
 enable `#define ESP3D_WIFISUPPORT   // ESP3D Library WiFi management (https://github.com/luc-github/ESP3DLib)`    
 
