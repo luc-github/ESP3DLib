@@ -38,6 +38,9 @@ Especially if need to buy new modules for testing.
 * Fail safe mode (Access point)is enabled if cannot connect to defined station at boot.  
 * The web ui add even more feature : https://github.com/luc-github/ESP3D-WEBUI/blob/master/README.md#features  
 
+## Coming Features
+As side project of ESP3D, it follows ESP3D features: https://github.com/luc-github/ESP3D/blob/3.0/ESP3D-features.xls?raw=true
+
 ## How to enable ?
 In Marlin configuration files :  
 [Configuration.h](https://github.com/MarlinFirmware/Marlin/blob/bugfix-2.0.x/Marlin/Configuration.h) 
