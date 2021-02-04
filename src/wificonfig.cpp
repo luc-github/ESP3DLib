@@ -291,7 +291,7 @@ bool WiFiConfig::StartSTA()
     //if not DHCP
     if (IP_mode != DHCP_MODE) {
         IPAddress ip(IP), mask(MK), gateway(GW);
-        WiFi.config(ip, gateway,mask);
+        WiFi.config(ip, gateway,mask, gateway);
     }
     if (WiFi.begin(SSID.c_str(), (password.length() > 0)?password.c_str():NULL)) {
         Esp3DCom::echo("WiFi station started");
