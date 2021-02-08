@@ -947,7 +947,7 @@ void Web_Server::handleFileList ()
 }
 
 //push error code and message to websocket
-void Web_Server::pushError(int code, const char * st, bool web_error, uint16_t timeout)
+void Web_Server::pushError(int code, const char * st, uint16_t web_error, uint16_t timeout)
 {
     if (_socket_server && st) {
         String s = "ERROR:" + String(code) + ":";
