@@ -104,7 +104,7 @@ void ESPResponseStream::print(const char *data)
     }
 #endif //HTTP_FEATURE
     if (_pipe == SERIAL_PIPE) {
-        SERIAL_ECHOPAIR_F("", data);
+        SERIAL_ECHOPGM_P(data);
     }
 }
 
