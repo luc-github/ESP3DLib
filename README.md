@@ -126,7 +126,7 @@ Check [wiki](https://raw.githubusercontent.com/luc-github/ESP3DLib/master/docs/C
 * The current UI is located [here](https://github.com/luc-github/ESP3D-WEBUI)
  
 # :question:Any question ?   
-Check [Wiki](https://github.com/luc-github/ESP3DLib/wiki) or Join the chat at [Discord server](https://discord.gg/Z4ujTwE)
+Check [Wiki](https://github.com/luc-github/ESP3DLib/wiki) or Join the chat at [![Discord server](https://img.shields.io/discord/752822148795596940?color=blue&label=discord&logo=discord)](https://discord.gg/Z4ujTwE)   
 you can also check [discussions panel](https://github.com/luc-github/ESP3DLib/discussions) 
 
 ## :exclamation:Any issue ?    
