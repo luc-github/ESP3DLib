@@ -321,7 +321,7 @@ bool ESP_SD::openDir(String path)
     if(root.isOpen()) {
         root.close();
     }
-    if (!sd_volume.init(&(card.getSd2Card()))) {
+    if (!sd_volume.init(card.diskIODriver())) {
         return false;
     }
     if (!root.openRoot(&sd_volume)) {
