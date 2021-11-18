@@ -43,7 +43,7 @@
 void Esp3DCom::echo(const char * data)
 {
     SERIAL_ECHO_START();
-    SERIAL_ECHOLNPAIR("", data);
+    SERIAL_ECHOLN(data);
 #if HAS_DISPLAY
     if (strlen(data)) {
         ui.set_status(data);
