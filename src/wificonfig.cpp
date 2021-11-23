@@ -354,6 +354,7 @@ bool WiFiConfig::StartAP()
     //Start AP
     if(WiFi.softAP(SSID.c_str(), (password.length() > 0)?password.c_str():NULL, channel)) {
         Esp3DCom::echo("AP started ");
+        Esp3DLibConfig::wait (100);
         //Set static IP
         WiFi.softAPConfig(ip, gw, mask);
         Esp3DCom::echo(WiFi.softAPIP().toString().c_str());
