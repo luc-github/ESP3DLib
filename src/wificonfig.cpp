@@ -348,13 +348,14 @@ bool WiFiConfig::StartAP()
     }
     prefs.end();
     IPAddress ip(IP);
+    IPAddress gw(0,0,0,0);
     IPAddress mask;
     mask.fromString(DEFAULT_AP_MK);
-    //Set static IP
-    WiFi.softAPConfig(ip, ip, mask);
     //Start AP
     if(WiFi.softAP(SSID.c_str(), (password.length() > 0)?password.c_str():NULL, channel)) {
         Esp3DCom::echo("AP started ");
+        //Set static IP
+        WiFi.softAPConfig(ip, gw, mask);
         Esp3DCom::echo(WiFi.softAPIP().toString().c_str());
         return true;
     } else {
