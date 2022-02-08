@@ -22,6 +22,7 @@
 #include "../../include/esp3dlib_config.h"
 
 #if defined(ESP3D_WIFISUPPORT)
+#include <Arduino.h>
 #include "serial2socket.h"
 
 Serial_2_Socket Serial2Socket;
@@ -29,7 +30,6 @@ Serial_2_Socket Serial2Socket;
 
 Serial_2_Socket::Serial_2_Socket()
 {
-    _web_socket = NULL;
     _TXbufferSize = 0;
     _RXbufferSize = 0;
     _RXbufferpos = 0;
@@ -57,11 +57,11 @@ long Serial_2_Socket::baudRate()
     return 0;
 }
 
-
 Serial_2_Socket::operator bool() const
 {
     return true;
 }
+
 int Serial_2_Socket::available()
 {
     return _RXbufferSize;
@@ -70,16 +70,27 @@ int Serial_2_Socket::available()
 
 size_t Serial_2_Socket::write(uint8_t c)
 {
-    if(!_web_socket) {
-        return 0;
-    }
-    write(&c,1);
-    return 1;
+    return write(&c,1);
 }
 
 size_t Serial_2_Socket::write(const uint8_t *buffer, size_t size)
 {
-
+    if(buffer == NULL || size == 0) {
+        return 0;
+    }
+    if (_TXbufferSize==0) {
+        _lastflush = millis();
+    }
+    //send full line
+    if (_TXbufferSize + size > TXBUFFERSIZE) {
+        flush();
+    }
+    //need periodic check to force to flush in case of no end
+    for (int i = 0; i < size; i++) {
+        _TXbuffer[_TXbufferSize] = buffer[i];
+        _TXbufferSize++;
+    }
+    handle_flush();
     return size;
 }
 
@@ -94,22 +105,59 @@ int Serial_2_Socket::peek(void)
 
 bool Serial_2_Socket::push (const char * data)
 {
-    return true;
+    int data_size = strlen(data);
+    if ((data_size + _RXbufferSize) <= RXBUFFERSIZE) {
+        int current = _RXbufferpos + _RXbufferSize;
+        if (current > RXBUFFERSIZE) {
+            current = current - RXBUFFERSIZE;
+        }
+        for (int i = 0; i < data_size; i++) {
+            if (current > (RXBUFFERSIZE-1)) {
+                current = 0;
+            }
+            _RXbuffer[current] = data[i];
+            current ++;
+        }
+        _RXbufferSize+=strlen(data);
+        return true;
+    }
+    return false;
 }
 
 int Serial_2_Socket::read(void)
 {
-    return -1;
+    if (_RXbufferSize > 0) {
+        int v = _RXbuffer[_RXbufferpos];
+        _RXbufferpos++;
+        if (_RXbufferpos > (RXBUFFERSIZE-1)) {
+            _RXbufferpos = 0;
+        }
+        _RXbufferSize--;
+        return v;
+    } else {
+        return -1;
+    }
 
 }
 
 void Serial_2_Socket::handle_flush()
 {
-
+    if (_TXbufferSize > 0) {
+        if ((_TXbufferSize>=TXBUFFERSIZE) || ((millis()- _lastflush) > FLUSHTIMEOUT)) {
+            flush();
+        }
+    }
 }
 void Serial_2_Socket::flush(void)
 {
+    if (_TXbufferSize > 0) {
+        // TODO : broadcastBIN(_TXbuffer,_TXbufferSize);
 
+        //refresh timout
+        _lastflush = millis();
+        //reset buffer
+        _TXbufferSize = 0;
+    }
 }
 
 #endif // ESP3D_WIFISUPPORT

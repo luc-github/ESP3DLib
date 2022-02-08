@@ -22,6 +22,10 @@
 #if defined(ESP3D_WIFISUPPORT)
 #include "esp3dlib.h"
 #include "core/hal.h"
+//TODO remove this
+#include <WiFi.h>
+#include <ESP32SSDP.h>
+#include <WebSocketsServer.h>
 
 Esp3DLib esp3dlib;
 
