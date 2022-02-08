@@ -19,7 +19,8 @@
 */
 
 #include "../include/esp3dlib_config.h"
-
+#if defined(ESP3D_WIFISUPPORT)
+#include "hal.h"
 #include <soc/soc.h>
 #include <soc/rtc_cntl_reg.h>
 #include <WiFi.h>
@@ -87,3 +88,5 @@ bool Hal::is_pin_usable(uint pin)
         return false;
     }
 }
+
+#endif
