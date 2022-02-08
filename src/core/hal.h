@@ -1,46 +1,39 @@
 /*
-  wifiservices.h -  wifi services functions class
+  hal.h - esp3d hal class
 
   Copyright (c) 2014 Luc Lebosse. All rights reserved.
 
-  This library is free software; you can redistribute it and/or
+  This code is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
   version 2.1 of the License, or (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
+  This code is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
+  License along with This code; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef _ESP3D_HAL_H
+#define _ESP3D_HAL_H
+#include "WiFi.h"
+#include <Arduino.h>
 
-
-#ifndef _WIFI_SERVICES_H
-#define _WIFI_SERVICES_H
-
-
-class WiFiServices
+class Hal
 {
 public:
-    WiFiServices();
-    ~WiFiServices();
     static bool begin();
     static void end();
-    static void handle();
-    static bool started()
-    {
-        return _started;
-    }
+    static void wait (uint32_t milliseconds);
+    static uint16_t getChipID();
+    static bool has_temperature_sensor();
+    static float temperature();
+    static bool is_pin_usable(uint pin);
 private:
-    static bool _started;
+    static void wdtFeed();
 };
-
-extern WiFiServices wifi_services;
-
-#endif
-
+#endif //_ESP3D_HAL_H

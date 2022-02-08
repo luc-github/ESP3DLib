@@ -22,7 +22,7 @@
 #ifndef _SERIAL_2_SOCKET_H_
 #define _SERIAL_2_SOCKET_H_
 
-#include "Print.h"
+#include <Print.h>
 #define TXBUFFERSIZE 1200
 #define RXBUFFERSIZE 128
 #define FLUSHTIMEOUT 500
@@ -64,8 +64,7 @@ public:
     void flush(void);
     void handle_flush();
     operator bool() const;
-    bool attachWS(void * web_socket);
-    bool detachWS();
+
 private:
     uint32_t _lastflush;
     void * _web_socket;

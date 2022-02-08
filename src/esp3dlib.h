@@ -1,30 +1,29 @@
 /*
-  esp3dlib.h - esp3dlib class
+    This file is part of ESP3DLib library for 3D printer.
 
-  Copyright (c) 2019 Luc Lebosse. All rights reserved.
+    ESP3DLib library for Marlin 3D printer  for 3D printer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
+    ESP3DLib library for Marlin 3D printer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with this Firmware.  If not, see <http://www.gnu.org/licenses/>.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+    Main author: luc lebosse
+
 */
 
 #ifndef ESP3DLIB_H
 #define ESP3DLIB_H
-//be sure correct IDE and settings are used for ESP8266 or ESP32
 #if !defined(ARDUINO_ARCH_ESP32)
 #error Oops!  Make sure you have 'ESP32' compatible board selected
 #endif
-#include "serial2socket.h"
+#include "modules/serial2socket/serial2socket.h"
 /*! Esp3DLib main class */
 class Esp3DLib
 {
