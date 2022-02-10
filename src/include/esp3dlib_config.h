@@ -43,6 +43,12 @@
 //AUTHENTICATION_FEATURE: protect pages by login password
 //Rely on Configuration_adv.h
 
+//WIFI_FEATURE : enable WIFI function
+#define WIFI_FEATURE
+
+//SERIAL_COMMAND_FEATURE: allow to send command by serial
+#define SERIAL_COMMAND_FEATURE
+
 //HTTP_FEATURE: enable Web Server
 //Rely on Configuration_adv.h
 #ifdef WEBSUPPORT
@@ -68,11 +74,86 @@
 #define SSDP_FEATURE
 #endif //DISABLE_SSDP_FEATURE
 
-//CAPTIVE_PORTAL_FEATURE: In SoftAP redirect all unknow call to main page
+//CAPTIVE_PORTAL_FEATURE: In config mode redirect all unknow call to main page
 //Rely on Configuration_adv.h
 #ifndef DISABLE_CAPTIVE_PORTAL_FEATURE
 #define CAPTIVE_PORTAL_FEATURE
 #endif //DISABLE_CAPTIVE_PORTAL_FEATURE
 
+//TELNET_FEATURE : enable Telnet function
+//Rely on Configuration_adv.h
+#ifndef DISABLE_TELNET_FEATURE
+#define CAPTIVE_TELNET_FEATURE
+#endif //DISABLE_TELNET_FEATURE
+
+//FILESYSTEM_FEATURE: to host some files on flash
+//ESP_SPIFFS_FILESYSTEM       0
+//ESP_FAT_FILESYSTEM          1
+//ESP_LITTLEFS_FILESYSTEM     2
+#define FILESYSTEM_FEATURE ESP_LITTLEFS_FILESYSTEM
+
+//WEB_UPDATE_FEATURE: allow to flash fw using web UI
+//Rely on Configuration_adv.h
+#ifndef DISABLE_WEB_UPDATE_FEATURE
+#define WEB_UPDATE_FEATURE
+#endif //DISABLE_WEB_UPDATE_FEATURE
+
+//SD_UPDATE_FEATURE: allow to configure settings using SD
+//Rely on Configuration_adv.h
+#ifndef DISABLE_SD_UPDATE_FEATURE
+//#define SD_UPDATE_FEATURE
+#endif //DISABLE_SD_UPDATE_FEATURE
+
+//NOTIFICATION_FEATURE : allow to push notifications
+//Rely on Configuration_adv.h
+#ifndef DISABLE_NOTIFICATION_FEATURE
+#define NOTIFICATION_FEATURE
+#endif //DISABLE_NOTIFICATION_FEATURE
 
 
+/************************************
+ *
+ * Settings
+ *
+ * **********************************/
+//SETTINGS_IN_EEPROM 0
+//SETTINGS_IN_PREFERENCES 1
+#define ESP_SAVE_SETTINGS SETTINGS_IN_PREFERENCES
+
+
+/************************************
+ *
+ * Customize SSDP
+ *
+ * **********************************/
+#ifdef SSDP_FEATURE
+#ifndef ESP_MODEL_NAME
+#define ESP_MODEL_NAME "ESP32"
+#endif //ESP_MODEL_NAME
+#ifndef ESP_MODEL_URL
+#define ESP_MODEL_URL "https://www.espressif.com/en/products/hardware/esp-wroom-32/overview"
+#endif //ESP_MODEL_URL
+#ifndef ESP_MODEL_NUMBER
+#define ESP_MODEL_NUMBER "ESP3DLib v" LIB_VERSION
+#endif //ESP_MODEL_NUMBER
+#ifndef ESP_MANUFACTURER_NAME
+#define ESP_MANUFACTURER_NAME "Espressif Systems"
+#endif //ESP_MANUFACTURER_NAME
+#ifndef ESP_MANUFACTURER_URL
+#define ESP_MANUFACTURER_URL "http://espressif.com"
+#endif //ESP_MANUFACTURER_URL
+#endif //SSDP_FEATURE
+
+/************************************
+ *
+ * Customize Notifications
+ *
+ * **********************************/
+#ifdef NOTIFICATION_FEATURE
+#ifndef NOTIFICATION_ESP_ONLINE
+#define NOTIFICATION_ESP_ONLINE "Hi, %ESP_NAME% is now online at %ESP_IP%"
+#endif //NOTIFICATION_ESP_ONLINE
+#ifndef NOTIFICATION_ESP_OFFLINE
+#define ESP_NOTIFICATION_TITLE "ESP3D Notification"
+#endif //NOTIFICATION_TITLE
+#endif //NOTIFICATION_FEATURE
