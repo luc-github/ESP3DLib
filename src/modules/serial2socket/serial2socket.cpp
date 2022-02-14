@@ -19,9 +19,9 @@
 */
 
 
-#include "../../include/esp3dlib_config.h"
+#include "../../include/esp3d_config.h"
 
-#if defined(ESP3D_WIFISUPPORT)
+#if defined(ESP3D_WIFISUPPORT) && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
 #include <Arduino.h>
 #include "serial2socket.h"
 

@@ -17,21 +17,17 @@
     Main author: luc lebosse
 
 */
-#include "include/esp3dlib_config.h"
+#include "include/esp3d_config.h"
 
 #if defined(ESP3D_WIFISUPPORT)
 #include "esp3dlib.h"
-#include "core/hal.h"
-//TODO remove this
-#include <WiFi.h>
-#include <ESP32SSDP.h>
-#include <WebSocketsServer.h>
+//to make it work with Platformio library detection
+//TODO: remove as soon as Platformio library detection is fixed
+#if FILESYSTEM_FEATURE == ESP_LITTLEFS_FILESYSTEM
+#include <LittleFS.h>
+#endif //FILESYSTEM_FEATURE
 
 Esp3DLib esp3dlib;
-
-#ifndef DELAY_START_ESP3D
-#define DELAY_START_ESP3D 100
-#endif //DELAY_START_ESP3D
 
 void ESP3DLibTaskfn( void * parameter )
 {
