@@ -41,6 +41,10 @@
 #ifdef CAMERA_DEVICE
 #include "../../modules/camera/camera.h"
 #endif //CAMERA_DEVICE
+#ifdef ESP3D_WIFISUPPORT
+#include MARLIN_PATH(inc/Version.h)
+#endif //ESP3D_WIFISUPPORT
+
 //get fw version firmare target and fw version
 //eventually set time with pc time
 //output is JSON or plain text according parameter
@@ -81,6 +85,10 @@ bool Commands::ESP800(const char* cmd_params, level_authenticate_type auth_type,
     } else {
         output->print("{\"FWVersion\":\"");
     }
+#if defined (SHORT_BUILD_VERSION)
+    output->print(SHORT_BUILD_VERSION);
+    output->print("-");
+#endif //SHORT_BUILD_VERSION
     output->print(FW_VERSION);
     if(plain) {
         output->printLN("");

@@ -395,8 +395,6 @@ bool processingFileFunction (const char * section, const char * key, const char 
                     b=UNKNOWN_FW;
                 } else if (strcasecmp("MARLIN",value)==0) {
                     b=MARLIN;
-                } else if (strcasecmp("MARLINKIMBRA",value)==0) {
-                    b=MARLINKIMBRA;
                 } else if (strcasecmp("GRBL",value)==0) {
                     b=GRBL;
                 } else if (strcasecmp("REPETIER",value)==0) {

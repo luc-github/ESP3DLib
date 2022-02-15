@@ -28,6 +28,7 @@
 #define ESP_SCREEN_CLIENT               64
 #define ESP_WEBSOCKET_CLIENT            128
 #define ESP_SOCKET_SERIAL_CLIENT        129
+#define ESP_ECHO_SERIAL_CLIENT          130
 #define ESP_ALL_CLIENTS                 255
 
 #ifndef _ESP3DOUTPUT_H

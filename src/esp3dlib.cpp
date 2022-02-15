@@ -26,17 +26,21 @@
 #if FILESYSTEM_FEATURE == ESP_LITTLEFS_FILESYSTEM
 #include <LittleFS.h>
 #endif //FILESYSTEM_FEATURE
+#include "core/esp3d.h"
+#include "core/esp3doutput.h"
+#include "core/commands.h"
 
 Esp3DLib esp3dlib;
 
+Esp3D myesp3d;
+
 void ESP3DLibTaskfn( void * parameter )
 {
-    Hal::wait (DELAY_START_ESP3D);  // Yield to other tasks
-    //Setup Network
-    //TODO
-
+    //Start esp3d
+    myesp3d.begin();
     //Main loop
     for(;;) {
+        myesp3d.handle();
         Hal::wait (0);  // Yield to other tasks
     }
     vTaskDelete( NULL );
@@ -65,18 +69,18 @@ void Esp3DLib::init()
 //Parse command
 bool Esp3DLib::parse(char * cmd)
 {
-    //TODO
+    if (esp3d_commands.is_esp_command((uint8_t *)cmd, strlen(cmd))) {
+        //command come from other serial port
+        ESP3DOutput  output(ESP_ECHO_SERIAL_CLIENT);
+        esp3d_commands.process((uint8_t *)cmd, strlen(cmd),& output, LEVEL_ADMIN);
+        return true;
+    }
     return false;
 }
 
 //Idletask when setup is done
 void Esp3DLib::idletask()
 {
-    static bool setupdone = false;
-    if (!setupdone) {
-        //Setup wifi
-        //TODO
-        setupdone = true;
-    }
+    Hal::wait (0);  // Yield to other tasks
 }
 #endif //ESP3D_WIFISUPPORT

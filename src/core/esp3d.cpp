@@ -30,6 +30,9 @@
 #if COMMUNICATION_PROTOCOL != SOCKET_SERIAL
 #include "../modules/serial/serial_service.h"
 #endif // COMMUNICATION_PROTOCOL != SOCKET_SERIAL
+#if COMMUNICATION_PROTOCOL ==SOCKET_SERIAL
+#include "../modules/serial2socket/serial2socket.h"
+#endif // COMMUNICATION_PROTOCOL ==SOCKET_SERIAL
 #if defined (WIFI_FEATURE) || defined(ETH_FEATURE)
 #include "../modules/network/netconfig.h"
 #endif //WIFI_FEATURE || ETH FEATURE
@@ -145,6 +148,9 @@ void Esp3D::handle()
 #if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
     serial_service.handle();
 #endif //COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
+#if COMMUNICATION_PROTOCOL ==SOCKET_SERIAL
+    Serial2Socket.handle();
+#endif //COMMUNICATION_PROTOCOL == SOCKET_SERIAL 
 #if defined(WIFI_FEATURE) || defined(ETH_FEATURE)
     NetConfig::handle();
 #endif //WIFI_FEATURE || ETH_FEATURE

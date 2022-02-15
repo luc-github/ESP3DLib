@@ -28,7 +28,7 @@
 #define UNKNOWN_FW      0
 #define GRBL            10
 #define MARLIN          20
-#define MARLINKIMBRA    35
+#define MARLIN_EMBEDDED 30
 #define SMOOTHIEWARE    40
 #define REPETIER        50
 

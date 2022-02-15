@@ -23,6 +23,13 @@
 #if COMMUNICATION_PROTOCOL != SOCKET_SERIAL
 #include "../modules/serial/serial_service.h"
 #endif // COMMUNICATION_PROTOCOL != SOCKET_SERIAL
+#if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+#include "../modules/serial2socket/serial2socket.h"
+#endif // COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+#if defined(ESP3D_WIFISUPPORT)
+#include MARLIN_HAL_PATH(FlushableHardwareSerial.h)
+#include MARLIN_HAL_PATH(HAL.h)
+#endif // defined(ESP3D_WIFISUPPORT)
 #include "settings_esp3d.h"
 #if defined (HTTP_FEATURE) || defined(WS_DATA_FEATURE)
 #include "../modules/websocket/websocket_server.h"
@@ -134,8 +141,9 @@ bool ESP3DOutput::isOutput(uint8_t flag, bool fromsettings)
 size_t ESP3DOutput::dispatch (uint8_t * sbuf, size_t len)
 {
     //log_esp3d("Dispatch %d chars to client %d", len, _client);
-    if (_client != ESP_SERIAL_CLIENT) {
 #if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
+    if (_client != ESP_SERIAL_CLIENT) {
+
         if (isOutput(ESP_SERIAL_CLIENT)) {
 #if COMMUNICATION_PROTOCOL == MKS_SERIAL
             MKSService::sendGcodeFrame((const char *)sbuf);
@@ -143,8 +151,13 @@ size_t ESP3DOutput::dispatch (uint8_t * sbuf, size_t len)
             serial_service.write(sbuf, len);
 #endif //COMMUNICATION_PROTOCOL == MKS_SERIAL
         }
-#endif //COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
     }
+#endif //COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
+#if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+    if (_client != ESP_SOCKET_SERIAL_CLIENT) {
+        Serial2Socket.push(sbuf, len);
+    }
+#endif //COMMUNICATION_PROTOCOL == SOCKET_SERIAL 
 #if defined (HTTP_FEATURE) //no need to block it never
     if (!((_client == ESP_WEBSOCKET_TERMINAL_CLIENT) || (_client == ESP_HTTP_CLIENT))) {
         if (websocket_terminal_server) {
@@ -277,7 +290,6 @@ size_t ESP3DOutput::printMSG(const char * s, bool withNL)
         display += "]";
         break;
     case MARLIN:
-    case MARLINKIMBRA:
         if (_client & ESP_PRINTER_LCD_CLIENT) {
             display = "M117 ";
         } else {
@@ -336,7 +348,6 @@ size_t ESP3DOutput::printERROR(const char * s, int code_error)
         display += s;
         break;
     case MARLIN:
-    case MARLINKIMBRA:
         display = "error: ";
         display += s;
         break;
@@ -390,6 +401,12 @@ size_t ESP3DOutput::write(uint8_t c)
     case ESP_SERIAL_CLIENT:
         return serial_service.write(c);
 #endif //COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
+#if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+    case ESP_ECHO_SERIAL_CLIENT:
+        return  MYSERIAL1.write(c);
+    case ESP_SOCKET_SERIAL_CLIENT:
+        return Serial2Socket.write(c);
+#endif //COMMUNICATION_PROTOCOL == SOCKET_SERIAL
 #if defined (BLUETOOTH_FEATURE)
     case ESP_BT_CLIENT:
         if(bt_service.started()) {
@@ -418,6 +435,9 @@ size_t ESP3DOutput::write(uint8_t c)
 #if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
         return serial_service.write(c);
 #endif //COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
+#if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+        return  MYSERIAL1.write(c);
+#endif //COMMUNICATION_PROTOCOL == SOCKET_SERIAL
     default :
         return 0;
     }
@@ -478,6 +498,14 @@ size_t ESP3DOutput::write(const uint8_t *buffer, size_t size)
         return serial_service.write(buffer, size);
         break;
 #endif //COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
+#if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+    case ESP_ECHO_SERIAL_CLIENT:
+        return  MYSERIAL1.write(buffer, size);
+        break;
+    case ESP_SOCKET_SERIAL_CLIENT:
+        return  Serial2Socket.write(buffer, size);
+        break;
+#endif //COMMUNICATION_PROTOCOL == SOCKET_SERIAL
     case ESP_ALL_CLIENTS:
 #if defined (BLUETOOTH_FEATURE)
         if(bt_service.started()) {
@@ -492,6 +520,9 @@ size_t ESP3DOutput::write(const uint8_t *buffer, size_t size)
 #if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
         return serial_service.write(buffer, size);
 #endif //COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
+#if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+        return  MYSERIAL1.write(buffer, size);
+#endif //COMMUNICATION_PROTOCOL == SOCKET_SERIAL
     default :
         break;
     }

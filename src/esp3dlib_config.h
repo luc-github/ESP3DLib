@@ -28,7 +28,7 @@
 #undef DISABLED
 #undef _BV
 //version
-#define LIB_VERSION "2.0.0"
+
 
 //Allow to override the default core used by ESP3DLIB
 #ifndef ESP3DLIB_RUNNING_CORE
@@ -103,7 +103,7 @@
 //TELNET_FEATURE : enable Telnet function
 //Rely on Configuration_adv.h
 #ifndef DISABLE_TELNET_FEATURE
-#define CAPTIVE_TELNET_FEATURE
+#define TELNET_FEATURE
 #endif //DISABLE_TELNET_FEATURE
 
 //FILESYSTEM_FEATURE: to host some files on flash
@@ -140,7 +140,8 @@
 //SETTINGS_IN_PREFERENCES 1
 #define ESP_SAVE_SETTINGS SETTINGS_IN_PREFERENCES
 
-
+//For Marlin Embedded no way to change the FW flavor
+#define FIXED_FW_TARGET MARLIN_EMBEDDED
 /************************************
  *
  * Customize SSDP
@@ -154,7 +155,7 @@
 #define ESP_MODEL_URL "https://www.espressif.com/en/products/hardware/esp-wroom-32/overview"
 #endif //ESP_MODEL_URL
 #ifndef ESP_MODEL_NUMBER
-#define ESP_MODEL_NUMBER "ESP3DLib v" LIB_VERSION
+#define ESP_MODEL_NUMBER "Marlin with ESP3DLib"
 #endif //ESP_MODEL_NUMBER
 #ifndef ESP_MANUFACTURER_NAME
 #define ESP_MANUFACTURER_NAME "Espressif Systems"

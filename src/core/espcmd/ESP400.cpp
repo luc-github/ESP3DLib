@@ -529,6 +529,7 @@ bool Commands::ESP400(const char* cmd_params, level_authenticate_type auth_type,
     output->print("\",\"H\":\"SD updater\",\"O\":[{\"no\":\"0\"},{\"yes\":\"1\"}]}");
 #endif //SD_UPDATE_FEATURE
 #endif //SD_DEVICE 
+#if !defined( FIXED_FW_TARGET )
     //Target FW
     output->print (",{\"F\":\"system/system\",\"P\":\"");
     output->print (ESP_TARGET_FW);
@@ -538,8 +539,6 @@ bool Commands::ESP400(const char* cmd_params, level_authenticate_type auth_type,
     output->print (REPETIER);
     output->print ("\"},{\"marlin\":\"");
     output->print (MARLIN);
-    output->print ("\"},{\"marlinkimbra\":\"");
-    output->print (MARLINKIMBRA);
     output->print ("\"},{\"smoothieware\":\"");
     output->print (SMOOTHIEWARE);
     output->print ("\"},{\"grbl\":\"");
@@ -547,6 +546,7 @@ bool Commands::ESP400(const char* cmd_params, level_authenticate_type auth_type,
     output->print ("\"},{\"unknown\":\"");
     output->print (UNKNOWN_FW);
     output->print ("\"}]}");
+#endif //FIXED_FW_TARGET
 #if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
     //Baud Rate
     output->print (",{\"F\":\"system/system\",\"P\":\"");
@@ -582,18 +582,21 @@ bool Commands::ESP400(const char* cmd_params, level_authenticate_type auth_type,
     output->print("\",\"H\":\"verbose\",\"O\":[{\"no\":\"0\"},{\"yes\":\"1\"}]}");
     //Output flag
     //Serial
+#if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
     output->print (",{\"F\":\"system/outputmsg\",\"P\":\"");
     output->print (ESP_SERIAL_FLAG);
     output->print ("\",\"T\":\"B\",\"V\":\"");
     output->print (Settings_ESP3D::read_byte(ESP_SERIAL_FLAG));
     output->print ("\",\"H\":\"serial\",\"O\":[{\"no\":\"0\"},{\"yes\":\"1\"}]}");
-
+#endif //COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
+#if !defined(ESP3D_WIFISUPPORT) || (defined(ESP3D_WIFISUPPORT) && HAS_DISPLAY)
     //Printer LCD
     output->print (",{\"F\":\"system/outputmsg\",\"P\":\"");
     output->print (ESP_PRINTER_LCD_FLAG);
     output->print ("\",\"T\":\"B\",\"V\":\"");
     output->print (Settings_ESP3D::read_byte(ESP_PRINTER_LCD_FLAG));
     output->print ("\",\"H\":\"M117\",\"O\":[{\"no\":\"0\"},{\"yes\":\"1\"}]}");
+#endif //ESP3D_WIFISUPPORT
 #ifdef DISPLAY_DEVICE
     //ESP LCD
     output->print (",{\"F\":\"system/outputmsg\",\"P\":\"");

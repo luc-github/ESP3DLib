@@ -73,6 +73,9 @@
 #ifdef SD_DEVICE
 #include "../../modules/filesystem/esp_sd.h"
 #endif //SD_DEVICE
+#ifdef ESP3D_WIFISUPPORT
+#include MARLIN_PATH(inc/Version.h)
+#endif //ESP3D_WIFISUPPORT
 
 //Get ESP current status
 //output is JSON or plain text according parameter
@@ -1373,6 +1376,10 @@ bool Commands::ESP420(const char* cmd_params, level_authenticate_type auth_type,
     } else {
         output->print (": ");
     }
+#if defined (SHORT_BUILD_VERSION)
+    output->print(SHORT_BUILD_VERSION);
+    output->print("-");
+#endif //SHORT_BUILD_VERSION
     output->print (FW_VERSION);
     if (!plain) {
         output->print ("\"}");

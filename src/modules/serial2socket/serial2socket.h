@@ -23,9 +23,9 @@
 #define _SERIAL_2_SOCKET_H_
 
 #include <Print.h>
-#define TXBUFFERSIZE 1200
-#define RXBUFFERSIZE 128
-#define FLUSHTIMEOUT 500
+#define S2S_TXBUFFERSIZE 1200
+#define S2S_RXBUFFERSIZE 128
+#define S2S_FLUSHTIMEOUT 500
 class Serial_2_Socket: public Print
 {
 public:
@@ -57,20 +57,22 @@ public:
     long baudRate();
     void begin(long speed);
     void end();
+    bool started();
     int available();
     int peek(void);
     int read(void);
-    bool push (const char * data);
+    bool push (const uint8_t *buffer, size_t size);
     void flush(void);
     void handle_flush();
+    void handle();
     operator bool() const;
 
 private:
+    bool _started;
     uint32_t _lastflush;
-    void * _web_socket;
-    uint8_t _TXbuffer[TXBUFFERSIZE];
+    uint8_t _TXbuffer[S2S_TXBUFFERSIZE];
     uint16_t _TXbufferSize;
-    uint8_t _RXbuffer[RXBUFFERSIZE];
+    uint8_t _RXbuffer[S2S_RXBUFFERSIZE];
     uint16_t _RXbufferSize;
     uint16_t _RXbufferpos;
 };

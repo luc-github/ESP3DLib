@@ -203,10 +203,16 @@ bool Settings_ESP3D::isVerboseBoot(bool fromsettings)
 
 uint8_t Settings_ESP3D::GetFirmwareTarget(bool fromsettings)
 {
+#if defined( FIXED_FW_TARGET )
+    (void)fromsettings;
+    _FirmwareTarget = FIXED_FW_TARGET;
+#else
     if(fromsettings) {
         _FirmwareTarget = read_byte (ESP_TARGET_FW);
     }
+#endif //#if defined( FIXED_FW_TARGET )
     return _FirmwareTarget;
+
 }
 
 uint8_t Settings_ESP3D::GetSDDevice()
@@ -221,12 +227,13 @@ uint8_t Settings_ESP3D::GetSDDevice()
 const char* Settings_ESP3D::GetFirmwareTargetShortName()
 {
     static String response;
+
     if  ( _FirmwareTarget == REPETIER) {
         response = F ("repetier");
     } else if ( _FirmwareTarget == MARLIN) {
         response = F ("marlin");
-    } else if ( _FirmwareTarget == MARLINKIMBRA) {
-        response = F ("marlinkimbra");
+    } else if ( _FirmwareTarget == MARLIN_EMBEDDED) {
+        response = F ("marlin");
     } else if ( _FirmwareTarget == SMOOTHIEWARE) {
         response = F ("smoothieware");
     } else if ( _FirmwareTarget == GRBL) {
