@@ -73,9 +73,6 @@
 #ifdef SD_DEVICE
 #include "../../modules/filesystem/esp_sd.h"
 #endif //SD_DEVICE
-#ifdef ESP3D_WIFISUPPORT
-#include MARLIN_PATH(inc/Version.h)
-#endif //ESP3D_WIFISUPPORT
 
 //Get ESP current status
 //output is JSON or plain text according parameter

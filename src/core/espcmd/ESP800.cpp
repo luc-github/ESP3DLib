@@ -41,9 +41,6 @@
 #ifdef CAMERA_DEVICE
 #include "../../modules/camera/camera.h"
 #endif //CAMERA_DEVICE
-#ifdef ESP3D_WIFISUPPORT
-#include MARLIN_PATH(inc/Version.h)
-#endif //ESP3D_WIFISUPPORT
 
 //get fw version firmare target and fw version
 //eventually set time with pc time

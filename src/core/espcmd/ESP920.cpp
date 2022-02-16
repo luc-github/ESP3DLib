@@ -39,10 +39,15 @@ bool Commands::ESP920(const char* cmd_params, level_authenticate_type auth_type,
     parameter = get_param (cmd_params, "");
     //get
     if (parameter.length() == 0) {
-        String s = "SERIAL=";
+        String s = "";
+#if COMMUNICATION_PROTOCOL != SOCKET_SERIAL
+        s += "SERIAL=";
         s += ESP3DOutput::isOutput(ESP_SERIAL_CLIENT)?"ON":"OFF";
+#endif //COMMUNICATION_PROTOCOL != SOCKET_SERIAL
+#if !defined(ESP3D_WIFISUPPORT) || (defined (ESP3D_WIFISUPPORT) && (HAS_DISPLAY || defined (HAS_SERIAL_DISPLAY)))
         s += " PRINTER_LCD=";
         s += ESP3DOutput::isOutput(ESP_PRINTER_LCD_CLIENT)?"ON":"OFF";
+#endif //!defined(ESP3D_WIFISUPPORT) || (defined (ESP3D_WIFISUPPORT) && HAS_DISPLAY)
 #ifdef DISPLAY_DEVICE
         s += " LCD=";
         s += ESP3DOutput::isOutput(ESP_SCREEN_CLIENT)?"ON":"OFF";
@@ -64,6 +69,7 @@ bool Commands::ESP920(const char* cmd_params, level_authenticate_type auth_type,
 
     } else { //set
         response = false;
+#if COMMUNICATION_PROTOCOL != SOCKET_SERIAL
         parameter = get_param (cmd_params, "SERIAL=");
         if (parameter.length() != 0) {
             if ((parameter == "ON")|| (parameter == "OFF")) {
@@ -77,6 +83,8 @@ bool Commands::ESP920(const char* cmd_params, level_authenticate_type auth_type,
             }
             response = true;
         }
+#endif //COMMUNICATION_PROTOCOL != SOCKET_SERIAL
+#if !defined(ESP3D_WIFISUPPORT) || (defined (ESP3D_WIFISUPPORT) && (HAS_DISPLAY || defined (HAS_SERIAL_DISPLAY)))
         parameter = get_param (cmd_params, "PRINTER_LCD=");
         if (parameter.length() != 0) {
             if ((parameter == "ON")|| (parameter == "OFF")) {
@@ -90,23 +98,27 @@ bool Commands::ESP920(const char* cmd_params, level_authenticate_type auth_type,
             }
             response = true;
         }
+#endif //!defined(ESP3D_WIFISUPPORT) || (defined (ESP3D_WIFISUPPORT) && HAS_DISPLAY)
         parameter = get_param (cmd_params, "ALL=");
         if (parameter.length() != 0) {
             if ((parameter == "ON")|| (parameter == "OFF")) {
-                if (!Settings_ESP3D::write_byte (ESP_SERIAL_FLAG, (parameter == "ON")?1:0)||
+                if (
+#if COMMUNICATION_PROTOCOL != SOCKET_SERIAL
+                    !Settings_ESP3D::write_byte (ESP_SERIAL_FLAG, (parameter == "ON")?1:0)||
+#endif //COMMUNICATION_PROTOCOL != SOCKET_SERIAL
 #ifdef DISPLAY_DEVICE
-                        !Settings_ESP3D::write_byte (ESP_LCD_FLAG, (parameter == "ON")?1:0)||
+                    !Settings_ESP3D::write_byte (ESP_LCD_FLAG, (parameter == "ON")?1:0)||
 #endif //DISPLAY_DEVICE
 #ifdef WS_DATA_FEATURE
-                        !Settings_ESP3D::write_byte (ESP_WEBSOCKET_FLAG, (parameter == "ON")?1:0)||
+                    !Settings_ESP3D::write_byte (ESP_WEBSOCKET_FLAG, (parameter == "ON")?1:0)||
 #endif //WS_DATA_FEATURE
 #ifdef BLUETOOTH_FEATURE
-                        !Settings_ESP3D::write_byte (ESP_BT_FLAG, (parameter == "ON")?1:0)||
+                    !Settings_ESP3D::write_byte (ESP_BT_FLAG, (parameter == "ON")?1:0)||
 #endif //BLUETOOTH_FEATURE
 #ifdef TELNET_FEATURE
-                        !Settings_ESP3D::write_byte (ESP_TELNET_FLAG, (parameter == "ON")?1:0)||
+                    !Settings_ESP3D::write_byte (ESP_TELNET_FLAG, (parameter == "ON")?1:0)||
 #endif //TELNET_FEATURE
-                        !Settings_ESP3D::write_byte (ESP_PRINTER_LCD_FLAG, (parameter == "ON")?1:0)) {
+                    !Settings_ESP3D::write_byte (ESP_PRINTER_LCD_FLAG, (parameter == "ON")?1:0)) {
                     output->printERROR ("Set failed!");
                     return false;
                 }

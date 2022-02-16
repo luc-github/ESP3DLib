@@ -56,6 +56,7 @@ Esp3DLib::Esp3DLib()
 //Begin which setup everything
 void Esp3DLib::init()
 {
+    //disableCore0WDT();
     xTaskCreatePinnedToCore(
         ESP3DLibTaskfn, /* Task function. */
         "ESP3DLib Task", /* name of task. */

@@ -26,10 +26,6 @@
 #if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
 #include "../modules/serial2socket/serial2socket.h"
 #endif // COMMUNICATION_PROTOCOL == SOCKET_SERIAL
-#if defined(ESP3D_WIFISUPPORT)
-#include MARLIN_HAL_PATH(FlushableHardwareSerial.h)
-#include MARLIN_HAL_PATH(HAL.h)
-#endif // defined(ESP3D_WIFISUPPORT)
 #include "settings_esp3d.h"
 #if defined (HTTP_FEATURE) || defined(WS_DATA_FEATURE)
 #include "../modules/websocket/websocket_server.h"

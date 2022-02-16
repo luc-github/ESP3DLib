@@ -220,7 +220,7 @@ void Hal::wdtFeed()
     ESP.wdtFeed();
 #endif //ARDUINO_ARCH_ESP8266
 #ifdef ARDUINO_ARCH_ESP32
-    void esp_task_wdt_feed();
+    yield();
 #endif //ARDUINO_ARCH_ESP32
 }
 

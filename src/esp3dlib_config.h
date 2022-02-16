@@ -17,6 +17,12 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
+//Uncomment if you want to compile Marlin and ESP3DLib with Arduino IDE
+//Comment if you want to compile Marlin and ESP3DLib with PlatformIO
+#define COMPILE_WITH_ARDUINO_IDE
+
+#if !defined(COMPILE_WITH_ARDUINO_IDE)
 //config reference, do not touch
 #ifndef ESP_XSTR
 #define ESP_XSTR_(M) #M
@@ -25,9 +31,36 @@
 #define MARLIN_HAL_PATH(PATH) HAL_PATH( ../../../../../Marlin/src/HAL, PATH)
 #define MARLIN_PATH(PATH) ESP_XSTR(../../../../../Marlin/src/PATH)
 #include MARLIN_PATH(inc/MarlinConfigPre.h)
+#include MARLIN_PATH(inc/Version.h)
+#include MARLIN_HAL_PATH(FlushableHardwareSerial.h)
+#include MARLIN_HAL_PATH(HAL.h)
 #undef DISABLED
 #undef _BV
-//version
+#else
+#include <HardwareSerial.h>
+class FlushableHardwareSerial : public HardwareSerial {
+public:
+  FlushableHardwareSerial(int uart_nr) : HardwareSerial(uart_nr) {}
+};
+extern FlushableHardwareSerial flushableSerial;
+#define MYSERIAL1 flushableSerial
+#define ESP3D_WIFISUPPORT
+#define OTASUPPORT
+#define WEBSUPPORT
+#define SHORT_BUILD_VERSION "2.0.0"
+/*********************************************************
+ * 
+ *        Manual Configuration 
+ * 
+ * *******************************************************/
+//#define DISABLE_MDNS_FEATURE
+//#define DISABLE_SSDP_FEATURE
+//#define DISABLE_CAPTIVE_PORTAL_FEATURE
+//#define DISABLE_TELNET_FEATURE
+//#define DISABLE_NOTIFICATION_FEATURE
+//#define DISABLE_SD_UPDATE_FEATURE
+//#define DISABLE_WEB_UPDATE_FEATURE
+#endif //COMPILE_MARLIN_WITH_ARDUINO_IDE
 
 
 //Allow to override the default core used by ESP3DLIB
