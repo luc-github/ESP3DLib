@@ -543,12 +543,14 @@ void SSDPClass::_onPacket(AsyncUDPPacket& packet)
                 DEBUG_SSDP.printf("Saving deferred SSDP reply to queue slot %i.\n", i);
 #endif
                 _replySlots[i] = new ssdp_reply_slot_item_t;
-                _replySlots[i]->_process_time = _process_time;
-                _replySlots[i]->_delay = _delay;
-                _replySlots[i]->_respondToAddr = _respondToAddr;
-                _replySlots[i]->_respondToPort = _respondToPort;
-                strlcpy(_replySlots[i]->_respondType, _respondType, sizeof(_replySlots[i]->_respondType));
-                strlcpy(_replySlots[i]->_usn_suffix, _usn_suffix, sizeof(_replySlots[i]->_usn_suffix));
+                if (_replySlots[i]) {
+                    _replySlots[i]->_process_time = _process_time;
+                    _replySlots[i]->_delay = _delay;
+                    _replySlots[i]->_respondToAddr = _respondToAddr;
+                    _replySlots[i]->_respondToPort = _respondToPort;
+                    strlcpy(_replySlots[i]->_respondType, _respondType, sizeof(_replySlots[i]->_respondType));
+                    strlcpy(_replySlots[i]->_usn_suffix, _usn_suffix, sizeof(_replySlots[i]->_usn_suffix));
+                }
                 break;
             }
         }
