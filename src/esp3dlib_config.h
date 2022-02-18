@@ -17,7 +17,8 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
+//this is ESP3DLIB compilation environement
+#define ESP3DLIB_ENV
 //Uncomment if you want to compile Marlin and ESP3DLib with Arduino IDE
 //Comment if you want to compile Marlin and ESP3DLib with PlatformIO
 #define COMPILE_WITH_ARDUINO_IDE
@@ -44,13 +45,13 @@ public:
 };
 extern FlushableHardwareSerial flushableSerial;
 #define MYSERIAL1 flushableSerial
-#define ESP3D_WIFISUPPORT
 #define OTASUPPORT
 #define WEBSUPPORT
-#define SHORT_BUILD_VERSION "2.0.0"
+#define SHORT_BUILD_VERSION "2.0.9.3+"
+
 /*********************************************************
  * 
- *        Manual Configuration 
+ *        Manual Configuration for Arduino IDE
  * 
  * *******************************************************/
 //#define DISABLE_MDNS_FEATURE
@@ -60,8 +61,14 @@ extern FlushableHardwareSerial flushableSerial;
 //#define DISABLE_NOTIFICATION_FEATURE
 //#define DISABLE_SD_UPDATE_FEATURE
 //#define DISABLE_WEB_UPDATE_FEATURE
+//#define DISABLE_WDT_CORE_0
+#define DISABLE_WDT_ESP3DLIB_TASK
 #endif //COMPILE_MARLIN_WITH_ARDUINO_IDE
 
+//Allow to disable WDT for ESP3DLIB task only
+#ifndef ENABLE_WDT_ESP3DLIB_TASK
+#define DISABLE_WDT_ESP3DLIB_TASK
+#endif
 
 //Allow to override the default core used by ESP3DLIB
 #ifndef ESP3DLIB_RUNNING_CORE
@@ -162,6 +169,22 @@ extern FlushableHardwareSerial flushableSerial;
 #ifndef DISABLE_NOTIFICATION_FEATURE
 #define NOTIFICATION_FEATURE
 #endif //DISABLE_NOTIFICATION_FEATURE
+
+/************************************
+ *
+ * DEBUG
+ *
+ * **********************************/
+//Do not do this when connected to printer !!!
+//be noted all upload may failed if enabled
+//DEBUG_OUTPUT_SERIAL0 1
+//DEBUG_OUTPUT_TELNET  4
+//DEBUG_OUTPUT_WEBSOCKET  5
+//#define ESP_DEBUG_FEATURE DEBUG_OUTPUT_SERIAL0
+
+#ifdef ESP_DEBUG_FEATURE
+#define DEBUG_ESP3D_OUTPUT_PORT  8000
+#endif //ESP_DEBUG_FEATURE
 
 
 /************************************

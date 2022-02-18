@@ -19,7 +19,7 @@
 */
 #include "include/esp3d_config.h"
 
-#if defined(ESP3D_WIFISUPPORT)
+#if defined(ESP3DLIB_ENV)
 #include "esp3dlib.h"
 //to make it work with Platformio library detection
 //TODO: remove as soon as Platformio library detection is fixed
@@ -43,7 +43,7 @@ void ESP3DLibTaskfn( void * parameter )
         myesp3d.handle();
         Hal::wait (0);  // Yield to other tasks
     }
-    vTaskDelete( NULL );
+    vTaskDelete( Hal::xHandle );
 }
 
 
@@ -56,16 +56,18 @@ Esp3DLib::Esp3DLib()
 //Begin which setup everything
 void Esp3DLib::init()
 {
-    //disableCore0WDT();
     xTaskCreatePinnedToCore(
         ESP3DLibTaskfn, /* Task function. */
         "ESP3DLib Task", /* name of task. */
         8192, /* Stack size of task */
         NULL, /* parameter of the task */
         ESP3DLIB_RUNNING_PRIORITY, /* priority of the task */
-        NULL, /* Task handle to keep track of created task */
+        &(Hal::xHandle), /* Task handle to keep track of created task */
         ESP3DLIB_RUNNING_CORE    /* Core to run the task */
     );
+    #ifdef DISABLE_WDT_ESP3DLIB_TASK
+    esp_task_wdt_delete(Hal::xHandle);
+    #endif //DISABLE_WDT_ESP3DLIB_TASK 
 }
 //Parse command
 bool Esp3DLib::parse(char * cmd)
@@ -84,4 +86,4 @@ void Esp3DLib::idletask()
 {
     Hal::wait (0);  // Yield to other tasks
 }
-#endif //ESP3D_WIFISUPPORT
+#endif //ESP3DLIB_ENV

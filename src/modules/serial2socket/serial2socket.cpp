@@ -21,7 +21,7 @@
 
 #include "../../include/esp3d_config.h"
 
-#if defined(ESP3D_WIFISUPPORT) && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+#if defined(ESP3DLIB_ENV) && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
 #include <Arduino.h>
 #include "serial2socket.h"
 #include "../../core/esp3doutput.h"
@@ -174,4 +174,4 @@ void Serial_2_Socket::flush(void)
     }
 }
 
-#endif // ESP3D_WIFISUPPORT
+#endif // ESP3DLIB_ENV

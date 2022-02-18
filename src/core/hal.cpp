@@ -27,13 +27,8 @@
 #include <soc/soc.h>
 #include <soc/rtc_cntl_reg.h>
 #include "WiFi.h"
-#ifdef __cplusplus
-extern "C" {
-#endif //__cplusplus
-esp_err_t esp_task_wdt_reset();
-#ifdef __cplusplus
-}
-#endif //__cplusplus
+#include "esp_task_wdt.h"
+TaskHandle_t Hal::xHandle = nullptr;
 #endif //ARDUINO_ARCH_ESP32
 
 #include "esp3doutput.h"
@@ -220,7 +215,19 @@ void Hal::wdtFeed()
     ESP.wdtFeed();
 #endif //ARDUINO_ARCH_ESP8266
 #ifdef ARDUINO_ARCH_ESP32
-    yield();
+    static uint64_t lastYield = 0;
+    uint64_t now = millis();
+    if((now - lastYield) > 2000) {
+        lastYield = now;
+        vTaskDelay(5); //delay 1 RTOS tick
+    }
+    #ifndef DISABLE_WDT_ESP3DLIB_TASK
+    if (xHandle && esp_task_wdt_status(xHandle)==ESP_OK){
+         if (esp_task_wdt_reset()!=ESP_OK){
+            log_esp3d("WDT Reset failed")
+            }
+    }
+    #endif //DISABLE_WDT_ESP3DLIB_TASK
 #endif //ARDUINO_ARCH_ESP32
 }
 

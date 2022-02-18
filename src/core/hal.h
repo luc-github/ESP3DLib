@@ -29,6 +29,7 @@
 #endif //ARDUINO_ARCH_ESP8266
 #if defined(ARDUINO_ARCH_ESP32)
 #include "WiFi.h"
+#include "esp_task_wdt.h"
 #endif //ARDUINO_ARCH_ESP32
 #include <Arduino.h>
 
@@ -50,6 +51,9 @@ public:
     static void analogWriteRange(uint32_t range);
     static void toneESP(uint8_t pin, unsigned int frequency, unsigned int duration, bool sync = true);
     static void no_tone(uint8_t pin);
+#if defined(ARDUINO_ARCH_ESP32)
+    static TaskHandle_t xHandle;
+#endif //ARDUINO_ARCH_ESP32
 private:
     static void wdtFeed();
     static uint32_t _analogWriteRange;

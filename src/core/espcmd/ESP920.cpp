@@ -44,10 +44,10 @@ bool Commands::ESP920(const char* cmd_params, level_authenticate_type auth_type,
         s += "SERIAL=";
         s += ESP3DOutput::isOutput(ESP_SERIAL_CLIENT)?"ON":"OFF";
 #endif //COMMUNICATION_PROTOCOL != SOCKET_SERIAL
-#if !defined(ESP3D_WIFISUPPORT) || (defined (ESP3D_WIFISUPPORT) && (HAS_DISPLAY || defined (HAS_SERIAL_DISPLAY)))
+#if !defined(ESP3DLIB_ENV) || (defined (ESP3DLIB_ENV) && (HAS_DISPLAY || defined (HAS_SERIAL_DISPLAY)))
         s += " PRINTER_LCD=";
         s += ESP3DOutput::isOutput(ESP_PRINTER_LCD_CLIENT)?"ON":"OFF";
-#endif //!defined(ESP3D_WIFISUPPORT) || (defined (ESP3D_WIFISUPPORT) && HAS_DISPLAY)
+#endif //!defined(ESP3DLIB_ENV) || (defined (ESP3DLIB_ENV) && HAS_DISPLAY)
 #ifdef DISPLAY_DEVICE
         s += " LCD=";
         s += ESP3DOutput::isOutput(ESP_SCREEN_CLIENT)?"ON":"OFF";
@@ -84,7 +84,7 @@ bool Commands::ESP920(const char* cmd_params, level_authenticate_type auth_type,
             response = true;
         }
 #endif //COMMUNICATION_PROTOCOL != SOCKET_SERIAL
-#if !defined(ESP3D_WIFISUPPORT) || (defined (ESP3D_WIFISUPPORT) && (HAS_DISPLAY || defined (HAS_SERIAL_DISPLAY)))
+#if !defined(ESP3DLIB_ENV) || (defined (ESP3DLIB_ENV) && (HAS_DISPLAY || defined (HAS_SERIAL_DISPLAY)))
         parameter = get_param (cmd_params, "PRINTER_LCD=");
         if (parameter.length() != 0) {
             if ((parameter == "ON")|| (parameter == "OFF")) {
@@ -98,7 +98,7 @@ bool Commands::ESP920(const char* cmd_params, level_authenticate_type auth_type,
             }
             response = true;
         }
-#endif //!defined(ESP3D_WIFISUPPORT) || (defined (ESP3D_WIFISUPPORT) && HAS_DISPLAY)
+#endif //!defined(ESP3DLIB_ENV) || (defined (ESP3DLIB_ENV) && HAS_DISPLAY)
         parameter = get_param (cmd_params, "ALL=");
         if (parameter.length() != 0) {
             if ((parameter == "ON")|| (parameter == "OFF")) {

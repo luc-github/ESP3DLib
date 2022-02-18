@@ -242,7 +242,13 @@ void HTTP_Server::handle()
 {
     if (_started) {
         if (_webserver) {
+#ifdef DISABLE_WDT_CORE_0
+            disableCore0WDT();
+#endif //DISABLE_WDT_CORE_0
             _webserver->handleClient();
+#ifdef DISABLE_WDT_CORE_0
+            enableCore0WDT();
+#endif //DISABLE_WDT_CORE_0
         }
     }
 }
