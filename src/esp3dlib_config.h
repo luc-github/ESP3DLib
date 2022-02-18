@@ -39,9 +39,10 @@
 #undef _BV
 #else
 #include <HardwareSerial.h>
-class FlushableHardwareSerial : public HardwareSerial {
+class FlushableHardwareSerial : public HardwareSerial
+{
 public:
-  FlushableHardwareSerial(int uart_nr) : HardwareSerial(uart_nr) {}
+    FlushableHardwareSerial(int uart_nr) : HardwareSerial(uart_nr) {}
 };
 extern FlushableHardwareSerial flushableSerial;
 #define MYSERIAL1 flushableSerial
@@ -50,9 +51,11 @@ extern FlushableHardwareSerial flushableSerial;
 #define SHORT_BUILD_VERSION "2.0.9.3+"
 
 /*********************************************************
- * 
+ *
  *        Manual Configuration for Arduino IDE
- * 
+ *        because cannot access to
+ *        Marlin configuration files
+ *
  * *******************************************************/
 //#define DISABLE_MDNS_FEATURE
 //#define DISABLE_SSDP_FEATURE
@@ -63,6 +66,8 @@ extern FlushableHardwareSerial flushableSerial;
 //#define DISABLE_WEB_UPDATE_FEATURE
 //#define DISABLE_WDT_CORE_0
 //#define AUTHENTICATION_FEATURE
+//#define HAS_DISPLAY
+//#define HAS_SERIAL_DISPLAY
 #define DISABLE_WDT_ESP3DLIB_TASK
 #endif //COMPILE_MARLIN_WITH_ARDUINO_IDE
 
