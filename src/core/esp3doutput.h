@@ -23,7 +23,7 @@
 #define ESP_TELNET_CLIENT               2
 #define ESP_HTTP_CLIENT                 4
 #define ESP_WEBSOCKET_TERMINAL_CLIENT   8
-#define ESP_PRINTER_LCD_CLIENT          16
+#define ESP_PRINTER_SCREEN_CLIENT       16
 #define ESP_BT_CLIENT                   32
 #define ESP_SCREEN_CLIENT               64
 #define ESP_WEBSOCKET_CLIENT            128
@@ -100,10 +100,10 @@ private:
     WEBSERVER * _webserver;
 #endif //HTTP_FEATURE
     static uint8_t _serialoutputflags;
-    static uint8_t _printerlcdoutputflags;
+    static uint8_t _printerscreenoutputflags;
     static uint8_t _websocketoutputflags;
     static uint8_t _telnetoutputflags;
-    static uint8_t _lcdoutputflags;
+    static uint8_t _screenoutputflags;
     static uint8_t _BToutputflags;
 };
 

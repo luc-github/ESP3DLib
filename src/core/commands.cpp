@@ -646,7 +646,7 @@ bool Commands::execute_internal_command (int cmd, const char* cmd_params, level_
 #endif //BUZZER_DEVICE
     case 920:
         //Get state / Set state of output message clients
-        //[ESP910]<SERIAL / LCD / PRINTER_LCD/ WEBSOCKET / TELNET /BT / ALL>=<ON/OFF>[pwd=<admin password>]
+        //[ESP910]<SERIAL / SCREEN / PRINTER_SCREEN/ WEBSOCKET / TELNET /BT / ALL>=<ON/OFF>[pwd=<admin password>]
         response = ESP920(cmd_params, auth_type, output);
         break;
     default:

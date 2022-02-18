@@ -41,10 +41,10 @@
 #endif //COMMUNICATION_PROTOCOL == MKS_SERIAL
 
 uint8_t ESP3DOutput::_serialoutputflags = DEFAULT_SERIAL_OUTPUT_FLAG;
-uint8_t ESP3DOutput::_printerlcdoutputflags = DEFAULT_PRINTER_LCD_FLAG;
+uint8_t ESP3DOutput::_printerscreenoutputflags = DEFAULT_PRINTER_SCREEN_FLAG;
 uint8_t ESP3DOutput::_websocketoutputflags = DEFAULT_WEBSOCKET_FLAG;
 uint8_t ESP3DOutput::_telnetoutputflags = DEFAULT_TELNET_FLAG;
-uint8_t ESP3DOutput::_lcdoutputflags = DEFAULT_LCD_FLAG;
+uint8_t ESP3DOutput::_screenoutputflags = DEFAULT_SCREEN_FLAG;
 uint8_t ESP3DOutput::_BToutputflags = DEFAULT_BT_FLAG;
 #if defined (HTTP_FEATURE)
 #if defined (ARDUINO_ARCH_ESP32)
@@ -110,23 +110,23 @@ bool ESP3DOutput::isOutput(uint8_t flag, bool fromsettings)
 {
     if(fromsettings) {
         _serialoutputflags= Settings_ESP3D::read_byte (ESP_SERIAL_FLAG);
-        _printerlcdoutputflags= Settings_ESP3D::read_byte (ESP_PRINTER_LCD_FLAG);
+        _printerscreenoutputflags= Settings_ESP3D::read_byte (ESP_PRINTER_SCREEN_FLAG);
         _websocketoutputflags= Settings_ESP3D::read_byte (ESP_WEBSOCKET_FLAG);
         _telnetoutputflags= Settings_ESP3D::read_byte (ESP_TELNET_FLAG);
-        _lcdoutputflags= Settings_ESP3D::read_byte (ESP_LCD_FLAG);
+        _screenoutputflags= Settings_ESP3D::read_byte (ESP_SCREEN_FLAG);
         _BToutputflags= Settings_ESP3D::read_byte (ESP_BT_FLAG);
     }
     switch(flag) {
     case ESP_SERIAL_CLIENT:
         return _serialoutputflags;
-    case ESP_PRINTER_LCD_CLIENT:
-        return _printerlcdoutputflags;
+    case ESP_PRINTER_SCREEN_CLIENT:
+        return _printerscreenoutputflags;
     case ESP_WEBSOCKET_CLIENT:
         return _websocketoutputflags;
     case ESP_TELNET_CLIENT:
         return _telnetoutputflags;
     case ESP_SCREEN_CLIENT:
-        return _lcdoutputflags;
+        return _screenoutputflags;
     case ESP_BT_CLIENT:
         return _BToutputflags;
     default:
@@ -275,7 +275,7 @@ size_t ESP3DOutput::printMSG(const char * s, bool withNL)
         return 0;
     }
 #endif //HTTP_FEATURE
-    if (_client & ESP_SCREEN_CLIENT) {
+    if (_client == ESP_SCREEN_CLIENT) {
         ESP3DOutput outputscr(ESP_SCREEN_CLIENT);
         outputscr.print(s);
     }
@@ -286,7 +286,7 @@ size_t ESP3DOutput::printMSG(const char * s, bool withNL)
         display += "]";
         break;
     case MARLIN:
-        if (_client & ESP_PRINTER_LCD_CLIENT) {
+        if (_client == ESP_PRINTER_SCREEN_CLIENT) {
             display = "M117 ";
         } else {
             display = ";echo: ";
@@ -296,7 +296,7 @@ size_t ESP3DOutput::printMSG(const char * s, bool withNL)
     case SMOOTHIEWARE:
     case REPETIER:
     default:
-        if (_client & ESP_PRINTER_LCD_CLIENT) {
+        if (_client == ESP_PRINTER_SCREEN_CLIENT) {
             display = "M117 ";
         } else {
             display = ";";
@@ -489,7 +489,7 @@ size_t ESP3DOutput::write(const uint8_t *buffer, size_t size)
         break;
 #endif //WS_DATA_FEATURE
 #if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
-    case ESP_PRINTER_LCD_CLIENT:
+    case ESP_PRINTER_SCREEN_CLIENT:
     case ESP_SERIAL_CLIENT:
         return serial_service.write(buffer, size);
         break;

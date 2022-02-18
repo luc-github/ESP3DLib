@@ -590,19 +590,19 @@ bool Commands::ESP400(const char* cmd_params, level_authenticate_type auth_type,
     output->print ("\",\"H\":\"serial\",\"O\":[{\"no\":\"0\"},{\"yes\":\"1\"}]}");
 #endif //COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
 #if !defined(ESP3DLIB_ENV) || (defined(ESP3DLIB_ENV) && HAS_DISPLAY)
-    //Printer LCD
+    //Printer SCREEN
     output->print (",{\"F\":\"system/outputmsg\",\"P\":\"");
-    output->print (ESP_PRINTER_LCD_FLAG);
+    output->print (ESP_PRINTER_SCREEN_FLAG);
     output->print ("\",\"T\":\"B\",\"V\":\"");
-    output->print (Settings_ESP3D::read_byte(ESP_PRINTER_LCD_FLAG));
+    output->print (Settings_ESP3D::read_byte(ESP_PRINTER_SCREEN_FLAG));
     output->print ("\",\"H\":\"M117\",\"O\":[{\"no\":\"0\"},{\"yes\":\"1\"}]}");
 #endif //ESP3DLIB_ENV
 #ifdef DISPLAY_DEVICE
-    //ESP LCD
+    //ESP SCREEN
     output->print (",{\"F\":\"system/outputmsg\",\"P\":\"");
-    output->print (ESP_LCD_FLAG);
+    output->print (ESP_SCREEN_FLAG);
     output->print ("\",\"T\":\"B\",\"V\":\"");
-    output->print (Settings_ESP3D::read_byte(ESP_LCD_FLAG));
+    output->print (Settings_ESP3D::read_byte(ESP_SCREEN_FLAG));
     output->print ("\",\"H\":\"M117\",\"O\":[{\"no\":\"0\"},{\"yes\":\"1\"}]}");
 #endif //DISPLAY_DEVICE
 #ifdef WS_DATA_FEATURE

@@ -150,7 +150,7 @@ const char * help[]= {"[ESP] - display this help",
 #ifdef BUZZER_DEVICE
                       "[ESP910](ENABLE/DISABLE) - display/set buzzer state",
 #endif //BUZZER_DEVICE
-                      "[ESP920](client)=(ON/OFF) - display/set SERIAL / LCD / PRINTER_LCD / WEBSOCKET / TELNET /BT / ALL client state if available",
+                      "[ESP920](client)=(ON/OFF) - display/set SERIAL / SCREEN / PRINTER_SCREEN / WEBSOCKET / TELNET /BT / ALL client state if available",
                       ""
                      };
 const uint cmdlist[]= {0,

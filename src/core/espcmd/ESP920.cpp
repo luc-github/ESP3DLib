@@ -23,7 +23,7 @@
 #include "../settings_esp3d.h"
 #include "../../modules/authentication/authentication_service.h"
 //Get state / Set state of output message clients
-//[ESP920]<SERIAL / LCD / PRINTER_LCD/ WEBSOCKET / TELNET /BT / ALL>=<ON/OFF>[pwd=<admin password>]
+//[ESP920]<SERIAL / SCREEN / PRINTER_SCREEN/ WEBSOCKET / TELNET /BT / ALL>=<ON/OFF>[pwd=<admin password>]
 bool Commands::ESP920(const char* cmd_params, level_authenticate_type auth_type, ESP3DOutput * output)
 {
     bool response = true;
@@ -45,11 +45,11 @@ bool Commands::ESP920(const char* cmd_params, level_authenticate_type auth_type,
         s += ESP3DOutput::isOutput(ESP_SERIAL_CLIENT)?"ON":"OFF";
 #endif //COMMUNICATION_PROTOCOL != SOCKET_SERIAL
 #if !defined(ESP3DLIB_ENV) || (defined (ESP3DLIB_ENV) && (HAS_DISPLAY || defined (HAS_SERIAL_DISPLAY)))
-        s += " PRINTER_LCD=";
-        s += ESP3DOutput::isOutput(ESP_PRINTER_LCD_CLIENT)?"ON":"OFF";
+        s += " PRINTER_SCREEN=";
+        s += ESP3DOutput::isOutput(ESP_PRINTER_SCREEN_CLIENT)?"ON":"OFF";
 #endif //!defined(ESP3DLIB_ENV) || (defined (ESP3DLIB_ENV) && HAS_DISPLAY)
 #ifdef DISPLAY_DEVICE
-        s += " LCD=";
+        s += " SCREEN=";
         s += ESP3DOutput::isOutput(ESP_SCREEN_CLIENT)?"ON":"OFF";
 #endif //DISPLAY_DEVICE
 #ifdef WS_DATA_FEATURE
@@ -85,10 +85,10 @@ bool Commands::ESP920(const char* cmd_params, level_authenticate_type auth_type,
         }
 #endif //COMMUNICATION_PROTOCOL != SOCKET_SERIAL
 #if !defined(ESP3DLIB_ENV) || (defined (ESP3DLIB_ENV) && (HAS_DISPLAY || defined (HAS_SERIAL_DISPLAY)))
-        parameter = get_param (cmd_params, "PRINTER_LCD=");
+        parameter = get_param (cmd_params, "PRINTER_SCREEN=");
         if (parameter.length() != 0) {
             if ((parameter == "ON")|| (parameter == "OFF")) {
-                if (!Settings_ESP3D::write_byte (ESP_PRINTER_LCD_FLAG, (parameter == "ON")?1:0)) {
+                if (!Settings_ESP3D::write_byte (ESP_PRINTER_SCREEN_FLAG, (parameter == "ON")?1:0)) {
                     output->printERROR ("Set failed!");
                     return false;
                 }
@@ -107,7 +107,7 @@ bool Commands::ESP920(const char* cmd_params, level_authenticate_type auth_type,
                     !Settings_ESP3D::write_byte (ESP_SERIAL_FLAG, (parameter == "ON")?1:0)||
 #endif //COMMUNICATION_PROTOCOL != SOCKET_SERIAL
 #ifdef DISPLAY_DEVICE
-                    !Settings_ESP3D::write_byte (ESP_LCD_FLAG, (parameter == "ON")?1:0)||
+                    !Settings_ESP3D::write_byte (ESP_SCREEN_FLAG, (parameter == "ON")?1:0)||
 #endif //DISPLAY_DEVICE
 #ifdef WS_DATA_FEATURE
                     !Settings_ESP3D::write_byte (ESP_WEBSOCKET_FLAG, (parameter == "ON")?1:0)||
@@ -118,7 +118,7 @@ bool Commands::ESP920(const char* cmd_params, level_authenticate_type auth_type,
 #ifdef TELNET_FEATURE
                     !Settings_ESP3D::write_byte (ESP_TELNET_FLAG, (parameter == "ON")?1:0)||
 #endif //TELNET_FEATURE
-                    !Settings_ESP3D::write_byte (ESP_PRINTER_LCD_FLAG, (parameter == "ON")?1:0)) {
+                    !Settings_ESP3D::write_byte (ESP_PRINTER_SCREEN_FLAG, (parameter == "ON")?1:0)) {
                     output->printERROR ("Set failed!");
                     return false;
                 }
@@ -129,10 +129,10 @@ bool Commands::ESP920(const char* cmd_params, level_authenticate_type auth_type,
             response = true;
         }
 #ifdef DISPLAY_DEVICE
-        parameter = get_param (cmd_params, "LCD=");
+        parameter = get_param (cmd_params, "SCREEN=");
         if (parameter.length() != 0) {
             if ((parameter == "ON")|| (parameter == "OFF")) {
-                if (!Settings_ESP3D::write_byte (ESP_LCD_FLAG, (parameter == "ON")?1:0)) {
+                if (!Settings_ESP3D::write_byte (ESP_SCREEN_FLAG, (parameter == "ON")?1:0)) {
                     output->printERROR ("Set failed!");
                     return false;
                 }
