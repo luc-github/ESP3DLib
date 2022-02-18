@@ -62,8 +62,13 @@ extern FlushableHardwareSerial flushableSerial;
 //#define DISABLE_SD_UPDATE_FEATURE
 //#define DISABLE_WEB_UPDATE_FEATURE
 //#define DISABLE_WDT_CORE_0
+//#define AUTHENTICATION_FEATURE
 #define DISABLE_WDT_ESP3DLIB_TASK
 #endif //COMPILE_MARLIN_WITH_ARDUINO_IDE
+
+
+//DISABLE_WDT_CORE_0: disable WDT on core 0 when procession webserver
+//Rely on Configuration_adv.h or manual config above
 
 //Allow to disable WDT for ESP3DLIB task only
 #ifndef ENABLE_WDT_ESP3DLIB_TASK
@@ -101,7 +106,7 @@ extern FlushableHardwareSerial flushableSerial;
 #define COMMUNICATION_PROTOCOL SOCKET_SERIAL
 
 //AUTHENTICATION_FEATURE: protect pages by login password
-//Rely on Configuration_adv.h
+//Rely on Configuration_adv.h  or manual config above
 
 //WIFI_FEATURE : enable WIFI function
 #define WIFI_FEATURE
