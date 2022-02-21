@@ -285,7 +285,11 @@ size_t ESP3DOutput::printMSG(const char * s, bool withNL)
         display += s;
         display += "]";
         break;
+    case MARLIN_EMBEDDED:
     case MARLIN:
+        if ((_client == ESP_ECHO_SERIAL_CLIENT) && (strcmp(s, "ok") == 0)) {
+            return 0;
+        }
         if (_client == ESP_PRINTER_SCREEN_CLIENT) {
             display = "M117 ";
         } else {
@@ -343,6 +347,7 @@ size_t ESP3DOutput::printERROR(const char * s, int code_error)
         display = "error: ";
         display += s;
         break;
+    case MARLIN_EMBEDDED:
     case MARLIN:
         display = "error: ";
         display += s;
