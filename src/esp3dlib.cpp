@@ -41,7 +41,7 @@ void ESP3DLibTaskfn( void * parameter )
     //Main loop
     for(;;) {
         myesp3d.handle();
-        Hal::wait (0);  // Yield to other tasks
+        vTaskDelay(1 / portTICK_RATE_MS);
     }
     vTaskDelete( Hal::xHandle );
 }
@@ -65,9 +65,9 @@ void Esp3DLib::init()
         &(Hal::xHandle), /* Task handle to keep track of created task */
         ESP3DLIB_RUNNING_CORE    /* Core to run the task */
     );
-    #ifdef DISABLE_WDT_ESP3DLIB_TASK
+#ifdef DISABLE_WDT_ESP3DLIB_TASK
     esp_task_wdt_delete(Hal::xHandle);
-    #endif //DISABLE_WDT_ESP3DLIB_TASK 
+#endif //DISABLE_WDT_ESP3DLIB_TASK 
 }
 //Parse command
 bool Esp3DLib::parse(char * cmd)
