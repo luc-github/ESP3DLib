@@ -50,7 +50,7 @@ bool Commands::ESP400(const char* cmd_params, level_authenticate_type auth_type,
     output->print ("{\"F\":\"network/network\",\"P\":\"");
     output->print (ESP_HOSTNAME);
     output->print ("\",\"T\":\"S\",\"R\":\"1\",\"V\":\"");
-    output->print (encodeString(Settings_ESP3D::read_string(ESP_HOSTNAME)));
+    output->print (ESP3DOutput::encodeString(Settings_ESP3D::read_string(ESP_HOSTNAME)));
     output->print ("\",\"H\":\"hostname\" ,\"S\":\"");
     output->print (Settings_ESP3D::get_max_string_size(ESP_HOSTNAME));
     output->print ("\", \"M\":\"");
@@ -86,7 +86,7 @@ bool Commands::ESP400(const char* cmd_params, level_authenticate_type auth_type,
     output->print (",{\"F\":\"network/sta\",\"P\":\"");
     output->print (ESP_STA_SSID);
     output->print ("\",\"T\":\"S\",\"V\":\"");
-    output->print (encodeString(Settings_ESP3D::read_string(ESP_STA_SSID)));
+    output->print (ESP3DOutput::encodeString(Settings_ESP3D::read_string(ESP_STA_SSID)));
     output->print ("\",\"S\":\"");
     output->print (Settings_ESP3D::get_max_string_size(ESP_STA_SSID));
     output->print ("\",\"H\":\"SSID\",\"M\":\"");
@@ -161,7 +161,7 @@ bool Commands::ESP400(const char* cmd_params, level_authenticate_type auth_type,
     output->print (",{\"F\":\"network/ap\",\"P\":\"");
     output->print (ESP_AP_SSID);
     output->print ("\",\"T\":\"S\",\"R\":\"1\",\"V\":\"");
-    output->print (encodeString(Settings_ESP3D::read_string(ESP_AP_SSID)));
+    output->print (ESP3DOutput::encodeString(Settings_ESP3D::read_string(ESP_AP_SSID)));
     output->print ("\",\"S\":\"");
     output->print (Settings_ESP3D::get_max_string_size(ESP_AP_SSID));
     output->print ("\",\"H\":\"SSID\",\"M\":\"");
@@ -395,7 +395,7 @@ bool Commands::ESP400(const char* cmd_params, level_authenticate_type auth_type,
     output->print (",{\"F\":\"service/time\",\"P\":\"");
     output->print (ESP_TIME_SERVER1);
     output->print("\",\"T\":\"S\",\"R\":\"1\",\"V\":\"");
-    output->print (encodeString(Settings_ESP3D::read_string(ESP_TIME_SERVER1)));
+    output->print (ESP3DOutput::encodeString(Settings_ESP3D::read_string(ESP_TIME_SERVER1)));
     output->print ("\",\"S\":\"");
     output->print (Settings_ESP3D::get_max_string_size(ESP_TIME_SERVER1));
     output->print ("\",\"H\":\"t-server\",\"M\":\"");
@@ -406,7 +406,7 @@ bool Commands::ESP400(const char* cmd_params, level_authenticate_type auth_type,
     output->print (",{\"F\":\"service/time\",\"P\":\"");
     output->print (ESP_TIME_SERVER2);
     output->print("\",\"T\":\"S\",\"R\":\"1\",\"V\":\"");
-    output->print (encodeString(Settings_ESP3D::read_string(ESP_TIME_SERVER2)));
+    output->print (ESP3DOutput::encodeString(Settings_ESP3D::read_string(ESP_TIME_SERVER2)));
     output->print ("\",\"S\":\"");
     output->print (Settings_ESP3D::get_max_string_size(ESP_TIME_SERVER2));
     output->print ("\",\"H\":\"t-server\",\"M\":\"");
@@ -417,7 +417,7 @@ bool Commands::ESP400(const char* cmd_params, level_authenticate_type auth_type,
     output->print (",{\"F\":\"service/time\",\"P\":\"");
     output->print (ESP_TIME_SERVER3);
     output->print("\",\"T\":\"S\",\"R\":\"1\",\"V\":\"");
-    output->print (encodeString(Settings_ESP3D::read_string(ESP_TIME_SERVER3)));
+    output->print (ESP3DOutput::encodeString(Settings_ESP3D::read_string(ESP_TIME_SERVER3)));
     output->print ("\",\"S\":\"");
     output->print (Settings_ESP3D::get_max_string_size(ESP_TIME_SERVER3));
     output->print ("\",\"H\":\"t-server\",\"M\":\"");
@@ -470,7 +470,7 @@ bool Commands::ESP400(const char* cmd_params, level_authenticate_type auth_type,
     output->print (",{\"F\":\"service/notification\",\"P\":\"");
     output->print (ESP_NOTIFICATION_SETTINGS);
     output->print ("\",\"T\":\"S\",\"R\":\"1\",\"V\":\"");
-    output->print (encodeString(Settings_ESP3D::read_string(ESP_NOTIFICATION_SETTINGS)));
+    output->print (ESP3DOutput::encodeString(Settings_ESP3D::read_string(ESP_NOTIFICATION_SETTINGS)));
     output->print ("\",\"S\":\"");
     output->print (Settings_ESP3D::get_max_string_size(ESP_NOTIFICATION_SETTINGS));
     output->print ("\",\"H\":\"ts\",\"M\":\"");

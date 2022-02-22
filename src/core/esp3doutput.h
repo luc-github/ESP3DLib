@@ -31,6 +31,13 @@
 #define ESP_ECHO_SERIAL_CLIENT          130
 #define ESP_ALL_CLIENTS                 255
 
+#define ESP_OUTPUT_IP_ADDRESS          0
+#define ESP_OUTPUT_STATUS              1
+#define ESP_OUTPUT_PROGRESS            2
+#define ESP_OUTPUT_STATE               3
+
+#define ESP_STATE_DISCONNECTED         0
+
 #ifndef _ESP3DOUTPUT_H
 #define _ESP3DOUTPUT_H
 
@@ -47,7 +54,6 @@ class WebServer;
 #endif //ARDUINO_ARCH_ESP8266
 #endif //HTTP_FEATURE
 
-extern const char * encodeString(const char * s);
 
 class ESP3DOutput : public Print
 {
@@ -91,6 +97,8 @@ public:
     void flush();
     int availableforwrite();
     static bool isOutput(uint8_t flag, bool fromsettings = false);
+    static void toScreen(uint8_t output_type, const char * s);
+    static const char * encodeString(const char * s);
 private:
     uint8_t _client;
 #ifdef HTTP_FEATURE
@@ -105,15 +113,6 @@ private:
     static uint8_t _telnetoutputflags;
     static uint8_t _screenoutputflags;
     static uint8_t _BToutputflags;
-};
-
-class ESP3DGlobalOutput
-{
-public:
-    static void SetStatus(const char * status);
-    static void display_progress(uint8_t v);
-    static void display_IP(bool force = false);
-    static void display_Disconnected();
 };
 
 #endif //_ESP3DOUTPUT_H

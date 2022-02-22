@@ -59,7 +59,7 @@ uint8_t ESP3DOutput::_BToutputflags = DEFAULT_BT_FLAG;
 #endif //DISPLAY_DEVICE
 
 //tool function to avoid string corrupt JSON files
-const char * encodeString(const char * s)
+const char * ESP3DOutput::encodeString(const char * s)
 {
     static String tmp;
     tmp = s;
@@ -73,6 +73,42 @@ const char * encodeString(const char * s)
         tmp=" ";
     }
     return tmp.c_str();
+}
+
+void ESP3DOutput::toScreen(uint8_t output_type, const char * s)
+{
+    switch (output_type) {
+    case ESP_OUTPUT_IP_ADDRESS:
+#ifdef DISPLAY_DEVICE
+        esp3d_display.display_IP(true);
+#endif //DISPLAY_DEVICE
+        break;
+    case ESP_OUTPUT_STATUS:
+#ifdef DISPLAY_DEVICE
+        esp3d_display.SetStatus(s);
+#endif //DISPLAY_DEVICE
+        break;
+    case ESP_OUTPUT_PROGRESS:
+#ifdef DISPLAY_DEVICE
+        esp3d_display.progress((uint8_t)atoi(s));
+#endif //DISPLAY_DEVICE
+        break;
+    case ESP_OUTPUT_STATE:
+#ifdef DISPLAY_DEVICE
+        switch(atoi(s)) {
+        case ESP_STATE_DISCONNECTED:
+            esp3d_display.SetStatus(F("Disconnected"));
+            break;
+            esp3d_display.SetStatus("Disconnected");
+        default :
+            break;
+        }
+#endif //DISPLAY_DEVICE
+        break;
+    default:
+        (void)s;
+        break;
+    }
 }
 
 //constructor
@@ -530,38 +566,5 @@ size_t ESP3DOutput::write(const uint8_t *buffer, size_t size)
     return 0;
 }
 
-void ESP3DGlobalOutput::SetStatus(const char * status)
-{
-#ifdef DISPLAY_DEVICE
-    esp3d_display.SetStatus(status);
-#else
-    (void)status;
-#endif //DISPLAY_DEVICE
-}
-void ESP3DGlobalOutput::display_progress(uint8_t v)
-{
-#ifdef DISPLAY_DEVICE
-    esp3d_display.progress(v);
-#else
-    (void)v;
-#endif //DISPLAY_DEVICE
-}
 
-void ESP3DGlobalOutput::display_Disconnected()
-{
-#ifdef DISPLAY_DEVICE
-    esp3d_display.SetStatus("Disconnected");
-#else
-
-#endif //DISPLAY_DEVICE
-}
-
-void ESP3DGlobalOutput::display_IP(bool force)
-{
-#ifdef DISPLAY_DEVICE
-    esp3d_display.display_IP(force);
-#else
-    (void)force;
-#endif //DISPLAY_DEVICE
-}
 
