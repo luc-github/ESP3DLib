@@ -48,7 +48,7 @@
 void Esp3DCom::echo(const char * data)
 {
     SERIAL_ECHO_START();
-    SERIAL_ECHOLNPGM(data);
+    SERIAL_ECHOLNPGM("", data);
 
 #if HAS_DISPLAY
     if (strlen(data)) {
