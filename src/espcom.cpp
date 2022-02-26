@@ -38,7 +38,7 @@
   #endif
   //for bugfix-2.0.x
   #if __has_include (MARLIN_PATH(lcd/marlinui.h))
-  #include MARLIN_PATH(lcd/marlinui.h)
+    #include MARLIN_PATH(lcd/marlinui.h)
   #endif
 #endif
 #include "espcom.h"
