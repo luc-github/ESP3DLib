@@ -48,7 +48,7 @@ public:
     static int analogRead(uint8_t pin);
     static bool analogWrite(uint8_t pin, uint value);
     static void analogWriteFreq(uint32_t freq);
-    static void analogWriteRange(uint32_t range);
+    static void analogRange(uint32_t range);
     static void toneESP(uint8_t pin, unsigned int frequency, unsigned int duration, bool sync = true);
     static void no_tone(uint8_t pin);
 #if defined(ARDUINO_ARCH_ESP32)
@@ -56,7 +56,7 @@ public:
 #endif //ARDUINO_ARCH_ESP32
 private:
     static void wdtFeed();
-    static uint32_t _analogWriteRange;
+    static uint32_t _analogRange;
     static uint32_t _analogWriteFreq;
 #if defined(ARDUINO_ARCH_ESP32)
     static int getAnalogWriteChannel(uint8_t pin);

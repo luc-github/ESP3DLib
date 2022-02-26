@@ -26,31 +26,17 @@
 #if defined(ARDUINO_ARCH_ESP32)
 #include <soc/soc.h>
 #include <soc/rtc_cntl_reg.h>
-#include "WiFi.h"
-#include "esp_task_wdt.h"
+#include <WiFi.h>
+#include <esp_task_wdt.h>
+#include <driver/adc.h>
 TaskHandle_t Hal::xHandle = nullptr;
 #endif //ARDUINO_ARCH_ESP32
 
 #include "esp3doutput.h"
 
-#if defined(ARDUINO_ARCH_ESP32)
-int ChannelAttached2Pin[16]= {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
-#endif //ARDUINO_ARCH_ESP32
 
-uint32_t Hal::_analogWriteRange = 255;
+uint32_t Hal::_analogRange = 255;
 uint32_t Hal::_analogWriteFreq = 1000;
-
-void Hal::clearAnalogChannels()
-{
-#ifdef ARDUINO_ARCH_ESP32
-    for (uint8_t p = 0; p < 16; p++) {
-        if(ChannelAttached2Pin[p] != -1) {
-            ledcDetachPin(ChannelAttached2Pin[p]);
-            ChannelAttached2Pin[p] = -1;
-        }
-    }
-#endif //ARDUINO_ARCH_ESP32
-}
 
 void Hal::pinMode(uint8_t pin, uint8_t mode)
 {
@@ -63,6 +49,31 @@ void Hal::pinMode(uint8_t pin, uint8_t mode)
     ::pinMode(pin, mode);
 }
 
+#if defined(ARDUINO_ARCH_ESP32)
+int Hal::getAnalogWriteChannel(uint8_t pin)
+{
+    switch (pin) {
+#if CONFIG_IDF_TARGET_ESP32
+    case 39:
+        return ADC1_CHANNEL_3;
+    case 36:
+        return ADC1_CHANNEL_0;
+    case 35:
+        return ADC1_CHANNEL_7;
+    case 34:
+        return ADC1_CHANNEL_6;
+    case 33:
+        return ADC1_CHANNEL_5;
+    case 32:
+        return ADC1_CHANNEL_4;
+    default:
+        return -1;
+#else
+#error "ADC1_CHANNEL not defined for this chip"
+#endif
+    }
+}
+#endif //ARDUINO_ARCH_ESP32
 void Hal::toneESP(uint8_t pin, unsigned int frequency, unsigned int duration, bool sync)
 {
 #if defined(ARDUINO_ARCH_ESP8266)
@@ -85,7 +96,7 @@ void Hal::toneESP(uint8_t pin, unsigned int frequency, unsigned int duration, bo
 void Hal::no_tone(uint8_t pin)
 {
 #if defined(ARDUINO_ARCH_ESP8266)
-    tone(pin, 0, 0);
+    ::tone(pin, 0, 0);
 #endif //ARDUINO_ARCH_ESP8266
 #if defined(ARDUINO_ARCH_ESP32)
     int channel = getAnalogWriteChannel(pin);
@@ -97,7 +108,7 @@ void Hal::no_tone(uint8_t pin)
 
 int Hal::analogRead(uint8_t pin)
 {
-#ifdef ARDUINO_ARCH_ESP8266 //only one ADC on ESP8266 A0
+#ifdef ARDUINO_ARCH_ESP8266 //only one ADC on ESP8266 A0     
     (void)pin;
     return ::analogRead (A0);
 #else
@@ -105,40 +116,31 @@ int Hal::analogRead(uint8_t pin)
 #endif
 }
 
-#if defined(ARDUINO_ARCH_ESP32)
-int Hal::getAnalogWriteChannel(uint8_t pin)
-{
-    for (uint8_t p = 0; p < 16; p++) {
-        if(ChannelAttached2Pin[p] == pin) {
-            return p;
-        }
-    }
-    for (uint8_t p = 0; p < 16; p++) {
-        if(ChannelAttached2Pin[p] == -1) {
-            ChannelAttached2Pin[p] = pin;
-            return p;
-        }
-    }
-
-    return -1;
-}
-#endif //ARDUINO_ARCH_ESP32
-
 bool Hal::analogWrite(uint8_t pin, uint value)
 {
-    if (value > (_analogWriteRange-1)) {
+    if (value > (_analogRange-1)) {
         return false;
     }
 #ifdef ARDUINO_ARCH_ESP8266
     ::analogWrite(pin, value);
 #endif //ARDUINO_ARCH_ESP8266
 #ifdef ARDUINO_ARCH_ESP32
-    int channel  = getAnalogWriteChannel(pin);
-    if (channel==-1) {
-        return false;
-    }
+    ::analogWrite(pin, value);
+#endif //ARDUINO_ARCH_ESP32
+    return true;
+}
+void     Hal::analogWriteFreq(uint32_t freq)
+{
+    _analogWriteFreq = freq;
+#ifdef ARDUINO_ARCH_ESP8266
+    ::analogWriteFreq(_analogWriteFreq);
+#endif //ARDUINO_ARCH_ESP8266
+}
+void Hal::analogRange(uint32_t range)
+{
+    _analogRange = range;
     uint8_t resolution = 0;
-    switch(_analogWriteRange) {
+    switch(_analogRange) {
     case 8191:
         resolution=13;
         break;
@@ -153,27 +155,12 @@ bool Hal::analogWrite(uint8_t pin, uint value)
         break;
     default:
         resolution=8;
-        _analogWriteRange = 255;
+        _analogRange = 255;
         break;
     }
-    ledcSetup(channel, _analogWriteFreq, resolution);
-    ledcAttachPin(pin, channel);
-    ledcWrite(channel, value);
-#endif //ARDUINO_ARCH_ESP32
-    return true;
-}
-void Hal::analogWriteFreq(uint32_t freq)
-{
-    _analogWriteFreq = freq;
+    ::analogReadResolution(resolution);
 #ifdef ARDUINO_ARCH_ESP8266
-    ::analogWriteFreq(_analogWriteFreq);
-#endif //ARDUINO_ARCH_ESP8266
-}
-void Hal::analogWriteRange(uint32_t range)
-{
-    _analogWriteRange = range;
-#ifdef ARDUINO_ARCH_ESP8266
-    ::analogWriteRange(_analogWriteRange);
+    ::analogWriteRange(_analogRange);
 #endif //ARDUINO_ARCH_ESP8266
 }
 
@@ -203,9 +190,6 @@ bool Hal::begin()
 //End ESP3D
 void Hal::end()
 {
-#if defined(ARDUINO_ARCH_ESP32)
-    clearAnalogChannels();
-#endif //ARDUINO_ARCH_ESP32
 }
 
 //Watchdog feeder
@@ -221,13 +205,17 @@ void Hal::wdtFeed()
         lastYield = now;
         vTaskDelay(5); //delay 1 RTOS tick
     }
-    #ifndef DISABLE_WDT_ESP3DLIB_TASK
-    if (xHandle && esp_task_wdt_status(xHandle)==ESP_OK){
-         if (esp_task_wdt_reset()!=ESP_OK){
+#if !defined(DISABLE_WDT_ESP3DLIB_TASK) && !defined(DISABLE_WDT_CORE_0)
+    rtc_wdt_feed();
+#endif//!defined(DISABLE_WDT_ESP3DLIB_TASK) && !defined(DISABLE_WDT_CORE_0)
+#ifndef DISABLE_WDT_ESP3DLIB_TASK
+    if (xHandle && esp_task_wdt_status(xHandle)==ESP_OK) {
+
+        if (esp_task_wdt_reset()!=ESP_OK) {
             log_esp3d("WDT Reset failed")
-            }
+        }
     }
-    #endif //DISABLE_WDT_ESP3DLIB_TASK
+#endif //DISABLE_WDT_ESP3DLIB_TASK
 #endif //ARDUINO_ARCH_ESP32
 }
 

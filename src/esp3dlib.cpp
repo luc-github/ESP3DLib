@@ -29,6 +29,8 @@
 #include "core/esp3d.h"
 #include "core/esp3doutput.h"
 #include "core/commands.h"
+#include <soc/rtc_wdt.h>
+
 
 Esp3DLib esp3dlib;
 
@@ -41,6 +43,7 @@ void ESP3DLibTaskfn( void * parameter )
     //Main loop
     for(;;) {
         myesp3d.handle();
+        rtc_wdt_feed();
         vTaskDelay(1 / portTICK_RATE_MS);
     }
     vTaskDelete( Hal::xHandle );

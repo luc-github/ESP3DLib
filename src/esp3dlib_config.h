@@ -68,7 +68,7 @@ extern FlushableHardwareSerial flushableSerial;
 //#define HAS_DISPLAY
 //#define HAS_SERIAL_DISPLAY
 //#define DISABLE_WDT_ESP3DLIB_TASK
-#define DISABLE_WDT_CORE_0
+//#define DISABLE_WDT_CORE_0
 #endif //COMPILE_MARLIN_WITH_ARDUINO_IDE
 
 
