@@ -21,29 +21,35 @@
 #include "esp3dlibconfig.h"
 
 #if defined(ESP3D_WIFISUPPORT)
+
 #include MARLIN_HAL_PATH(FlushableHardwareSerial.h)
 #include MARLIN_HAL_PATH(HAL.h)
 #if HAS_GRAPHICAL_LCD
-#include <U8glib.h>
+  #include <U8glib.h>
 #endif
+#if HAS_MARLINUI_U8GLIB
+  #include <U8glib-HAL.h>
+#endif
+
 //for 2.0.x
 #if defined __has_include
-#if __has_include (MARLIN_PATH(lcd/ultralcd.h))
-#include MARLIN_PATH(lcd/ultralcd.h)
-#endif
-//for bugfix-2.0.x
-#if __has_include (MARLIN_PATH(lcd/marlinui.h))
-#include MARLIN_PATH(lcd/marlinui.h)
-#endif
+  #if __has_include (MARLIN_PATH(lcd/ultralcd.h))
+    #include MARLIN_PATH(lcd/ultralcd.h)
+  #endif
+  //for bugfix-2.0.x
+  #if __has_include (MARLIN_PATH(lcd/marlinui.h))
+  #include MARLIN_PATH(lcd/marlinui.h)
+  #endif
 #endif
 #include "espcom.h"
 #if defined(HTTP_FEATURE)
-#include <WebServer.h>
+  #include <WebServer.h>
 #endif //HTTP_FEATURE
 void Esp3DCom::echo(const char * data)
 {
     SERIAL_ECHO_START();
-    SERIAL_ECHOLN(data);
+    SERIAL_ECHOLNPGM(data);
+
 #if HAS_DISPLAY
     if (strlen(data)) {
         ui.set_status(data);
