@@ -67,7 +67,7 @@ extern FlushableHardwareSerial flushableSerial;
 //#define AUTHENTICATION_FEATURE
 //#define SDSUPPORT
 //#define HAS_DISPLAY
-//#define HAS_SERIAL_DISPLAY
+#define HAS_SERIAL_DISPLAY "M118 P1 "
 //#define DISABLE_WDT_ESP3DLIB_TASK
 //#define DISABLE_WDT_CORE_0
 #endif //COMPILE_MARLIN_WITH_ARDUINO_IDE

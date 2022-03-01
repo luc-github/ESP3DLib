@@ -40,9 +40,9 @@
 #include "../modules/mks/mks_service.h"
 #endif //COMMUNICATION_PROTOCOL == MKS_SERIAL
 
-#if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
+#if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL || COMMUNICATION_PROTOCOL == SOCKET_SERIAL
 uint8_t ESP3DOutput::_serialoutputflags = DEFAULT_SERIAL_OUTPUT_FLAG;
-#endif //COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
+#endif //COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL || COMMUNICATION_PROTOCOL == SOCKET_SERIAL
 #if defined(HAS_DISPLAY) || defined(HAS_SERIAL_DISPLAY)
 uint8_t ESP3DOutput::_remotescreenoutputflags = DEFAULT_REMOTE_SCREEN_FLAG;
 #endif //HAS_DISPLAY || HAS_SERIAL_DISPLAY
@@ -186,7 +186,7 @@ ESP3DOutput::~ESP3DOutput()
 bool ESP3DOutput::isOutput(uint8_t flag, bool fromsettings)
 {
     if(fromsettings) {
-#if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
+#if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL || COMMUNICATION_PROTOCOL == SOCKET_SERIAL
         _serialoutputflags= Settings_ESP3D::read_byte (ESP_SERIAL_FLAG);
 #endif // COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
 #if defined(HAS_DISPLAY) || defined(HAS_SERIAL_DISPLAY)
@@ -206,8 +206,9 @@ bool ESP3DOutput::isOutput(uint8_t flag, bool fromsettings)
 #endif //BLUETOOTH_FEATURE
     }
     switch(flag) {
+    case ESP_ECHO_SERIAL_CLIENT:
     case ESP_SERIAL_CLIENT:
-#if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
+#if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL || COMMUNICATION_PROTOCOL == SOCKET_SERIAL
         return _serialoutputflags;
 #endif // COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
         return 0;
@@ -360,13 +361,13 @@ size_t ESP3DOutput::printLN(const char * s)
 
 size_t ESP3DOutput::printMSG(const char * s, bool withNL)
 {
-    if (!isOutput(_client)) {
-        return 0;
-    }
+
     if (_client == ESP_ALL_CLIENTS) {
         //process each client one by one
+        log_esp3d("PrintMSG to all clients");
         for (uint8_t c=0; c < sizeof(activeClients); c++) {
-            if (c) {
+            if (activeClients[c]) {
+                log_esp3d("Sending PrintMSG to client %d", activeClients[c]);
                 _client = activeClients[c];
                 printMSG(s, withNL);
             }
@@ -374,8 +375,11 @@ size_t ESP3DOutput::printMSG(const char * s, bool withNL)
         _client = ESP_ALL_CLIENTS;
         return strlen(s);
     }
+    if (!isOutput(_client)) {
+        return 0;
+    }
     String display;
-
+    log_esp3d("PrintMSG to client %d", _client);
     if (_client == ESP_HTTP_CLIENT) {
 #ifdef HTTP_FEATURE
         if (_webserver) {
@@ -409,7 +413,11 @@ size_t ESP3DOutput::printMSG(const char * s, bool withNL)
             return 0;
         }
         if (_client == ESP_REMOTE_SCREEN_CLIENT) {
-            display = "M117 ";
+#if defined(HAS_SERIAL_DISPLAY)
+            display = HAS_SERIAL_DISPLAY;
+#endif //HAS_REMOTE_SCREEN
+            display += "M117 ";
+            log_esp3d("Screen should display %s%s", display.c_str(),s);
         } else {
             display = ";echo: ";
         }
@@ -425,7 +433,7 @@ size_t ESP3DOutput::printMSG(const char * s, bool withNL)
         }
         display += s;
     }
-    if(withNL) {
+    if(withNL&& _client != ESP_REMOTE_SCREEN_CLIENT) {
         return printLN(display.c_str());
     } else {
         return print(display.c_str());
@@ -568,7 +576,6 @@ size_t ESP3DOutput::write(const uint8_t *buffer, size_t size)
     switch (_client) {
 #ifdef HTTP_FEATURE
     case ESP_HTTP_CLIENT:
-
         if (_webserver) {
             if (!_headerSent && !_footerSent) {
                 _webserver->setContentLength(CONTENT_LENGTH_UNKNOWN);
@@ -609,6 +616,7 @@ size_t ESP3DOutput::write(const uint8_t *buffer, size_t size)
         }
         break;
 #endif //WS_DATA_FEATURE
+
 #if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
     case ESP_REMOTE_SCREEN_CLIENT:
     case ESP_SERIAL_CLIENT:
@@ -616,11 +624,15 @@ size_t ESP3DOutput::write(const uint8_t *buffer, size_t size)
         break;
 #endif //COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
 #if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+    case ESP_REMOTE_SCREEN_CLIENT:
+        log_esp3d("Writing to remote screen: %s",buffer);
+        return  Serial2Socket.push(buffer, size);
+        break;
     case ESP_ECHO_SERIAL_CLIENT:
         return  MYSERIAL1.write(buffer, size);
         break;
     case ESP_SOCKET_SERIAL_CLIENT:
-        return  Serial2Socket.write(buffer, size);
+        return  Serial2Socket.push(buffer, size);
         break;
 #endif //COMMUNICATION_PROTOCOL == SOCKET_SERIAL
     case ESP_ALL_CLIENTS:

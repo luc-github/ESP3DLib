@@ -40,10 +40,10 @@ bool Commands::ESP920(const char* cmd_params, level_authenticate_type auth_type,
     //get
     if (parameter.length() == 0) {
         String s = "";
-#if COMMUNICATION_PROTOCOL != SOCKET_SERIAL
+#if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL || COMMUNICATION_PROTOCOL == SOCKET_SERIAL
         s += "SERIAL=";
         s += ESP3DOutput::isOutput(ESP_SERIAL_CLIENT)?"ON":"OFF";
-#endif //COMMUNICATION_PROTOCOL != SOCKET_SERIAL
+#endif //COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL || COMMUNICATION_PROTOCOL == SOCKET_SERIAL
 #if !defined(ESP3DLIB_ENV) || (defined (ESP3DLIB_ENV) && (HAS_DISPLAY || defined (HAS_SERIAL_DISPLAY)))
         s += " REMOTE_SCREEN=";
         s += ESP3DOutput::isOutput(ESP_REMOTE_SCREEN_CLIENT)?"ON":"OFF";
@@ -69,7 +69,7 @@ bool Commands::ESP920(const char* cmd_params, level_authenticate_type auth_type,
 
     } else { //set
         response = false;
-#if COMMUNICATION_PROTOCOL != SOCKET_SERIAL
+#if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL || COMMUNICATION_PROTOCOL == SOCKET_SERIAL
         parameter = get_param (cmd_params, "SERIAL=");
         if (parameter.length() != 0) {
             if ((parameter == "ON")|| (parameter == "OFF")) {
@@ -83,7 +83,7 @@ bool Commands::ESP920(const char* cmd_params, level_authenticate_type auth_type,
             }
             response = true;
         }
-#endif //COMMUNICATION_PROTOCOL != SOCKET_SERIAL
+#endif //COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL || COMMUNICATION_PROTOCOL == SOCKET_SERIAL
 #if !defined(ESP3DLIB_ENV) || (defined (ESP3DLIB_ENV) && (HAS_DISPLAY || defined (HAS_SERIAL_DISPLAY)))
         parameter = get_param (cmd_params, "REMOTE_SCREEN=");
         if (parameter.length() != 0) {
@@ -103,9 +103,9 @@ bool Commands::ESP920(const char* cmd_params, level_authenticate_type auth_type,
         if (parameter.length() != 0) {
             if ((parameter == "ON")|| (parameter == "OFF")) {
                 if (
-#if COMMUNICATION_PROTOCOL != SOCKET_SERIAL
+#if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL || COMMUNICATION_PROTOCOL == SOCKET_SERIAL
                     !Settings_ESP3D::write_byte (ESP_SERIAL_FLAG, (parameter == "ON")?1:0)||
-#endif //COMMUNICATION_PROTOCOL != SOCKET_SERIAL
+#endif //COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL || COMMUNICATION_PROTOCOL == SOCKET_SERIAL
 #ifdef DISPLAY_DEVICE
                     !Settings_ESP3D::write_byte (ESP_SCREEN_FLAG, (parameter == "ON")?1:0)||
 #endif //DISPLAY_DEVICE
