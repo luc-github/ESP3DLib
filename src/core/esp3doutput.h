@@ -23,7 +23,7 @@
 #define ESP_TELNET_CLIENT               2
 #define ESP_HTTP_CLIENT                 4
 #define ESP_WEBSOCKET_TERMINAL_CLIENT   8
-#define ESP_PRINTER_SCREEN_CLIENT       16
+#define ESP_REMOTE_SCREEN_CLIENT       16
 #define ESP_BT_CLIENT                   32
 #define ESP_SCREEN_CLIENT               64
 #define ESP_WEBSOCKET_CLIENT            128
@@ -107,12 +107,24 @@ private:
     bool _footerSent;
     WEBSERVER * _webserver;
 #endif //HTTP_FEATURE
+#if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
     static uint8_t _serialoutputflags;
-    static uint8_t _printerscreenoutputflags;
+#endif //COMMUNICATION_PROTOCOL
+#if defined(HAS_DISPLAY) || defined(HAS_SERIAL_DISPLAY)
+    static uint8_t _remotescreenoutputflags;
+#endif //HAS_DISPLAY || HAS_SERIAL_DISPLAY
+#if defined (WS_DATA_FEATURE)
     static uint8_t _websocketoutputflags;
+#endif //WS_DATA_FEATURE
+#if defined (TELNET_FEATURE)
     static uint8_t _telnetoutputflags;
+#endif //TELNET_FEATURE
+#if defined (DISPLAY_DEVICE)
     static uint8_t _screenoutputflags;
+#endif //DISPLAY_DEVICE
+#if defined (BLUETOOTH_FEATURE)
     static uint8_t _BToutputflags;
+#endif //BLUETOOTH_FEATURE  
 };
 
 #endif //_ESP3DOUTPUT_H

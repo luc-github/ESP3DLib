@@ -592,9 +592,9 @@ bool Commands::ESP400(const char* cmd_params, level_authenticate_type auth_type,
 #if !defined(ESP3DLIB_ENV) || (defined(ESP3DLIB_ENV) && HAS_DISPLAY)
     //Printer SCREEN
     output->print (",{\"F\":\"system/outputmsg\",\"P\":\"");
-    output->print (ESP_PRINTER_SCREEN_FLAG);
+    output->print (ESP_REMOTE_SCREEN_FLAG);
     output->print ("\",\"T\":\"B\",\"V\":\"");
-    output->print (Settings_ESP3D::read_byte(ESP_PRINTER_SCREEN_FLAG));
+    output->print (Settings_ESP3D::read_byte(ESP_REMOTE_SCREEN_FLAG));
     output->print ("\",\"H\":\"M117\",\"O\":[{\"no\":\"0\"},{\"yes\":\"1\"}]}");
 #endif //ESP3DLIB_ENV
 #ifdef DISPLAY_DEVICE

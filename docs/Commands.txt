@@ -158,7 +158,7 @@ ESP_TIME_IS_DST         463     //1  bytes = flag
 ESP_TIME_SERVER1        464     //129 bytes 128+1 = string  ; warning does not support multibyte char like chinese
 ESP_TIME_SERVER2        593     //129 bytes 128+1 = string  ; warning does not support multibyte char like chinese
 ESP_TIME_SERVER3        722     //129 bytes 128+1 = string  ; warning does not support multibyte char like chinese
-ESP_PRINTER_SCREEN      851     //1  bytes = flag
+ESP_REMOTE_SCREEN      851     //1  bytes = flag
 ESP_SD_MOUNT            852     //1  bytes = flag
 ESP_SESSION_TIMEOUT     853     //1  bytes = flag
 ESP_WEBSOCKET_FLAG      854     //1  bytes = flag
@@ -245,4 +245,4 @@ rmdir / remove / mkdir / exists / create
 [ESP910]<ENABLE/DISABLE>[pwd=<admin/user password>]
 
 *Get state / Set state of  output message clients
-[ESP920]<SERIAL / SCREEN / PRINTER_SCREEN/ WEBSOCKET / TELNET /BT / ALL>=<ON/OFF>[pwd=<admin/user password>]
+[ESP920]<SERIAL / SCREEN / REMOTE_SCREEN/ WEBSOCKET / TELNET /BT / ALL>=<ON/OFF>[pwd=<admin/user password>]

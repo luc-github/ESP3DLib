@@ -34,7 +34,7 @@
 
 //Default flags
 #define DEFAULT_SERIAL_OUTPUT_FLAG 1
-#define DEFAULT_PRINTER_SCREEN_FLAG 1
+#define DEFAULT_REMOTE_SCREEN_FLAG 1
 #define DEFAULT_WEBSOCKET_FLAG 1
 #define DEFAULT_TELNET_FLAG 1
 #define DEFAULT_BT_FLAG 1
@@ -80,7 +80,7 @@
 #define ESP_TIME_SERVER1        464     //129 bytes 128+1 = string  ; warning does not support multibyte char like chinese
 #define ESP_TIME_SERVER2        593     //129 bytes 128+1 = string  ; warning does not support multibyte char like chinese
 #define ESP_TIME_SERVER3        722     //129 bytes 128+1 = string  ; warning does not support multibyte char like chinese
-#define ESP_PRINTER_SCREEN_FLAG    851     //1  bytes = flag
+#define ESP_REMOTE_SCREEN_FLAG    851     //1  bytes = flag
 #define ESP_SD_MOUNT            852     //1  bytes = flag
 #define ESP_SESSION_TIMEOUT     853     //1  bytes = flag
 #define ESP_WEBSOCKET_FLAG      854     //1  bytes = flag

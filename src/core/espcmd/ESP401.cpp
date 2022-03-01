@@ -74,7 +74,7 @@ bool Commands::ESP401(const char* cmd_params, level_authenticate_type auth_type,
                 //dynamique refresh is better than restart the boards
                 switch(spos.toInt()) {
                 case ESP_SERIAL_FLAG:
-                case ESP_PRINTER_SCREEN_FLAG:
+                case ESP_REMOTE_SCREEN_FLAG:
                 case ESP_WEBSOCKET_FLAG:
                 case ESP_TELNET_FLAG:
                 case ESP_SCREEN_FLAG:

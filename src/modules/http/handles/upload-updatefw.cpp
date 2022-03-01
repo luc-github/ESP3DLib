@@ -37,7 +37,7 @@ void HTTP_Server::WebUpdateUpload ()
 {
     static size_t last_upload_update;
     static uint32_t downloadsize = 0;
-    ESP3DOutput  output(ESP_PRINTER_SCREEN_CLIENT);
+    ESP3DOutput  output(ESP_REMOTE_SCREEN_CLIENT);
     //only admin can update FW
     if (AuthenticationService::authenticated_level() != LEVEL_ADMIN) {
         _upload_status = UPLOAD_STATUS_FAILED;

@@ -144,7 +144,7 @@ const uint16_t ServboolKeysPos[] = {ESP_HTTP_ON,
                                     ESP_BOOT_RADIO_STATE
                                    } ;
 
-const char * SysboolKeysVal[] = {"Active_Printer_Screen",
+const char * SysboolKeysVal[] = {"Active_Remote_Screen",
                                  "Active_ESP3D_Screen",
                                  "Active_Serial ",
                                  "Active_WebSocket",
@@ -154,7 +154,7 @@ const char * SysboolKeysVal[] = {"Active_Printer_Screen",
                                  "Secure_serial"
                                 } ;
 
-const uint16_t SysboolKeysPos[] = {ESP_PRINTER_SCREEN_FLAG,
+const uint16_t SysboolKeysPos[] = {ESP_REMOTE_SCREEN_FLAG,
                                    ESP_SCREEN_FLAG,
                                    ESP_SERIAL_FLAG,
                                    ESP_WEBSOCKET_FLAG,

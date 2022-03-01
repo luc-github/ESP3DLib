@@ -44,7 +44,7 @@ esp3dlib.parse(command_ptr);
 4 - Screen flags
     1 - ESP_SERIAL_FLAG 
         to Serial if ESP3D (ESP_SERIAL_CLIENT ) or ESP3DLib (ESP_ECHO_SERIAL_CLIENT)
-    2 - ESP_PRINTER_SCREEN_FLAG
+    2 - ESP_REMOTE_SCREEN_FLAG
         a - to Serial using M117 if ESP3D for connected display
         b - to Socket2Serial using M117 if ESP3DLib (HAS_DISPLAY) for embedded display
         c - to Serial (ESP_ECHO_SERIAL_CLIENT) using M117 if ESP3DLib (HAS_SERIAL_DISPLAY) for serial display

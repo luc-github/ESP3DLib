@@ -65,6 +65,7 @@ extern FlushableHardwareSerial flushableSerial;
 //#define DISABLE_SD_UPDATE_FEATURE
 //#define DISABLE_WEB_UPDATE_FEATURE
 //#define AUTHENTICATION_FEATURE
+//#define SDSUPPORT
 //#define HAS_DISPLAY
 //#define HAS_SERIAL_DISPLAY
 //#define DISABLE_WDT_ESP3DLIB_TASK

@@ -25,11 +25,11 @@
 #error Oops!  Make sure you have 'ESP8266 or ESP32' compatible board selected from the 'Tools -> Boards' menu.
 #endif // ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ARCH_ESP32
 #if defined(ARDUINO_ARCH_ESP8266)
-#include "ESP8266WiFi.h"
+#include <ESP8266WiFi.h>
 #endif //ARDUINO_ARCH_ESP8266
 #if defined(ARDUINO_ARCH_ESP32)
-#include "WiFi.h"
-#include "esp_task_wdt.h"
+#include <WiFi.h>
+#include <esp_task_wdt.h>
 #endif //ARDUINO_ARCH_ESP32
 #include <Arduino.h>
 

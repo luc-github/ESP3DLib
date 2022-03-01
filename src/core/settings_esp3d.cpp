@@ -305,8 +305,8 @@ uint8_t Settings_ESP3D::get_default_byte_value(int pos)
     case ESP_SERIAL_FLAG:
         res = DEFAULT_SERIAL_OUTPUT_FLAG;
         break;
-    case ESP_PRINTER_SCREEN_FLAG:
-        res = DEFAULT_PRINTER_SCREEN_FLAG;
+    case ESP_REMOTE_SCREEN_FLAG:
+        res = DEFAULT_REMOTE_SCREEN_FLAG;
         break;
     case ESP_WEBSOCKET_FLAG:
         res = DEFAULT_WEBSOCKET_FLAG;
@@ -1203,7 +1203,7 @@ bool Settings_ESP3D::reset(bool networkonly)
     Settings_ESP3D::write_byte(ESP_TARGET_FW,Settings_ESP3D::get_default_byte_value(ESP_TARGET_FW));
     //Output flags
     Settings_ESP3D::write_byte(ESP_SERIAL_FLAG,Settings_ESP3D::get_default_byte_value(ESP_SERIAL_FLAG));
-    Settings_ESP3D::write_byte(ESP_PRINTER_SCREEN_FLAG,Settings_ESP3D::get_default_byte_value(ESP_PRINTER_SCREEN_FLAG));
+    Settings_ESP3D::write_byte(ESP_REMOTE_SCREEN_FLAG,Settings_ESP3D::get_default_byte_value(ESP_REMOTE_SCREEN_FLAG));
     Settings_ESP3D::write_byte(ESP_WEBSOCKET_FLAG,Settings_ESP3D::get_default_byte_value(ESP_WEBSOCKET_FLAG));
     Settings_ESP3D::write_byte(ESP_TELNET_FLAG,Settings_ESP3D::get_default_byte_value(ESP_TELNET_FLAG));
     Settings_ESP3D::write_byte(ESP_BT_FLAG,Settings_ESP3D::get_default_byte_value(ESP_BT_FLAG));
