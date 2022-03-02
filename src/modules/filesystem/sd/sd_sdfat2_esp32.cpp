@@ -26,6 +26,16 @@ sd_native_esp8266.cpp - ESP3D sd support class
 #include <SdFat.h>
 #include <sdios.h>
 
+#if SDFAT_FILE_TYPE == 1
+typedef File32 File;
+#elif SDFAT_FILE_TYPE == 2
+typedef ExFile File;
+#elif SDFAT_FILE_TYPE == 3
+typedef FsFile File;
+#else  // SDFAT_FILE_TYPE
+#error Invalid SDFAT_FILE_TYPE
+#endif  // SDFAT_FILE_TYPE
+
 // Try to select the best SD card configuration.
 #if HAS_SDIO_CLASS
 #define SD_CONFIG SdioConfig(FIFO_SDIO)
@@ -40,6 +50,12 @@ extern File tSDFile_handle[ESP_MAX_SD_OPENHANDLE];
 //Max Freq Working
 #define FREQMZ 40
 SdFat SD;
+#undef FILE_WRITE
+#undef FILE_READ
+#undef FILE_APPEND
+#define FILE_WRITE 2
+#define FILE_READ 0
+#define FILE_APPEND 8
 
 void dateTime (uint16_t* date, uint16_t* dtime)
 {
@@ -449,15 +465,20 @@ ESP_SDFile::ESP_SDFile(void* handle, bool isdir, bool iswritemode, const char * 
 //todo need also to add short filename
 const char* ESP_SDFile::shortname() const
 {
-    static char sname[13];
-    File ftmp = SD.open(_filename.c_str());
-    if (ftmp) {
-        ftmp.getSFN(sname);
-        ftmp.close();
-        return sname;
-    } else {
-        return _name.c_str();
-    }
+#if SDFAT_FILE_TYPE != 1
+    return _name.c_str();
+#else
+     static char sname[13];
+     File ftmp = SD.open(_filename.c_str());
+     if (ftmp) {
+         ftmp.getSFN(sname,12);
+         ftmp.close();
+         if(strlen(sname)==0)return _name.c_str();
+         return sname;
+     } else {
+         return _name.c_str();
+     }
+#endif
 }
 
 void ESP_SDFile::close()

@@ -65,7 +65,7 @@ extern FlushableHardwareSerial flushableSerial;
 //#define DISABLE_SD_UPDATE_FEATURE
 //#define DISABLE_WEB_UPDATE_FEATURE
 //#define AUTHENTICATION_FEATURE
-//#define SDSUPPORT
+#define SDSUPPORT
 //#define HAS_DISPLAY
 #define HAS_SERIAL_DISPLAY "M118 P1 "
 //#define DISABLE_WDT_ESP3DLIB_TASK
@@ -168,6 +168,33 @@ extern FlushableHardwareSerial flushableSerial;
 #ifndef DISABLE_WEB_UPDATE_FEATURE
 #define WEB_UPDATE_FEATURE
 #endif //DISABLE_WEB_UPDATE_FEATURE
+
+#ifdef SDSUPPORT
+//SD_DEVICE: to access SD Card files directly
+//ESP_SD_NATIVE               1
+//ESP_SDFAT                   3
+//ESP_SDFAT2                  4
+#define SD_DEVICE    ESP_SDFAT2
+
+//SDIO mode
+#define SD_ONE_BIT_MODE true
+
+//SD Device Connection type (default is ESP_NO_SD if not defined)
+//ESP_NO_SD
+//ESP_DIRECT_SD
+//ESP_SHARED_SD
+#define SD_DEVICE_CONNECTION  ESP_DIRECT_SD
+
+//pin if reader has insert detection feature
+//let -1 or comment if none
+#ifdef SD_DETECT_PIN
+#define ESP_SD_DETECT_PIN       SD_DETECT_PIN
+#endif //SD_DETECT_PIN  
+//value expected for ESP_SD_DETECT_PIN
+#ifdef SD_DETECT_STATE
+#define ESP_SD_DETECT_VALUE      SD_DETECT_STATE
+#endif
+#endif //SDSUPPORT
 
 //SD_UPDATE_FEATURE: allow to configure settings using SD
 //Rely on Configuration_adv.h

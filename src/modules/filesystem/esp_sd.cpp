@@ -36,11 +36,23 @@ File tSDFile_handle[ESP_MAX_SD_OPENHANDLE];
 sdfat::File tSDFile_handle[ESP_MAX_SD_OPENHANDLE];
 #elif ((SD_DEVICE == ESP_SDFAT) || (SD_DEVICE == ESP_SDFAT2)) && defined (ARDUINO_ARCH_ESP32)
 #include <SdFat.h>
+#if (SD_DEVICE == ESP_SDFAT2)
+#if SDFAT_FILE_TYPE == 1
+typedef File32 File;
+#elif SDFAT_FILE_TYPE == 2
+typedef ExFile File;
+#elif SDFAT_FILE_TYPE == 3
+typedef FsFile File;
+#else  // SDFAT_FILE_TYPE
+#error Invalid SDFAT_FILE_TYPE
+#endif  // SDFAT_FILE_TYPE
+#endif
 File tSDFile_handle[ESP_MAX_SD_OPENHANDLE];
 #else
 #include <FS.h>
 File tSDFile_handle[ESP_MAX_SD_OPENHANDLE];
 #endif
+
 
 bool ESP_SD::_started = false;
 uint8_t ESP_SD::_state = ESP_SDCARD_NOT_PRESENT;
