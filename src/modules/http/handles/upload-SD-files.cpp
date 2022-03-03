@@ -70,8 +70,10 @@ void HTTP_Server::SDFileupload ()
                 }
                 String  sizeargname  = upload.filename + "S";
                 //TODO add busy state and handle it for upload
+                log_esp3d("Uploading file %s", filename.c_str());
                 if (ESP_SD::getState(true) != ESP_SDCARD_IDLE) {
                     _upload_status=UPLOAD_STATUS_FAILED;
+                    log_esp3d("SDcard is not available");
                 }
                 if (_upload_status!=UPLOAD_STATUS_FAILED) {
                     if (_webserver->hasArg (sizeargname.c_str()) ) {
@@ -84,16 +86,19 @@ void HTTP_Server::SDFileupload ()
                     }
                 }
                 if (_upload_status!=UPLOAD_STATUS_FAILED) {
+                    log_esp3d("Try file creation");
                     //create file
                     fsUploadFile = ESP_SD::open(filename.c_str(), ESP_FILE_WRITE);
                     //check If creation succeed
                     if (fsUploadFile) {
                         //if yes upload is started
                         _upload_status= UPLOAD_STATUS_ONGOING;
+                        log_esp3d("Try file creation");
                     } else {
                         //if no set cancel flag
                         _upload_status=UPLOAD_STATUS_FAILED;
                         pushError(ESP_ERROR_FILE_CREATION, "File creation failed");
+                        log_esp3d("File creation failed");
                     }
 
                 }
@@ -102,14 +107,17 @@ void HTTP_Server::SDFileupload ()
                 //check if file is available and no error
                 if(fsUploadFile && _upload_status == UPLOAD_STATUS_ONGOING) {
                     //no error so write post date
-                    if(upload.currentSize != fsUploadFile.write(upload.buf, upload.currentSize)) {
+                    int writeddatanb=fsUploadFile.write(upload.buf, upload.currentSize);
+                    if(upload.currentSize != writeddatanb) {
                         //we have a problem set flag UPLOAD_STATUS_FAILED
+                        log_esp3d("File write failed du to mismatch size %d vs %d", writeddatanb, upload.currentSize);
                         _upload_status=UPLOAD_STATUS_FAILED;
                         pushError(ESP_ERROR_FILE_WRITE, "File write failed");
                     }
                 } else {
                     //we have a problem set flag UPLOAD_STATUS_FAILED
                     _upload_status=UPLOAD_STATUS_FAILED;
+                    log_esp3d("Error detected");
                     pushError(ESP_ERROR_FILE_WRITE, "File write failed");
                 }
                 //Upload end
@@ -161,5 +169,6 @@ void HTTP_Server::SDFileupload ()
         }
         ESP_SD::releaseSD();
     }
+    Hal::wait(5);
 }
 #endif //HTTP_FEATURE && SD_DEVICE

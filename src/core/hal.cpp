@@ -229,7 +229,8 @@ void Hal::wait (uint32_t milliseconds)
     }
 #else // !(ASYNCWEBSERVER 
     wdtFeed();
-    delay(milliseconds);
+    //before 0 was acceptable, now it seems need to put 5 to have some effect if on esp32 core 0
+    delay(milliseconds<5?5:milliseconds);
 #endif // !ASYNCWEBSERVER
 }
 

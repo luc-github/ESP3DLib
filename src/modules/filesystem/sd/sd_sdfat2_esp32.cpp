@@ -53,9 +53,9 @@ SdFat SD;
 #undef FILE_WRITE
 #undef FILE_READ
 #undef FILE_APPEND
-#define FILE_WRITE 2
-#define FILE_READ 0
-#define FILE_APPEND 8
+#define FILE_WRITE  (O_RDWR | O_CREAT | O_AT_END)
+#define FILE_READ O_RDONLY
+#define FILE_APPEND (O_RDWR | O_AT_END)
 
 void dateTime (uint16_t* date, uint16_t* dtime)
 {
@@ -468,16 +468,18 @@ const char* ESP_SDFile::shortname() const
 #if SDFAT_FILE_TYPE != 1
     return _name.c_str();
 #else
-     static char sname[13];
-     File ftmp = SD.open(_filename.c_str());
-     if (ftmp) {
-         ftmp.getSFN(sname,12);
-         ftmp.close();
-         if(strlen(sname)==0)return _name.c_str();
-         return sname;
-     } else {
-         return _name.c_str();
-     }
+    static char sname[13];
+    File ftmp = SD.open(_filename.c_str());
+    if (ftmp) {
+        ftmp.getSFN(sname,12);
+        ftmp.close();
+        if(strlen(sname)==0) {
+            return _name.c_str();
+        }
+        return sname;
+    } else {
+        return _name.c_str();
+    }
 #endif
 }
 
