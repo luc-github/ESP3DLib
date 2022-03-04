@@ -29,7 +29,8 @@
 #undef DISABLED
 #undef _BV
 #include "../esp3dlib_config.h"
-#  endif
+#include "./Marlin/FlushableHardwareSerial.h"
+#endif
 #endif
 
 #include "../include/pins.h"

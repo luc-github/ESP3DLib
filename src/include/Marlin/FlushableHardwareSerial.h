@@ -20,6 +20,11 @@
  *
  */
 #pragma once
+#include "../esp3d_config.h"
+
+//stripped version 
+
+#if defined (ESP3DLIB_ENV)
 
 #include <HardwareSerial.h>
 class FlushableHardwareSerial : public HardwareSerial
@@ -28,3 +33,6 @@ public:
     FlushableHardwareSerial(int uart_nr) : HardwareSerial(uart_nr) {}
 };
 extern FlushableHardwareSerial flushableSerial;
+
+#define MYSERIAL1 flushableSerial
+#endif //ESP3DLIB_ENV

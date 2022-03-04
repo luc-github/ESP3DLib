@@ -22,7 +22,6 @@
 //Uncomment if you want to compile Marlin and ESP3DLib with Arduino IDE
 //Comment if you want to compile Marlin and ESP3DLib with PlatformIO
 #define COMPILE_WITH_ARDUINO_IDE
-
 #if !defined(COMPILE_WITH_ARDUINO_IDE)
 //config reference, do not touch
 #ifndef ESP_XSTR
@@ -33,19 +32,9 @@
 #define MARLIN_PATH(PATH) ESP_XSTR(../../../../../Marlin/src/PATH)
 #include MARLIN_PATH(inc/MarlinConfigPre.h)
 #include MARLIN_PATH(inc/Version.h)
-#include MARLIN_HAL_PATH(FlushableHardwareSerial.h)
-#include MARLIN_HAL_PATH(HAL.h)
 #undef DISABLED
 #undef _BV
 #else
-#include <HardwareSerial.h>
-class FlushableHardwareSerial : public HardwareSerial
-{
-public:
-    FlushableHardwareSerial(int uart_nr) : HardwareSerial(uart_nr) {}
-};
-extern FlushableHardwareSerial flushableSerial;
-#define MYSERIAL1 flushableSerial
 #define OTASUPPORT
 #define WEBSUPPORT
 #define SHORT_BUILD_VERSION "2.0.9.3+"
