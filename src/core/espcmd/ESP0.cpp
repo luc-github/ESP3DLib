@@ -132,7 +132,7 @@ const char * help[]= {"[ESP] - display this help",
 #endif //SD_DEVICE
 #if defined(FILESYSTEM_FEATURE)
                       "[ESP720](path) - List ESP Filesystem",
-                      "[[ESP730]](Action)=(path) - rmdir / remove / mkdir / exists / create on ESP FileSystem (path)",
+                      "[ESP730](Action)=(path) - rmdir / remove / mkdir / exists / create on ESP FileSystem (path)",
 #endif //FILESYSTEM_FEATURE
 #if defined (SD_DEVICE)
                       "[ESP740](path)  - List SD Filesystem",
