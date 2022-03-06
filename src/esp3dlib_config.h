@@ -172,7 +172,7 @@
 //ESP_NO_SD
 //ESP_DIRECT_SD
 //ESP_SHARED_SD
-#define SD_DEVICE_CONNECTION  ESP_DIRECT_SD
+#define SD_DEVICE_CONNECTION  ESP_SHARED_SD
 
 //pin if reader has insert detection feature
 //let -1 or comment if none

@@ -53,6 +53,34 @@ File tSDFile_handle[ESP_MAX_SD_OPENHANDLE];
 File tSDFile_handle[ESP_MAX_SD_OPENHANDLE];
 #endif
 
+#if defined (ESP3DLIB_ENV)
+#include "../../include/Marlin/cardreader.h"
+#endif // ESP3DLIB_ENV
+
+#if SD_DEVICE_CONNECTION == ESP_SHARED_SD
+bool ESP_SD::_enabled = false;
+
+bool ESP_SD::enableSharedSD()
+{
+    _enabled = true;
+#if defined (ESP_FLAG_SHARED_SD_PIN)
+    //need to check if SD is in use ?
+    //Method : TBD
+    //1 - check sd cs state ?
+    //2 - check M27 status ?
+    digitalWrite(ESP_FLAG_SHARED_SD_PIN, ESP_FLAG_SHARED_SD_VALUE);
+#endif // ESP_FLAG_SHARED_SD_PIN
+#if defined (ESP3DLIB_ENV)
+    //check if card is not currently in use
+    if (card.isMounted() && (IS_SD_PRINTING() ||IS_SD_FETCHING() ||IS_SD_PAUSED() ||  IS_SD_FILE_OPEN())) {
+        _enabled = false;
+    } else {
+        card.release();
+    }
+#endif // ESP3DLIB_ENV
+    return _enabled;
+}
+#endif // SD_DEVICE_CONNECTION == ESP_SHARED_SD
 
 bool ESP_SD::_started = false;
 uint8_t ESP_SD::_state = ESP_SDCARD_NOT_PRESENT;
@@ -66,20 +94,22 @@ uint8_t ESP_SD::setState(uint8_t flag)
 
 bool  ESP_SD::accessSD()
 {
-    bool res = false;
-#if SD_DEVICE_CONNECTION == ESP_SHARED_SD
-    //need to send the current state to avoid
-    res =  (digitalRead(ESP_FLAG_SHARED_SD_PIN) == ESP_FLAG_SHARED_SD_VALUE);
-    if (!res) {
-        digitalWrite(ESP_FLAG_SHARED_SD_PIN, ESP_FLAG_SHARED_SD_VALUE);
+    if  (ESP_SD::enableSharedSD()) {
+        return true;
+    } else {
+        return false;
     }
-#endif //SD_DEVICE_CONNECTION == ESP_SHARED_SD 
-    return res;
 }
 void  ESP_SD::releaseSD()
 {
 #if SD_DEVICE_CONNECTION == ESP_SHARED_SD
+#if defined (ESP_FLAG_SHARED_SD_PIN)
     digitalWrite(ESP_FLAG_SHARED_SD_PIN, !ESP_FLAG_SHARED_SD_VALUE);
+#endif // ESP_FLAG_SHARED_SD_PIN
+#if defined (ESP3DLIB_ENV)
+    card.mount();
+#endif // ESP3DLIB_ENV
+    _enabled = false;
 #endif //SD_DEVICE_CONNECTION == ESP_SHARED_SD 
 }
 

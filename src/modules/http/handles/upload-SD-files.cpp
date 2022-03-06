@@ -47,7 +47,11 @@ void HTTP_Server::SDFileupload ()
             //Upload start
             if (upload.status == UPLOAD_FILE_START) {
                 _upload_status = UPLOAD_STATUS_ONGOING;
-                ESP_SD::accessSD();
+                if (!ESP_SD::accessSD()) {
+                    _upload_status=UPLOAD_STATUS_FAILED;
+                    pushError(ESP_ERROR_NOT_ENOUGH_SPACE, "Upload rejected");
+                    return;
+                }
                 if (upload_filename[0] != '/') {
                     filename = "/" + upload_filename;
                 } else {

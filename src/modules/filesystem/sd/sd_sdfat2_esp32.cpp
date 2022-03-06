@@ -119,7 +119,6 @@ uint8_t ESP_SD::getState(bool refresh)
     }
     //SD is idle or not detected, let see if still the case
     _state = ESP_SDCARD_NOT_PRESENT;
-    bool isactive = accessSD();
     log_esp3d("Spi : CS: %d,  Miso: %d, Mosi: %d, SCK: %d",ESP_SD_CS_PIN!=-1?ESP_SD_CS_PIN:SS, ESP_SD_MISO_PIN!=-1?ESP_SD_MISO_PIN:MISO, ESP_SD_MOSI_PIN!=-1?ESP_SD_MOSI_PIN:MOSI, ESP_SD_SCK_PIN!=-1?ESP_SD_SCK_PIN:SCK);
     //refresh content if card was removed
     if (SD.begin((ESP_SD_CS_PIN == -1)?SS:ESP_SD_CS_PIN, SD_SCK_MHZ(FREQMZ/_spi_speed_divider))) {
@@ -127,9 +126,6 @@ uint8_t ESP_SD::getState(bool refresh)
         if (SD.card()->readCSD(&m_csd) && sdCardCapacity(&m_csd) > 0 ) {
             _state = ESP_SDCARD_IDLE;
         }
-    }
-    if (!isactive) {
-        releaseSD();
     }
     return _state;
 }
@@ -169,42 +165,51 @@ void ESP_SD::end()
     _started = false;
 }
 
-uint64_t ESP_SD::totalBytes()
+void ESP_SD::refreshStats(bool force)
 {
+    if (force || _sizechanged) {
+        usedBytes(true);
+    }
+    _sizechanged = false;
+}
+
+uint64_t ESP_SD::totalBytes(bool refresh)
+{
+    static uint64_t _totalBytes = 0;
     if (!SD.volumeBegin()) {
         return 0;
     }
-    uint64_t volTotal = SD.clusterCount();
-    uint8_t sectors = SD.sectorsPerCluster();
-    return volTotal * sectors * 512;
+    if (refresh || _totalBytes==0) {
+        uint64_t _totalBytes = SD.clusterCount();
+        uint8_t sectors = SD.sectorsPerCluster();
+        _totalBytes =  _totalBytes * sectors * 512;
+    }
+    return _totalBytes;
 }
 
-uint64_t ESP_SD::usedBytes()
+uint64_t ESP_SD::usedBytes(bool refresh)
 {
-    if(freeBytes() >totalBytes() ) {
-        _sizechanged = true;
+    return totalBytes(refresh) - freeBytes(refresh);
+}
+
+uint64_t ESP_SD::freeBytes(bool refresh)
+{
+    static uint64_t _freeBytes = 0;
+    if (!SD.volumeBegin()) {
+        return 0;
     }
-    return totalBytes() - freeBytes();
+    if (refresh || _freeBytes==0) {
+
+        _freeBytes = SD.freeClusterCount();
+        uint8_t sectors = SD.sectorsPerCluster();
+        _freeBytes = _freeBytes * sectors * 512;
+    }
+    return _freeBytes;
 }
 
 uint ESP_SD::maxPathLength()
 {
     return 255;
-}
-
-uint64_t ESP_SD::freeBytes()
-{
-    static uint64_t volFree;
-    if (!SD.volumeBegin()) {
-        _sizechanged = true;
-        return 0;
-    }
-    if (_sizechanged) {
-        volFree = SD.freeClusterCount();
-        _sizechanged = false;
-    }
-    uint8_t sectors = SD.sectorsPerCluster();
-    return volFree * sectors * 512;
 }
 
 bool ESP_SD::rename(const char *oldpath, const char *newpath)
