@@ -82,7 +82,8 @@ label can be: light/framesize/quality/contrast/brightness/saturation/gainceiling
 [ESP191]<port>pwd=<admin password>
 
 * Get SD Card Status
-[ESP200] pwd=<user/admin password>
+[ESP200] <RELEASESD> pwd=<user/admin password>
+RELEASESD will force the release of SD from ESP3D if SD is shared
 
 *Get/Set pin value
 [ESP201]P<pin> V<value> [PULLUP=YES RAW=YES]pwd=<admin password>

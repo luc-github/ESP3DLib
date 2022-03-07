@@ -419,7 +419,11 @@ size_t ESP3DOutput::printMSG(const char * s, bool withNL)
             display += "M117 ";
             log_esp3d("Screen should display %s%s", display.c_str(),s);
         } else {
-            display = ";echo: ";
+            if (_client == ESP_ECHO_SERIAL_CLIENT) {
+                display = "echo: ";
+            } else {
+                display = ";echo: ";
+            }
         }
         display += s;
         break;

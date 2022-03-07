@@ -25,7 +25,7 @@
 #include "../../modules/filesystem/esp_sd.h"
 #include "../../modules/authentication/authentication_service.h"
 //Get SD Card Status
-//[ESP200] pwd=<user/admin password>
+//[ESP200] <RELEASESD> pwd=<user/admin password>
 bool Commands::ESP200(const char* cmd_params, level_authenticate_type auth_type, ESP3DOutput * output)
 {
     (void)cmd_params;
@@ -37,14 +37,31 @@ bool Commands::ESP200(const char* cmd_params, level_authenticate_type auth_type,
 #else
     (void)auth_type;
 #endif //AUTHENTICATION_FEATURE
+    String parameter;
     String resp = "No SD card";
-    int8_t state = ESP_SD::getState(true);
-    if (state == ESP_SDCARD_IDLE) {
-        resp="SD card detected";
-    } else if (state == ESP_SDCARD_NOT_PRESENT) {
-        resp="No SD card";
+    parameter = get_param (cmd_params, "");
+    if (parameter.length() != 0) {
+        parameter.toUpperCase();
+        if (parameter == "RELEASESD") {
+            ESP_SD::releaseSD();
+            return true;
+        } else {
+            output->printERROR("Unknown parameter");
+            return false;
+        }
+    }
+    if (!ESP_SD::accessSD()) {
+        resp = "Not available";
     } else {
-        resp="Busy";
+        int8_t state = ESP_SD::getState(true);
+        if (state == ESP_SDCARD_IDLE) {
+            resp="SD card detected";
+        } else if (state == ESP_SDCARD_BUSY) {
+            resp="Busy";
+        }
+        if (state!=ESP_SDCARD_BUSY) {
+            ESP_SD::releaseSD();
+        }
     }
     output->printMSG (resp.c_str());
     return true;

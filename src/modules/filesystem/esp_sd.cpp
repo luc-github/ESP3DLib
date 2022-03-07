@@ -66,7 +66,7 @@ bool ESP_SD::enableSharedSD()
 #if defined (ESP_FLAG_SHARED_SD_PIN)
     //need to check if SD is in use ?
     //Method : TBD
-    //1 - check sd cs state ?
+    //1 - check sd cs state ? what about SDIO then ?
     //2 - check M27 status ?
     digitalWrite(ESP_FLAG_SHARED_SD_PIN, ESP_FLAG_SHARED_SD_VALUE);
 #endif // ESP_FLAG_SHARED_SD_PIN
