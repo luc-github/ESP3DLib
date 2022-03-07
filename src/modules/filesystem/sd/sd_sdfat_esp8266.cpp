@@ -1,5 +1,5 @@
 /*
-sd_native_esp8266.cpp - ESP3D sd support class
+sd_sdfat_esp8266.cpp - ESP3D sd support class
 
   Copyright (c) 2014 Luc Lebosse. All rights reserved.
 
@@ -154,9 +154,9 @@ uint64_t ESP_SD::totalBytes(bool refresh)
 {
     static uint64_t _totalBytes = 0;
     if (refresh || _totalBytes==0) {
-        uint64_t volTotal = SD.vol()->clusterCount();
+        _totalBytes = SD.vol()->clusterCount();
         uint8_t blocks = SD.vol()->blocksPerCluster();
-        _totalBytes =  volTotal * blocks * 512;
+        _totalBytes =  _totalBytes * blocks * 512;
     }
     return _totalBytes;
 }

@@ -1,5 +1,5 @@
 /*
-sd_native_esp8266.cpp - ESP3D sd support class
+sd_sdfat2_esp32.cpp - ESP3D sd support class
 
   Copyright (c) 2014 Luc Lebosse. All rights reserved.
 
@@ -180,7 +180,7 @@ uint64_t ESP_SD::totalBytes(bool refresh)
         return 0;
     }
     if (refresh || _totalBytes==0) {
-        uint64_t _totalBytes = SD.clusterCount();
+        _totalBytes = SD.clusterCount();
         uint8_t sectors = SD.sectorsPerCluster();
         _totalBytes =  _totalBytes * sectors * 512;
     }
