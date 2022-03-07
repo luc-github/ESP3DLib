@@ -49,6 +49,7 @@ bool Commands::ESP715(const char* cmd_params, level_authenticate_type auth_type,
                     output->printERROR ("SD card is busy!");
                     response = false;
                 } else {
+                    ESP_SD::setState(ESP_SDCARD_BUSY);
                     output->printMSG("Start Formating");
                     if (ESP_SD::format(output)) {
                         output->printMSG("Format Done");
@@ -56,6 +57,7 @@ bool Commands::ESP715(const char* cmd_params, level_authenticate_type auth_type,
                         output->printERROR ("Format failed!");
                         response = false;
                     }
+                    ESP_SD::setState(ESP_SDCARD_IDLE);
                     ESP_SD::releaseSD();
                 }
 
