@@ -41,16 +41,24 @@ bool Commands::ESP715(const char* cmd_params, level_authenticate_type auth_type,
 #endif //AUTHENTICATION_FEATURE
     {
         if (parameter == "FORMATSD") {
-            bool isactive = ESP_SD::accessSD();
-            output->printMSG("Start Formating");
-            if (ESP_SD::format(output)) {
-                output->printMSG("Format Done");
-            } else {
-                output->printERROR ("Format failed!");
+            if (!ESP_SD::accessSD()) {
+                output->printERROR ("Not available!");
                 response = false;
-            }
-            if (!isactive) {
-                ESP_SD::releaseSD();
+            } else {
+                if (ESP_SD::getState(false) ==  ESP_SDCARD_BUSY) {
+                    output->printERROR ("SD card is busy!");
+                    response = false;
+                } else {
+                    output->printMSG("Start Formating");
+                    if (ESP_SD::format(output)) {
+                        output->printMSG("Format Done");
+                    } else {
+                        output->printERROR ("Format failed!");
+                        response = false;
+                    }
+                    ESP_SD::releaseSD();
+                }
+
             }
         } else {
             output->printERROR ("Invalid parameter!");
