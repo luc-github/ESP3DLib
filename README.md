@@ -22,6 +22,8 @@ for them go [here](https://github.com/luc-github/ESP3D)
 
 [All releases](https://github.com/luc-github/ESP3DLib/releases)
 
+## Sponsors 
+[<img width="200px" src="https://raw.githubusercontent.com/luc-github/ESP3DLib/master/images/sponsors-supporters/MKS/mksmakerbase.jpg" title="MKS Makerbase">](https://github.com/makerbase-mks)&nbsp;&nbsp;
 
 ## Become a sponsor or a supporter
  * A sponsor is a recurent donator <a href="https://liberapay.com/ESP3D/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a>   
