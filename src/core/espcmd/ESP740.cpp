@@ -49,72 +49,66 @@ bool Commands::ESP740(const char* cmd_params, level_authenticate_type auth_type,
         output->printERROR ("Not available!");
         response = false;
     } else {
-        if (ESP_SD::getState(false) ==  ESP_SDCARD_BUSY) {
-            output->printERROR ("SD card is busy!");
+        if (ESP_SD::getState(true) == ESP_SDCARD_NOT_PRESENT) {
+            output->printERROR ("No SD card");
             response = false;
         } else {
-            if (ESP_SD::getState(true) == ESP_SDCARD_NOT_PRESENT) {
-                output->printERROR ("No SD card");
-                response = false;
-            } else {
-                ESP_SD::setState(ESP_SDCARD_BUSY );
-                output->printf("Directory on SD : %s", parameter.c_str());
-                output->printLN("");
-                if (ESP_SD::exists(parameter.c_str())) {
-                    ESP_SDFile f = ESP_SD::open(parameter.c_str(), ESP_FILE_READ);
-                    uint countf = 0;
-                    uint countd = 0;
-                    if (f) {
-                        //Check directories
-                        ESP_SDFile sub = f.openNextFile();
-                        while (sub) {
-                            if (sub.isDirectory()) {
-                                countd++;
-                                output->print("<DIR> \t");
-                                output->print(sub.name());
-                                output->print(" \t");
-                                output->printLN("");
-                            }
-                            sub.close();
-                            sub = f.openNextFile();
+            ESP_SD::setState(ESP_SDCARD_BUSY );
+            output->printf("Directory on SD : %s", parameter.c_str());
+            output->printLN("");
+            if (ESP_SD::exists(parameter.c_str())) {
+                ESP_SDFile f = ESP_SD::open(parameter.c_str(), ESP_FILE_READ);
+                uint countf = 0;
+                uint countd = 0;
+                if (f) {
+                    //Check directories
+                    ESP_SDFile sub = f.openNextFile();
+                    while (sub) {
+                        if (sub.isDirectory()) {
+                            countd++;
+                            output->print("<DIR> \t");
+                            output->print(sub.name());
+                            output->print(" \t");
+                            output->printLN("");
                         }
-                        f.close();
-                        f = ESP_SD::open(parameter.c_str(), ESP_FILE_READ);
-                        //Check files
+                        sub.close();
                         sub = f.openNextFile();
-                        while (sub) {
-                            if (!sub.isDirectory()) {
-                                countf++;
-                                output->print("      \t");
-                                output->print(sub.name());
-                                output->print(" \t");
-                                output->print(ESP_SD::formatBytes(sub.size()).c_str());
-                                output->print(" \t");
-#ifdef SD_TIMESTAMP_FEATURE
-                                output->print(timeserver.current_time(sub.getLastWrite()));
-                                output->print(" \t");
-#endif //SD_TIMESTAMP_FEATURE              
-                                output->printLN("");
-                            }
-                            sub.close();
-                            sub = f.openNextFile();
-                        }
-                        f.close();
-                        output->printf("%d file%s, %d dir%s", countf, (countf > 1)?"(s)":"", countd, (countd > 1)?"(s)":"");
-                        output->printLN("");
-                        String t = ESP_SD::formatBytes(ESP_SD::totalBytes());
-                        String u = ESP_SD::formatBytes(ESP_SD::usedBytes());
-                        String f = ESP_SD::formatBytes(ESP_SD::freeBytes());
-                        output->printf("Total %s, Used %s, Available: %s", t.c_str(), u.c_str(),f.c_str());
-                        output->printLN("");
-                    } else {
-                        output->printERROR ("Invalid directory!");
                     }
+                    f.close();
+                    f = ESP_SD::open(parameter.c_str(), ESP_FILE_READ);
+                    //Check files
+                    sub = f.openNextFile();
+                    while (sub) {
+                        if (!sub.isDirectory()) {
+                            countf++;
+                            output->print("      \t");
+                            output->print(sub.name());
+                            output->print(" \t");
+                            output->print(ESP_SD::formatBytes(sub.size()).c_str());
+                            output->print(" \t");
+#ifdef SD_TIMESTAMP_FEATURE
+                            output->print(timeserver.current_time(sub.getLastWrite()));
+                            output->print(" \t");
+#endif //SD_TIMESTAMP_FEATURE              
+                            output->printLN("");
+                        }
+                        sub.close();
+                        sub = f.openNextFile();
+                    }
+                    f.close();
+                    output->printf("%d file%s, %d dir%s", countf, (countf > 1)?"(s)":"", countd, (countd > 1)?"(s)":"");
+                    output->printLN("");
+                    String t = ESP_SD::formatBytes(ESP_SD::totalBytes());
+                    String u = ESP_SD::formatBytes(ESP_SD::usedBytes());
+                    String f = ESP_SD::formatBytes(ESP_SD::freeBytes());
+                    output->printf("Total %s, Used %s, Available: %s", t.c_str(), u.c_str(),f.c_str());
+                    output->printLN("");
                 } else {
                     output->printERROR ("Invalid directory!");
-                    response = false;
                 }
-                ESP_SD::setState(ESP_SDCARD_IDLE);
+            } else {
+                output->printERROR ("Invalid directory!");
+                response = false;
             }
         }
         ESP_SD::releaseSD();

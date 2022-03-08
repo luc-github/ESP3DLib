@@ -94,6 +94,10 @@ uint8_t ESP_SD::setState(uint8_t flag)
 
 bool  ESP_SD::accessSD()
 {
+    //if card is busy do not let another task access SD and so prevent a release
+    if (_state == ESP_SDCARD_BUSY) {
+        return false;
+    }
     if  (ESP_SD::enableSharedSD()) {
         return true;
     } else {
@@ -111,6 +115,7 @@ void  ESP_SD::releaseSD()
 #endif // ESP3DLIB_ENV
     _enabled = false;
 #endif //SD_DEVICE_CONNECTION == ESP_SHARED_SD 
+    setState(ESP_SDCARD_IDLE);
 }
 
 

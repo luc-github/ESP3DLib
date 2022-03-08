@@ -45,7 +45,8 @@ bool Commands::ESP200(const char* cmd_params, level_authenticate_type auth_type,
         if (parameter == "RELEASESD") {
             ESP_SD::releaseSD();
             return true;
-        } else {
+        }
+        if (parameter != "MOUNT") {
             output->printERROR("Unknown parameter");
             return false;
         }
@@ -60,6 +61,9 @@ bool Commands::ESP200(const char* cmd_params, level_authenticate_type auth_type,
             resp="Busy";
         }
         if (state!=ESP_SDCARD_BUSY) {
+            if (parameter=="MOUNT") {
+                ESP_SD::refreshStats(true);
+            }
             ESP_SD::releaseSD();
         }
     }
