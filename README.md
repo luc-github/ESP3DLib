@@ -23,10 +23,13 @@ for them go [here](https://github.com/luc-github/ESP3D)
 [All releases](https://github.com/luc-github/ESP3DLib/releases)
 
 
+## Become a sponsor or a supporter
+ * A sponsor is a recurent donator <a href="https://liberapay.com/ESP3D/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a>   
+ The sponsors are automaticaly displayed by github, if your tier is `10 US$/month` or more, to thank you for your support, your logo / avatar will be also added to the readme page with eventually with a link to your site.    
 
-## Donate
-Every support is welcome: [<img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG_global.gif" border="0" alt="PayPal – The safer, easier way to pay online.">](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=Y8FFE7NA4LJWQ)    
-Especially if need to buy new modules for testing.
+ * A supporter is per time donator [<img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG_global.gif" border="0" alt="PayPal – The safer, easier way to pay online.">](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=Y8FFE7NA4LJWQ)   
+ If your donation is over `120 US$` per year, to thank you for your support, your logo / avatar will be added to the readme page with eventually with a link to your site.  
+
 
 ## Features
 * Complete configuration by web browser (Station or Access point) or by Serial commands
