@@ -45,7 +45,7 @@
 //get fw version firmare target and fw version
 //eventually set time with pc time
 //output is JSON or plain text according parameter
-//[ESP800]<plain><time=YYYY-MM-DD-HH-MM-SS>
+//[ESP800]<json><time=YYYY-MM-DD-HH-MM-SS>
 bool Commands::ESP800(const char* cmd_params, level_authenticate_type auth_type, ESP3DOutput * output)
 {
     bool response = true;
@@ -58,7 +58,7 @@ bool Commands::ESP800(const char* cmd_params, level_authenticate_type auth_type,
 #else
     (void)auth_type;
 #endif //AUTHENTICATION_FEATURE
-    bool plain = hastag(cmd_params,"plain");
+    bool json = has_tag(cmd_params,"json");
 #ifdef TIMESTAMP_FEATURE
     String newtime = get_param (cmd_params, "time=");
     String tparm = (timeserver.is_internet_time())?"Auto":"Manual";
@@ -77,7 +77,7 @@ bool Commands::ESP800(const char* cmd_params, level_authenticate_type auth_type,
         Settings_ESP3D::write_byte (ESP_SETUP, parameter =="0"?0:1);
     }
     //FW version
-    if (plain) {
+    if (!json) {
         output->print("FW version:");
     } else {
         output->print("{\"FWVersion\":\"");
@@ -87,50 +87,50 @@ bool Commands::ESP800(const char* cmd_params, level_authenticate_type auth_type,
     output->print("-");
 #endif //SHORT_BUILD_VERSION
     output->print(FW_VERSION);
-    if(plain) {
+    if(!json) {
         output->printLN("");
     } else {
         output->print("\"");
     }
 
     //FW target
-    if (plain) {
+    if (!json) {
         output->print("FW target:");
     } else {
         output->print(",\"FWTarget\":\"");
     }
     output->print(Settings_ESP3D::GetFirmwareTargetShortName());
-    if(plain) {
+    if(!json) {
         output->printLN("");
     } else {
         output->print("\"");
     }
     //FW ID
-    if (plain) {
+    if (!json) {
         output->print("FW ID:");
     } else {
         output->print(",\"FWTargetID\":\"");
     }
     output->print(Settings_ESP3D::GetFirmwareTarget());
-    if(plain) {
+    if(!json) {
         output->printLN("");
     } else {
         output->print("\"");
     }
     //Setup done
-    if (plain) {
+    if (!json) {
         output->print("Setup:");
     } else {
         output->print(",\"Setup\":\"");
     }
     output->print(Settings_ESP3D::read_byte (ESP_SETUP) == 0?F("Enabled"):F("Disabled"));
-    if(plain) {
+    if(!json) {
         output->printLN("");
     } else {
         output->print("\"");
     }
     //SD connection
-    if (plain) {
+    if (!json) {
         output->print("SD connection:");
     } else {
         output->print(",\"SDConnection\":\"");
@@ -142,13 +142,14 @@ bool Commands::ESP800(const char* cmd_params, level_authenticate_type auth_type,
     } else {
         output->print("none");
     }
-    if(plain) {
+    if(!json) {
         output->printLN("");
     } else {
         output->print("\"");
     }
+
     //Serial protocol
-    if (plain) {
+    if (!json) {
         output->print("Serial protocol:");
     } else {
         output->print(",\"serialprotocol\":\"");
@@ -157,15 +158,18 @@ bool Commands::ESP800(const char* cmd_params, level_authenticate_type auth_type,
     output->print("MKS");
 #endif //COMMUNICATION_PROTOCOL ==  MKS_SERIAL 
 #if COMMUNICATION_PROTOCOL ==  RAW_SERIAL
-    output->print("RAW");
+    output->print("Raw");
 #endif //COMMUNICATION_PROTOCOL ==  RAW_SERIAL 
-    if(plain) {
+#if COMMUNICATION_PROTOCOL ==  SOCKET_SERIAL
+    output->print("Socket");
+#endif //COMMUNICATION_PROTOCOL ==  SOCKET_SERIAL  
+    if(!json) {
         output->printLN("");
     } else {
         output->print("\"");
     }
     //Authentication
-    if (plain) {
+    if (!json) {
         output->print("Authentication:");
     } else {
         output->print(",\"Authentication\":\"");
@@ -175,14 +179,14 @@ bool Commands::ESP800(const char* cmd_params, level_authenticate_type auth_type,
 #else
     output->print("Disabled");
 #endif //AUTHENTICATION_FEATURE
-    if(plain) {
+    if(!json) {
         output->printLN("");
     } else {
         output->print("\"");
     }
 #if (defined(WIFI_FEATURE) || defined(ETH_FEATURE)) && defined(HTTP_FEATURE)
     //Web Communication
-    if (plain) {
+    if (!json) {
         output->print("Web Communication:");
     } else {
         output->print(",\"WebCommunication\":\"");
@@ -192,25 +196,25 @@ bool Commands::ESP800(const char* cmd_params, level_authenticate_type auth_type,
 #else
     output->print("Synchronous");
 #endif //ASYNCWEBSERVER_FEATURE
-    if(plain) {
+    if(!json) {
         output->printLN("");
     } else {
         output->print("\"");
     }
     //WebSocket IP
-    if (plain) {
+    if (!json) {
         output->print("Web Socket IP:");
     } else {
         output->print(",\"WebSocketIP\":\"");
     }
     output->print(NetConfig::localIP().c_str());
-    if(plain) {
+    if(!json) {
         output->printLN("");
     } else {
         output->print("\"");
     }
     //WebSocket Port
-    if (plain) {
+    if (!json) {
         output->print("Web Socket port:");
     } else {
         output->print(",\"WebSocketPort\":\"");
@@ -220,7 +224,7 @@ bool Commands::ESP800(const char* cmd_params, level_authenticate_type auth_type,
 #else
     output->print(HTTP_Server::port() +1);
 #endif
-    if(plain) {
+    if(!json) {
         output->printLN("");
     } else {
         output->print("\"");
@@ -229,13 +233,13 @@ bool Commands::ESP800(const char* cmd_params, level_authenticate_type auth_type,
 #endif // (WIFI_FEATURE) || ETH_FEATURE) && HTTP_FEATURE)
 #if defined(WIFI_FEATURE) || defined(ETH_FEATURE) || defined(BT_FEATURE)
     //Hostname
-    if (plain) {
+    if (!json) {
         output->print("Hostname:");
     } else {
         output->print(",\"Hostname\":\"");
     }
     output->print(NetConfig::hostname());
-    if(plain) {
+    if(!json) {
         output->printLN("");
     } else {
         output->print("\"");
@@ -244,13 +248,13 @@ bool Commands::ESP800(const char* cmd_params, level_authenticate_type auth_type,
 #if defined(WIFI_FEATURE)
     if (WiFiConfig::started()) {
         //WiFi mode
-        if (plain) {
+        if (!json) {
             output->print("WiFi mode:");
         } else {
             output->print(",\"WiFiMode\":\"");
         }
         output->print((WiFi.getMode() == WIFI_AP)?"AP":"STA");
-        if(plain) {
+        if(!json) {
             output->printLN("");
         } else {
             output->print("\"");
@@ -259,7 +263,7 @@ bool Commands::ESP800(const char* cmd_params, level_authenticate_type auth_type,
 #endif //WIFI_FEATURE
 #if defined(WIFI_FEATURE) || defined(ETH_FEATURE)
     //Update
-    if (plain) {
+    if (!json) {
         output->print("Web Update:");
     } else {
         output->print(",\"WebUpdate\":\"");
@@ -273,7 +277,7 @@ bool Commands::ESP800(const char* cmd_params, level_authenticate_type auth_type,
 #else
     output->print("Disabled");
 #endif //WEB_UPDATE_FEATURE
-    if(plain) {
+    if(!json) {
         output->printLN("");
     } else {
         output->print("\"");
@@ -281,7 +285,7 @@ bool Commands::ESP800(const char* cmd_params, level_authenticate_type auth_type,
 #endif //WIFI_FEATURE|| ETH_FEATURE
 
 //Hostname
-    if (plain) {
+    if (!json) {
         output->print("Filesystem:");
     } else {
         output->print(",\"Filesystem\":\"");
@@ -291,13 +295,13 @@ bool Commands::ESP800(const char* cmd_params, level_authenticate_type auth_type,
 #else
     output->print("none");
 #endif //FILESYSTEM_FEATURE
-    if(plain) {
+    if(!json) {
         output->printLN("");
     } else {
         output->print("\"");
     }
 //time server
-    if (plain) {
+    if (!json) {
         output->print("Time:");
     } else {
         output->print(",\"Time\":\"");
@@ -307,39 +311,39 @@ bool Commands::ESP800(const char* cmd_params, level_authenticate_type auth_type,
 #else
     output->print("none");
 #endif //TIMESTAMP_FEATURE
-    if(plain) {
+    if(!json) {
         output->printLN("");
     } else {
         output->print("\"");
     }
 #ifdef CAMERA_DEVICE
     //camera ID
-    if (plain) {
+    if (!json) {
         output->print("Camera ID:");
     } else {
         output->print(",\"Cam_ID\":\"");
     }
     output->print(esp3d_camera.GetModel());
-    if(plain) {
+    if(!json) {
         output->printLN("");
     } else {
         output->print("\"");
     }
     //camera Name
-    if (plain) {
+    if (!json) {
         output->print("Camera Name:");
     } else {
         output->print(",\"Cam_name\":\"");
     }
     output->print(esp3d_camera.GetModelString());
-    if(plain) {
+    if(!json) {
         output->printLN("");
     } else {
         output->print("\"");
     }
 #endif //CAMERA_DEVICE
     //final
-    if(!plain) {
+    if(json) {
         output->printLN("}");
     }
     return response;

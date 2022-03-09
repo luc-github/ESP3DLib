@@ -89,7 +89,7 @@ bool Commands::ESP420(const char* cmd_params, level_authenticate_type auth_type,
 #else
     (void)auth_type;
 #endif //AUTHENTICATION_FEATURE
-    bool plain = hastag(cmd_params,"plain");
+    bool plain = has_tag(cmd_params,"plain");
     //TODO add plain / JSON support
     if (!plain) {
         output->print ("{\"Status\":[");

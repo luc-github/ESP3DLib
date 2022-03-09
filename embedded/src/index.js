@@ -416,7 +416,7 @@ function InfoMSG(msg) {
 
 function getFWData() {
   let url = new URL("http://" + window.location.host + "/command");
-  url.searchParams.append("cmd", "[ESP800]time=" + getPCTime());
+  url.searchParams.append("cmd", "[ESP800]json=YES time=" + getPCTime());
   httpGet(url, processFWJson);
 }
 

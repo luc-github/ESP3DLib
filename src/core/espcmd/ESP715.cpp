@@ -28,9 +28,10 @@
 //[ESP715]FORMATSD pwd=<admin password>
 bool Commands::ESP715(const char* cmd_params, level_authenticate_type auth_type, ESP3DOutput * output)
 {
-    bool response = true;
-    String parameter;
-    parameter = get_param (cmd_params, "");
+    bool noError = true;
+    String res;
+    bool json = has_tag(cmd_params, "json");
+    bool formatSD = has_tag (cmd_params, "FORMATSD");
 #ifdef AUTHENTICATION_FEATURE
     if (auth_type != LEVEL_ADMIN) {
         output->printERROR("Wrong authentication!", 401);
@@ -40,27 +41,42 @@ bool Commands::ESP715(const char* cmd_params, level_authenticate_type auth_type,
     (void)auth_type;
 #endif //AUTHENTICATION_FEATURE
     {
-        if (parameter == "FORMATSD") {
+        if (formatSD) {
             if (!ESP_SD::accessSD()) {
-                output->printERROR ("Not available!");
-                response = false;
+                res ="Not available!";
+                noError = false;
             } else {
                 ESP_SD::setState(ESP_SDCARD_BUSY);
-                output->printMSG("Start Formating");
+                if (!json) {
+                    output->print("Start Formating...");
+                }
                 if (ESP_SD::format(output)) {
-                    output->printMSG("Format Done");
+                    res= "Format Done";
                 } else {
-                    output->printERROR ("Format failed!");
-                    response = false;
+                    res="Format failed!";
+                    noError = false;
                 }
                 ESP_SD::releaseSD();
             }
         } else {
-            output->printERROR ("Invalid parameter!");
-            response = false;
+            res = "Invalid parameter!";
+            noError = false;
         }
     }
-    return response;
+    if (json) {
+        output->print("{\"status\":\"");
+        output->print(noError ? "ok" : "error");
+        output->print("\",\"message\":\"");
+        output->print(res.c_str());
+        output->printLN("\"}");
+    } else {
+        if(noError) {
+            output->printMSG(res.c_str());
+        } else {
+            output->printERROR(res.c_str());
+        }
+    }
+    return noError;
 }
 
 #endif //SD_DEVICE

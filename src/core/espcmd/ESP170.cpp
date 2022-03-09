@@ -48,7 +48,7 @@ bool Commands::ESP170(const char* cmd_params, level_authenticate_type auth_type,
     }
     parameter = get_param (cmd_params, "");
     //get
-    bool plain = hastag (cmd_params, "plain");
+    bool plain = has_tag (cmd_params, "plain");
     if ((parameter.length() == 0) || plain) {
         sensor_t * s = esp_camera_sensor_get();
         if (s == nullptr) {

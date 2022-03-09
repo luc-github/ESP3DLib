@@ -33,7 +33,8 @@ bool Commands::ESP740(const char* cmd_params, level_authenticate_type auth_type,
 {
     bool response = true;
     String parameter;
-    parameter = get_param (cmd_params, "");
+    parameter = clean_param(get_param (cmd_params, ""));
+    bool json = has_tag(cmd_params, "json");
 #ifdef AUTHENTICATION_FEATURE
     if (auth_type != LEVEL_ADMIN) {
         output->printERROR("Wrong authentication!", 401);

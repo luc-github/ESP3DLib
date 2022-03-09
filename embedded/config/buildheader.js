@@ -6,7 +6,7 @@ const chalk = require("chalk");
 let distPath = path.normalize(__dirname + "/../dist/");
 let srcPath = path.normalize(__dirname + "/../src/");
 let headerPath = path.normalize(
-  __dirname + "/../../esp3d/src/modules/http/embedded.h"
+  __dirname + "/../../src/modules/http/embedded.h"
 );
 
 console.log(chalk.yellow("Converting bin to text file"));

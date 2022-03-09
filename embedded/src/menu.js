@@ -1,6 +1,6 @@
 function initMenus() {
   document.getElementById("FWLink").addEventListener("click", function () {
-    window.open("https://github.com/luc-github/ESP3D/tree/3.0", "_blank");
+    window.open("https://github.com/MarlinFirmware/Marlin", "_blank");
   });
 
   document.getElementById("UiLink").addEventListener("click", function () {
@@ -8,7 +8,7 @@ function initMenus() {
   });
 
   document.getElementById("hlpLink").addEventListener("click", function () {
-    window.open("https://github.com/luc-github/ESP3D/wiki", "_blank");
+    window.open("https://github.com/luc-github/ESP3DLib/wiki", "_blank");
   });
 }
 

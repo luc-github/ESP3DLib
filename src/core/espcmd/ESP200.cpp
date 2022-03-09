@@ -37,12 +37,10 @@ bool Commands::ESP200(const char* cmd_params, level_authenticate_type auth_type,
 #else
     (void)auth_type;
 #endif //AUTHENTICATION_FEATURE
-    String parameter;
     String resp = "No SD card";
-    parameter = get_param (cmd_params, "");
-    bool json = hastag (cmd_params, "json");
-    bool releaseSD = hastag (cmd_params, "RELEASE");
-    bool refreshSD = hastag (cmd_params, "REFRESH");
+    bool json = has_tag (cmd_params, "json");
+    bool releaseSD = has_tag (cmd_params, "RELEASE");
+    bool refreshSD = has_tag (cmd_params, "REFRESH");
     if (releaseSD) {
         ESP_SD::releaseSD();
         if (!json) {

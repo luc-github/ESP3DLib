@@ -156,6 +156,21 @@ const char* Commands::get_label (const char * cmd_params, const char * labelsepa
     return res.c_str();
 }
 
+const char * Commands::clean_param (const char * cmd_params)
+{
+    static String res;
+    res = cmd_params;
+    if (strlen(cmd_params) == 0) {
+        return "";
+    }
+    String tmp = cmd_params;
+    if(tmp.indexOf("json=") != -1) {
+        //remove formating flag
+        res = tmp.substring(0,tmp.indexOf("json="));
+    }
+    return res.c_str();
+}
+
 //extract parameter with corresponding label
 //if label is empty give whole line without authentication label/parameter
 const char * Commands::get_param (const char * cmd_params, const char * label)
@@ -190,7 +205,6 @@ const char * Commands::get_param (const char * cmd_params, const char * label)
     //extract parameter
     res = tmp.substring (start, end);
 
-
 #ifdef AUTHENTICATION_FEATURE
     //if no label remove authentication parameters
     if (strlen(label) == 0) {
@@ -217,7 +231,7 @@ const char * Commands::get_param (const char * cmd_params, const char * label)
 
 }
 
-bool Commands::hastag (const char * cmd_params, const char *tag)
+bool Commands::has_tag (const char * cmd_params, const char *tag)
 {
     log_esp3d("Checking for tag: %s, in %s", tag, cmd_params);
     String tmp = "";

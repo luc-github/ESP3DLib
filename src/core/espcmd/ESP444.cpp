@@ -37,12 +37,12 @@ bool Commands::ESP444(const char* cmd_params, level_authenticate_type auth_type,
 #else
     (void)auth_type;
 #endif //AUTHENTICATION_FEATURE
-    if (hastag(cmd_params,"RESTART")) {
+    if (has_tag(cmd_params,"RESTART")) {
         output->printMSG ("Restart ongoing");
         output->flush();
         Hal::wait(100);
         Esp3D::restart_esp();
-    } else if (hastag(cmd_params,"RESET")) {
+    } else if (has_tag(cmd_params,"RESET")) {
         if (Esp3D::reset()) {
             output->printMSG ("Reset done");
         } else {

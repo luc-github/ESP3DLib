@@ -88,7 +88,7 @@ bool Commands::ESP140(const char* cmd_params, level_authenticate_type auth_type,
             }
         }
 
-        if (hastag(parameter.c_str(), "SYNC")) {
+        if (has_tag(parameter.c_str(), "SYNC")) {
             if (timeserver.is_internet_time()) {
                 output->printMSG("Contacting time servers");
                 if(!timeserver.begin()) {
