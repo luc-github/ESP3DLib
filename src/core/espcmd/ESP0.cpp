@@ -78,7 +78,7 @@ const char * help[]= {"[ESP] - display this help",
                       "[ESP191](Port) - display/set WebDav port",
 #endif //WEBDAV_FEATURE
 #if defined (SD_DEVICE)
-                      "[ESP200] - display SD Card Status",
+                      "[ESP200] (json) (RELEASE) (REFRESH)- display/set SD Card Status",
 #endif //SD_DEVICE
 #ifdef DIRECT_PIN_FEATURE
                       "[ESP201](Pxxx) (Vxxx) (PULLUP=YES RAW=YES ANALOG=NO ANALOG_RANGE=255 CLEARCHANNELS=NO) - read / set  pin value",

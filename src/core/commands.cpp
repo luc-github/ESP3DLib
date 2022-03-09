@@ -219,9 +219,11 @@ const char * Commands::get_param (const char * cmd_params, const char * label)
 
 bool Commands::hastag (const char * cmd_params, const char *tag)
 {
+    log_esp3d("Checking for tag: %s, in %s", tag, cmd_params);
     String tmp = "";
     String stag = " ";
     if ((strlen(cmd_params) == 0) || (strlen(tag) == 0)) {
+        log_esp3d("No value provided for tag");
         return false;
     }
     stag += tag;
@@ -229,8 +231,23 @@ bool Commands::hastag (const char * cmd_params, const char *tag)
     tmp.trim();
     tmp = " " + tmp;
     if (tmp.indexOf(stag) == -1) {
+        log_esp3d("No tag detected");
         return false;
     }
+    log_esp3d("Tag detected");
+    //to support plain , plain=yes , plain=no
+    String param =  String(tag) + "=";
+    log_esp3d("Checking  %s , in %s", param.c_str());
+    String parameter = get_param (cmd_params, param.c_str());
+    if (parameter.length() != 0) {
+        log_esp3d("Parameter is %s", parameter.c_str());
+        if (parameter == "YES" ||parameter == "true" ||parameter == "TRUE" || parameter == "yes" || parameter == "1") {
+            return true;
+        }
+        log_esp3d("No parameter to enable  %s ", param.c_str());
+        return false;
+    }
+    log_esp3d("No parameter for %s but tag detected", param.c_str());
     return true;
 }
 
@@ -433,8 +450,8 @@ bool Commands::execute_internal_command (int cmd, const char* cmd_params, level_
         break;
 #endif //WEBDAV_FEATURE
 #if defined (SD_DEVICE)
-    //Get SD Card Status
-    //[ESP200] pwd=<user/admin password>
+    //Get/Set SD Card Status
+    //[ESP200] json=<YES/NO> <RELEASESD> <REFRESH> pwd=<user/admin password>
     case 200:
         response = ESP200(cmd_params, auth_type, output);
         break;

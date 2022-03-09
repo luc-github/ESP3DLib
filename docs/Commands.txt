@@ -81,9 +81,10 @@ label can be: light/framesize/quality/contrast/brightness/saturation/gainceiling
 * Get/Set WebDav port 
 [ESP191]<port>pwd=<admin password>
 
-* Get SD Card Status
-[ESP200] <RELEASESD> pwd=<user/admin password>
-RELEASESD will force the release of SD from ESP3D if SD is shared
+* Get/Set SD Card Status
+[ESP200] <json=YES/NO> <RELEASE> <REFRESH> pwd=<user/admin password>
+RELEASE will force the release of SD from ESP3D if SD is shared
+REFRESH will refresh the SD info is available
 
 *Get/Set pin value
 [ESP201]P<pin> V<value> [PULLUP=YES RAW=YES]pwd=<admin password>

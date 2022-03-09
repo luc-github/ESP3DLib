@@ -25,7 +25,7 @@
 #include "../../modules/filesystem/esp_sd.h"
 #include "../../modules/authentication/authentication_service.h"
 //Get SD Card Status
-//[ESP200] <RELEASESD> pwd=<user/admin password>
+//[ESP200] json=<YES/NO> <RELEASESD> <REFRESH> pwd=<user/admin password>
 bool Commands::ESP200(const char* cmd_params, level_authenticate_type auth_type, ESP3DOutput * output)
 {
     (void)cmd_params;
@@ -40,16 +40,18 @@ bool Commands::ESP200(const char* cmd_params, level_authenticate_type auth_type,
     String parameter;
     String resp = "No SD card";
     parameter = get_param (cmd_params, "");
-    if (parameter.length() != 0) {
-        parameter.toUpperCase();
-        if (parameter == "RELEASESD") {
-            ESP_SD::releaseSD();
-            return true;
+    bool json = hastag (cmd_params, "json");
+    bool releaseSD = hastag (cmd_params, "RELEASE");
+    bool refreshSD = hastag (cmd_params, "REFRESH");
+    if (releaseSD) {
+        ESP_SD::releaseSD();
+        if (!json) {
+            output->printMSG ("SD card released");
+        } else {
+            resp = "{\"status\": \"released\"}";
+            output->printMSG (resp.c_str());
         }
-        if (parameter != "MOUNT") {
-            output->printERROR("Unknown parameter");
-            return false;
-        }
+        return true;
     }
     if (!ESP_SD::accessSD()) {
         if (ESP_SD::getState() == ESP_SDCARD_BUSY) {
@@ -61,11 +63,14 @@ bool Commands::ESP200(const char* cmd_params, level_authenticate_type auth_type,
         int8_t state = ESP_SD::getState(true);
         if (state == ESP_SDCARD_IDLE) {
             resp="SD card detected";
-            if (parameter=="MOUNT") {
+            if (refreshSD) {
                 ESP_SD::refreshStats(true);
             }
         }
         ESP_SD::releaseSD();
+    }
+    if (json) {
+        resp = "{\"status\": \""+resp+"\"}";
     }
     output->printMSG (resp.c_str());
     return true;
