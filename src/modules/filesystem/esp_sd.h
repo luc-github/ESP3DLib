@@ -72,7 +72,7 @@ public:
     static void  releaseSD();
     static void handle();
     static void end();
-    static uint8_t getState(bool refresh);
+    static uint8_t getState(bool refresh=false);
     static uint8_t setState(uint8_t state);
     static void refreshStats(bool force = false);
     static uint64_t totalBytes(bool refresh = false);

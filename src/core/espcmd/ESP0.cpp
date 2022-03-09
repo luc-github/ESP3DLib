@@ -272,7 +272,9 @@ const uint cmdlist[]= {0,
                        790,
 #endif //GLOBAL_FILESYSTEM_FEATURE
                        800,
+#if COMMUNICATION_PROTOCOL != SOCKET_SERIAL
                        900,
+#endif //COMMUNICATION_PROTOCOL != SOCKET_SERIAL
                        901,
 #ifdef BUZZER_DEVICE
                        910,
@@ -301,7 +303,8 @@ bool Commands::ESP0(const char* cmd_params, level_authenticate_type auth_type, E
         bool found = false;
         uint cmdval = String(cmd_params).toInt();
         if (sizeof(help)/sizeof(char*) != sizeof(cmdlist)/sizeof(uint)) {
-            output->printLN("Error in code");
+            String s = "Error in code:" + String(sizeof(help)/sizeof(char*)) + "entries vs " + String(sizeof(cmdlist)/sizeof(uint));
+            output->printLN(s.c_str());
             return false;
         }
         for (uint i = 0; i < cmdNb-1; i++) {

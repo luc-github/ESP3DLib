@@ -52,20 +52,20 @@ bool Commands::ESP200(const char* cmd_params, level_authenticate_type auth_type,
         }
     }
     if (!ESP_SD::accessSD()) {
-        resp = "Not available";
+        if (ESP_SD::getState() == ESP_SDCARD_BUSY) {
+            resp="Busy";
+        } else {
+            resp = "Not available";
+        }
     } else {
         int8_t state = ESP_SD::getState(true);
         if (state == ESP_SDCARD_IDLE) {
             resp="SD card detected";
-        } else if (state == ESP_SDCARD_BUSY) {
-            resp="Busy";
-        }
-        if (state!=ESP_SDCARD_BUSY) {
             if (parameter=="MOUNT") {
                 ESP_SD::refreshStats(true);
             }
-            ESP_SD::releaseSD();
         }
+        ESP_SD::releaseSD();
     }
     output->printMSG (resp.c_str());
     return true;

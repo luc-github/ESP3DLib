@@ -40,90 +40,80 @@ bool Commands::ESP750(const char* cmd_params, level_authenticate_type auth_type,
 #else
     (void)auth_type;
 #endif //AUTHENTICATION_FEATURE
-    int8_t state = ESP_SD::getState(false);
-    if (state != ESP_SDCARD_IDLE) {
-        state = ESP_SD::getState(true);
-    }
-    if (state == ESP_SDCARD_NOT_PRESENT) {
-        output->printERROR ("No SD card");
-        return false;
-    } else if (state != ESP_SDCARD_IDLE) {
-        output->printERROR ("Busy");
-        return false;
-    }
-    parameter = get_param (cmd_params, "mkdir=");
-    if (parameter.length() != 0) {
-        bool isactive = ESP_SD::accessSD();
-        if (ESP_SD::mkdir(parameter.c_str())) {
-            output->printMSG ("ok");
-        } else {
-            output->printERROR ("failed!");
+    if (!ESP_SD::accessSD()) {
+        output->printERROR ("Not available!");
+        response = false;
+    } else {
+        if (ESP_SD::getState(true) == ESP_SDCARD_NOT_PRESENT) {
+            output->printERROR ("No SD card");
             response = false;
-        }
-        if (!isactive) {
-            ESP_SD::releaseSD();
-        }
-        return response;
-    }
-    parameter = get_param (cmd_params, "rmdir=");
-    if (parameter.length() != 0) {
-        bool isactive = ESP_SD::accessSD();
-        if (ESP_SD::rmdir(parameter.c_str())) {
-            output->printMSG ("ok");
         } else {
-            output->printERROR ("failed!");
-            response = false;
-        }
-        if (!isactive) {
+            ESP_SD::setState(ESP_SDCARD_BUSY );
+            parameter = get_param (cmd_params, "mkdir=");
+            if (parameter.length() != 0) {
+                if (ESP_SD::mkdir(parameter.c_str())) {
+                    output->printMSG ("ok");
+                } else {
+                    output->printERROR ("failed!");
+                    response = false;
+                }
+            }
+            if (parameter.length() == 0) {
+                parameter = get_param (cmd_params, "rmdir=");
+                if (parameter.length() != 0) {
+                    if (ESP_SD::rmdir(parameter.c_str())) {
+                        output->printMSG ("ok");
+                    } else {
+                        output->printERROR ("failed!");
+                        response = false;
+                    }
+                }
+            }
+
+            if (parameter.length() == 0) {
+                parameter = get_param (cmd_params, "remove=");
+                if (parameter.length() != 0) {
+                    if (ESP_SD::remove(parameter.c_str())) {
+                        output->printMSG ("ok");
+                    } else {
+                        output->printERROR ("failed!");
+                        response = false;
+                    }
+                }
+            }
+
+            if (parameter.length() == 0) {
+                parameter = get_param (cmd_params, "exists=");
+                if (parameter.length() != 0) {
+                    if (ESP_SD::exists(parameter.c_str())) {
+                        output->printMSG ("yes");
+                    } else {
+                        output->printMSG ("no");
+                    }
+                }
+            }
+
+            if (parameter.length() == 0) {
+                parameter = get_param (cmd_params, "create=");
+                if (parameter.length() != 0) {
+                    ESP_SDFile f = ESP_SD::open(parameter.c_str(), ESP_FILE_WRITE);
+                    if (f.isOpen()) {
+                        f.close();
+                        output->printMSG ("ok");
+                    } else {
+                        output->printERROR ("failed!");
+                        response = false;
+                    }
+                }
+            }
+
             ESP_SD::releaseSD();
         }
-        return response;
+        if (parameter.length() == 0) {
+            output->printERROR ("Incorrect command!");
+        }
+        return response;;
     }
-    parameter = get_param (cmd_params, "remove=");
-    if (parameter.length() != 0) {
-        bool isactive = ESP_SD::accessSD();
-        if (ESP_SD::remove(parameter.c_str())) {
-            output->printMSG ("ok");
-        } else {
-            output->printERROR ("failed!");
-            response = false;
-        }
-        if (!isactive) {
-            ESP_SD::releaseSD();
-        }
-        return response;
-    }
-    parameter = get_param (cmd_params, "exists=");
-    if (parameter.length() != 0) {
-        bool isactive = ESP_SD::accessSD();
-        if (ESP_SD::exists(parameter.c_str())) {
-            output->printMSG ("yes");
-        } else {
-            output->printMSG ("no");
-        }
-        if (!isactive) {
-            ESP_SD::releaseSD();
-        }
-        return response;
-    }
-    parameter = get_param (cmd_params, "create=");
-    if (parameter.length() != 0) {
-        bool isactive = ESP_SD::accessSD();
-        ESP_SDFile f = ESP_SD::open(parameter.c_str(), ESP_FILE_WRITE);
-        if (f.isOpen()) {
-            f.close();
-            output->printMSG ("ok");
-        } else {
-            output->printERROR ("failed!");
-            response = false;
-        }
-        if (!isactive) {
-            ESP_SD::releaseSD();
-        }
-        return response;
-    }
-    output->printERROR ("Incorrect command!");
-    return false;
 }
 
 #endif //SD_DEVICE
