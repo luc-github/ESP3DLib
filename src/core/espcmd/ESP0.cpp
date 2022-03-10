@@ -319,7 +319,7 @@ bool Commands::ESP0(const char* cmd_params, level_authenticate_type auth_type, E
 
         }
         if (json) {
-            output->print ("]}");
+            output->printLN("]}");
         }
     } else {
         bool found = false;
@@ -334,7 +334,7 @@ bool Commands::ESP0(const char* cmd_params, level_authenticate_type auth_type, E
                 if (json) {
                     output->print("{\"cmd\":\"0\",\"status\":\"ok\",\"msg\":\"");
                     output->print(String(help[i]).c_str());
-                    output->print("\"}");
+                    output->printLN("\"}");
                 } else {
                     output->printLN(help[i]);
                 }
@@ -347,7 +347,7 @@ bool Commands::ESP0(const char* cmd_params, level_authenticate_type auth_type, E
             if (json) {
                 output->print("{\"cmd\":\"0\",\"status\":\"error\",\"msg\":\"");
                 output->print(tmp.c_str());
-                output->print("\"}");
+                output->printLN("\"}");
             } else {
                 output->printLN(tmp.c_str());
             }

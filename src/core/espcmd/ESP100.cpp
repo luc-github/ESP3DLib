@@ -68,7 +68,11 @@ bool Commands::ESP100(const char* cmd_params, level_authenticate_type auth_type,
         }
     }
     if (noError) {
-        output->printMSG (response.c_str() );
+        if (json) {
+            output->printLN (response.c_str() );
+        } else {
+            output->printMSG (response.c_str() );
+        }
     } else {
         output->printERROR(response.c_str(), 401);
     }
