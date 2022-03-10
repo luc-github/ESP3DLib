@@ -293,11 +293,33 @@ bool Commands::ESP0(const char* cmd_params, level_authenticate_type auth_type, E
     String parameter;
     const uint cmdNb = sizeof(help)/sizeof(char*);
     (void)auth_type;
-    parameter = get_param (cmd_params, "");
+    bool json=has_tag(cmd_params,"json");
+    parameter = clean_param(get_param (cmd_params, ""));
     if (parameter.length() == 0) {
-        output->printLN("[List of ESP3D commands]");
+
+        if (json) {
+            output->print("{\"cmd\":\"0\",\"status\":\"ok\",\"msg\":[");
+        } else {
+            output->printLN("[List of ESP3D commands]");
+        }
+
         for (uint i = 0; i < cmdNb -1; i++) {
-            output->printLN(help[i]);
+            if (json) {
+                output->print("{\"id\":\"");
+                output->print(String(cmdlist[i]).c_str());
+                output->print("\",\"help\":\"");
+                output->print(String(help[i]).c_str());
+                output->print("\"}");
+                if (i < cmdNb - 2) {
+                    output->print(",");
+                }
+            } else {
+                output->printLN(help[i]);
+            }
+
+        }
+        if (json) {
+            output->print ("]}");
         }
     } else {
         bool found = false;
@@ -310,13 +332,26 @@ bool Commands::ESP0(const char* cmd_params, level_authenticate_type auth_type, E
         for (uint i = 0; i < cmdNb-1; i++) {
             if (cmdlist[i] == cmdval) {
                 output->printLN(help[i]);
+                if (json) {
+                    output->print("{\"cmd\":\"0\",\"status\":\"ok\",\"msg\":\"");
+                    output->print(String(help[i]).c_str());
+                    output->print("\"}");
+                } else {
+                    output->printLN(help[i]);
+                }
                 found = true;
             }
         }
         if (!found) {
             String tmp = "This command is not supported: ";
             tmp+= cmd_params;
-            output->printLN(tmp.c_str());
+            if (json) {
+                output->print("{\"cmd\":\"0\",\"status\":\"error\",\"msg\":\"");
+                output->print(tmp.c_str());
+                output->print("\"}");
+            } else {
+                output->printLN(tmp.c_str());
+            }
         }
     }
     return response;
