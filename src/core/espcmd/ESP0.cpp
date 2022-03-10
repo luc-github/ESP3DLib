@@ -331,7 +331,6 @@ bool Commands::ESP0(const char* cmd_params, level_authenticate_type auth_type, E
         }
         for (uint i = 0; i < cmdNb-1; i++) {
             if (cmdlist[i] == cmdval) {
-                output->printLN(help[i]);
                 if (json) {
                     output->print("{\"cmd\":\"0\",\"status\":\"ok\",\"msg\":\"");
                     output->print(String(help[i]).c_str());
