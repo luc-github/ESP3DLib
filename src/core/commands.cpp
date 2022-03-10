@@ -156,6 +156,27 @@ const char* Commands::get_label (const char * cmd_params, const char * labelsepa
     return res.c_str();
 }
 
+const char *  Commands::format_response(uint cmdID, bool isjson, bool isok, const char * message)
+{
+    static String res;
+    if (!isjson) {
+        res = message;
+    } else {
+        res = "{\"cmd\":\"";
+        res += String(cmdID);
+        res += "\",\"status\":\"";
+        if (isok) {
+            res += "ok";
+        } else {
+            res += "error";
+        }
+        res += "\",\"msg\":\"";
+        res += message;
+        res += "\"}";
+    }
+    return res.c_str();
+}
+
 const char * Commands::clean_param (const char * cmd_params)
 {
     static String res;
@@ -164,6 +185,10 @@ const char * Commands::clean_param (const char * cmd_params)
         return "";
     }
     String tmp = cmd_params;
+    tmp.trim();
+    if (tmp =="json" || tmp.startsWith("json ")) {
+        return "";
+    }
     if(tmp.indexOf("json=") != -1) {
         //remove formating flag
         res = tmp.substring(0,tmp.indexOf("json="));
