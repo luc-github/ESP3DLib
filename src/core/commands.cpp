@@ -159,8 +159,9 @@ const char* Commands::get_label (const char * cmd_params, const char * labelsepa
 const char *  Commands::format_response(uint cmdID, bool isjson, bool isok, const char * message)
 {
     static String res;
+    res ="";
     if (!isjson) {
-        res = message;
+        res += message;
     } else {
         res = "{\"cmd\":\"";
         res += String(cmdID);

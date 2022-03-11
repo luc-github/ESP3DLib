@@ -446,6 +446,7 @@ size_t ESP3DOutput::printMSG(const char * s, bool withNL)
 
 size_t ESP3DOutput::printERROR(const char * s, int code_error)
 {
+    String display = "";
     if (!isOutput(_client)) {
         return 0;
     }
@@ -459,31 +460,41 @@ size_t ESP3DOutput::printERROR(const char * s, int code_error)
         if (_webserver) {
             if (!_headerSent && !_footerSent) {
                 _webserver->sendHeader("Cache-Control","no-cache");
-                _webserver->send (_code, "text/plain", s);
+                if (s[0]!='{') {
+                    display = "error: ";
+                } else {
+                    display ="";
+                }
+                display += s;
+                _webserver->send (_code, "text/plain", display.c_str());
                 _headerSent = true;
                 _footerSent = true;
-                return strlen(s);
+                return display.length();
             }
         }
 #endif //HTTP_FEATURE
         return 0;
     }
-    String display;
     switch(Settings_ESP3D::GetFirmwareTarget()) {
     case GRBL:
-
-        display = "error: ";
+        if (s[0]!='{') {
+            display = "error: ";
+        }
         display += s;
         break;
     case MARLIN_EMBEDDED:
     case MARLIN:
-        display = "error: ";
+        if (s[0]!='{') {
+            display = "error: ";
+        }
         display += s;
         break;
     case SMOOTHIEWARE:
     case REPETIER:
     default:
-        display = ";error: ";
+        if (s[0]!='{') {
+            display = ";error: ";
+        }
         display += s;
     }
     return printLN(display.c_str());

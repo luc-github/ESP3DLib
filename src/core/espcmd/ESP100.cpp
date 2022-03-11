@@ -33,7 +33,7 @@ bool Commands::ESP100(const char* cmd_params, level_authenticate_type auth_type,
     bool json = has_tag (cmd_params, "json");
     String response;
     String parameter;
-    uint8_t errorCode = 501;
+    int errorCode = 200; //unless it is a server error use 200 as default and set error in json instead
 
 #ifdef AUTHENTICATION_FEATURE
     if (auth_type == LEVEL_GUEST) {
