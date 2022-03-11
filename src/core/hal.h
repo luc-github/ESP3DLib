@@ -49,8 +49,6 @@ public:
     static bool analogWrite(uint8_t pin, uint value);
     static void analogWriteFreq(uint32_t freq);
     static void analogRange(uint32_t range);
-    static void toneESP(uint8_t pin, unsigned int frequency, unsigned int duration, bool sync = true);
-    static void no_tone(uint8_t pin);
 #if defined(ARDUINO_ARCH_ESP32)
     static TaskHandle_t xHandle;
 #endif //ARDUINO_ARCH_ESP32
