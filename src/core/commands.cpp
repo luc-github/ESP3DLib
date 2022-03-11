@@ -171,9 +171,15 @@ const char *  Commands::format_response(uint cmdID, bool isjson, bool isok, cons
         } else {
             res += "error";
         }
-        res += "\",\"msg\":\"";
+        res += "\",\"msg\":";
+        if (message[0]!='{') {
+            res+="\"";
+        }
         res += message;
-        res += "\"}";
+        if (message[0]!='{') {
+            res += "\"";
+        }
+        res +="}";
     }
     return res.c_str();
 }

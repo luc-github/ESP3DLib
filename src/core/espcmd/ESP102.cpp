@@ -78,7 +78,6 @@ bool Commands::ESP102(const char* cmd_params, level_authenticate_type auth_type,
                 } else {
                     uint8_t bbuf = (parameter == "DHCP")?DHCP_MODE:STATIC_IP_MODE;
                     if (!Settings_ESP3D::write_byte(ESP_STA_IP_MODE, bbuf)) {
-                        output->printERROR ("Set failed!");
                         response = format_response(COMMANDID, json, false, "Set failed");
                         noError = false;
                     } else {
