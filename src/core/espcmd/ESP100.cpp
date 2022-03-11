@@ -26,7 +26,7 @@
 #include "../../modules/authentication/authentication_service.h"
 #define COMMANDID   100
 //STA SSID
-//[ESP100]<SSID>[json=yes][pwd=<admin password>]
+//[ESP100]<SSID>[json=no] [pwd=<admin password>
 bool Commands::ESP100(const char* cmd_params, level_authenticate_type auth_type, ESP3DOutput * output)
 {
     bool noError = true;
