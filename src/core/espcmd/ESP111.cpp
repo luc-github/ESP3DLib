@@ -26,7 +26,7 @@
 #include "../../modules/authentication/authentication_service.h"
 #define COMMANDID   111
 //Get current IP
-//[ESP111]
+//[ESP111] [json=no]
 bool Commands::ESP111(const char* cmd_params, level_authenticate_type auth_type, ESP3DOutput * output)
 {
     (void)auth_type;
