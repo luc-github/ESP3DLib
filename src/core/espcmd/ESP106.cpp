@@ -51,7 +51,6 @@ bool Commands::ESP106(const char* cmd_params, level_authenticate_type auth_type,
             noError = false;
         } else {
             if (!WiFiConfig::isPasswordValid (parameter.c_str() ) ) {
-                output->printERROR ("Set failed!");
                 response = format_response(COMMANDID, json, false, "Set failed");
                 noError = false;
             } else {
