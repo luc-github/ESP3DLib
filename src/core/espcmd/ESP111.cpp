@@ -24,20 +24,32 @@
 #include "../settings_esp3d.h"
 #include "../../modules/network/netconfig.h"
 #include "../../modules/authentication/authentication_service.h"
+#define COMMANDID   104
 //Get current IP
 //[ESP111]
 bool Commands::ESP111(const char* cmd_params, level_authenticate_type auth_type, ESP3DOutput * output)
 {
-    String parameter = get_param (cmd_params, "");
     (void)auth_type;
-    if (parameter.length() > 0) {
-        parameter += " ";
-        parameter += NetConfig::localIP();
-        output->printLN (parameter.c_str());
+    bool noError = true;
+    bool json = has_tag (cmd_params, "json");
+    String response ;
+    String parameter = clean_param(get_param (cmd_params, ""));
+    if (parameter.length() == 0) {
+        response = format_response(COMMANDID, json, true, NetConfig::localIP().c_str());
     } else {
-        output->printMSG (NetConfig::localIP().c_str());
+        response = format_response(COMMANDID, json, false, "Unknown parameter");
+        noError = false;
     }
-    return true;
+    if (noError) {
+        if (json) {
+            output->printLN (response.c_str() );
+        } else {
+            output->printMSG (response.c_str() );
+        }
+    } else {
+        output->printERROR(response.c_str(), 200);
+    }
+    return noError;
 }
 
 #endif //WIFI_FEATURE
