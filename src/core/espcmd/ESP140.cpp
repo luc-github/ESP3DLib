@@ -24,86 +24,119 @@
 #include "../settings_esp3d.h"
 #include "../../modules/authentication/authentication_service.h"
 #include "../../modules/time/time_server.h"
+#define COMMANDID   140
 //Sync / Set / Get current time
-//[ESP140]<SYNC> <srv1=XXXXX> <srv2=XXXXX> <srv3=XXXXX> <zone=xxx> <dst=YES/NO> <time=YYYY-MM-DD#H24:MM:SS> pwd=<admin password>
+//[ESP140]<SYNC> <srv1=XXXXX> <srv2=XXXXX> <srv3=XXXXX> <zone=xxx> <dst=YES/NO> <time=YYYY-MM-DD#H24:MM:SS> json=<no> pwd=<admin password>
 bool Commands::ESP140(const char* cmd_params, level_authenticate_type auth_type, ESP3DOutput * output)
 {
-    bool response = true;
+    bool noError = true;
+    bool json = has_tag (cmd_params, "json");
+    String response;
     String parameter;
+    int errorCode = 200; //unless it is a server error use 200 as default and set error in json instead
+
 #ifdef AUTHENTICATION_FEATURE
     if (auth_type == LEVEL_GUEST) {
-        output->printERROR("Wrong authentication!", 401);
-        return false;
+        response = format_response(COMMANDID, json, false, "Guest user can't use this command");
+        noError = false;
+        errorCode = 401;
     }
 #else
     (void)auth_type;
 #endif //AUTHENTICATION_FEATURE
-    parameter = get_param (cmd_params, "");
-    //get
-    if (parameter.length() != 0) {
+    if (noError) {
+        parameter = clean_param(get_param (cmd_params, ""));//get
+        if (parameter.length() != 0) {
 #ifdef AUTHENTICATION_FEATURE
-        if (auth_type != LEVEL_ADMIN) {
-            output->printERROR("Wrong authentication!", 401);
-            return false;
-        }
+            if (auth_type != LEVEL_ADMIN) {
+                response = format_response(COMMANDID, json, false, "Wrong authentication level");
+                noError = false;
+                errorCode = 401;
+            }
 #endif //AUTHENTICATION_FEATURE
-        String s = get_param (cmd_params, "srv1=");
-        if (s.length() > 0 && s.length() < Settings_ESP3D::get_max_string_size(ESP_TIME_SERVER1)) {
-            if (!Settings_ESP3D::write_string (ESP_TIME_SERVER1, s.c_str())) {
-                output->printERROR("Set server 1 failed!");
-            }
-        }
-        s = get_param (cmd_params, "srv2=");
-        if (s.length() > 0 && s.length() < Settings_ESP3D::get_max_string_size(ESP_TIME_SERVER2)) {
-            if (!Settings_ESP3D::write_string (ESP_TIME_SERVER2, s.c_str())) {
-                output->printERROR("Set server 2 failed!");
-            }
-        }
-        s = get_param (cmd_params, "srv3=");
-        if (s.length() > 0 && s.length() < Settings_ESP3D::get_max_string_size(ESP_TIME_SERVER3)) {
-            if (!Settings_ESP3D::write_string (ESP_TIME_SERVER3, s.c_str())) {
-                output->printERROR("Set server 2 failed!");
-            }
-        }
-        s = get_param (cmd_params, "zone=");
-        if (s.length() > 0 && (s.toInt() <= (int8_t)Settings_ESP3D::get_max_byte(ESP_TIMEZONE)) && (s.toInt() >= (int8_t)Settings_ESP3D::get_min_byte(ESP_TIMEZONE))) {
-            if (!Settings_ESP3D::write_byte (ESP_TIMEZONE, s.toInt())) {
-                output->printERROR("Set time zone failed!");
-            }
-        }
-        s = get_param (cmd_params, "dst=");
-        s.toUpperCase();
-        if (s.length() > 0 ) {
-            if (!Settings_ESP3D::write_byte (ESP_TIME_IS_DST, (s == "NO")?0:1)) {
-                output->printERROR("Set dayligh failed!");
-            }
-        }
-        s = get_param (cmd_params, "time=");
-        s.toUpperCase();
-        if (s.length() > 0 ) {
-            output->printMSG("Setting time");
-            if(!timeserver.setTime(s.c_str())) {
-                output->printERROR("Set time failed!");
-                response = false;
-            }
-        }
-
-        if (has_tag(parameter.c_str(), "SYNC")) {
-            if (timeserver.is_internet_time()) {
-                output->printMSG("Contacting time servers");
-                if(!timeserver.begin()) {
-                    output->printERROR("Init time failed!");
-                    response = false;
+            if (noError) {
+                String s = get_param (cmd_params, "srv1=");
+                if (s.length() > 0 && s.length() < Settings_ESP3D::get_max_string_size(ESP_TIME_SERVER1)) {
+                    if (!Settings_ESP3D::write_string (ESP_TIME_SERVER1, s.c_str())) {
+                        response = format_response(COMMANDID, json, false, "Set server 1 failed");
+                        noError = false;
+                    }
                 }
-            } else {
-                output->printERROR("Time is manual!");
-                response = false;
+                if (noError) {
+                    s = get_param (cmd_params, "srv2=");
+                    if (s.length() > 0 && s.length() < Settings_ESP3D::get_max_string_size(ESP_TIME_SERVER2)) {
+                        if (!Settings_ESP3D::write_string (ESP_TIME_SERVER2, s.c_str())) {
+                            response = format_response(COMMANDID, json, false, "Set server 2 failed");
+                            noError = false;
+                        }
+                    }
+                }
+                if (noError) {
+                    s = get_param (cmd_params, "srv3=");
+                    if (s.length() > 0 && s.length() < Settings_ESP3D::get_max_string_size(ESP_TIME_SERVER3)) {
+                        if (!Settings_ESP3D::write_string (ESP_TIME_SERVER3, s.c_str())) {
+                            response = format_response(COMMANDID, json, false, "Set server 3 failed");
+                            noError = false;
+                        }
+                    }
+                }
+                if (noError) {
+                    s = get_param (cmd_params, "zone=");
+                    if (s.length() > 0 && (s.toInt() <= (int8_t)Settings_ESP3D::get_max_byte(ESP_TIMEZONE)) && (s.toInt() >= (int8_t)Settings_ESP3D::get_min_byte(ESP_TIMEZONE))) {
+                        if (!Settings_ESP3D::write_byte (ESP_TIMEZONE, s.toInt())) {
+                            response = format_response(COMMANDID, json, false, "Set time zone failed");
+                            noError = false;
+                        }
+                    }
+                }
+                if (noError) {
+                    s = get_param (cmd_params, "dst=");
+                    s.toUpperCase();
+                    if (s.length() > 0 ) {
+                        if (!Settings_ESP3D::write_byte (ESP_TIME_IS_DST, (s == "NO")?0:1)) {
+                            response = format_response(COMMANDID, json, false, "Set dayligh failed");
+                            noError = false;
+                        }
+                    }
+                }
+                if (noError) {
+                    s = get_param (cmd_params, "time=");
+                    s.toUpperCase();
+                    if (s.length() > 0 ) {
+                        if(!timeserver.setTime(s.c_str())) {
+                            response = format_response(COMMANDID, json, false, "Set time failed");
+                            noError = false;
+                        }
+                    }
+                }
+                if (noError) {
+                    if (has_tag(parameter.c_str(), "SYNC")) {
+                        if (timeserver.is_internet_time()) {
+                            if(!timeserver.begin()) {
+                                response = format_response(COMMANDID, json, false, "Init time failed");
+                                noError = false;
+                            }
+                        } else {
+                            response = format_response(COMMANDID, json, false, "Time is manual");
+                            noError = false;
+                        }
+                    }
+                }
             }
         }
-    }
 
-    output->printMSG(timeserver.current_time());
-    return response;
+    }
+    if (noError) {
+        response = format_response(COMMANDID, json, true, timeserver.current_time());
+        if (json) {
+            output->printLN (response.c_str() );
+        } else {
+            output->printMSG (response.c_str() );
+        }
+    } else {
+        output->printERROR(response.c_str(), errorCode);
+    }
+    return noError;
 }
 
 #endif //TIMESTAMP_FEATURE
