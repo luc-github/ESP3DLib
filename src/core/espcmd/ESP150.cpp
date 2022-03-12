@@ -105,11 +105,10 @@ bool Commands::ESP150(const char* cmd_params, level_authenticate_type auth_type,
                         }
                     }
                 }
-                if (!hasParameter) {
-                    response = format_response(COMMANDID, json, false, "Incorrect command!");
+                if (noError && !hasParameter) {
+                    response = format_response(COMMANDID, json, false, "Incorrect command");
                     noError = false;
-                }
-                if(noError) {
+                } else if(noError) {
                     response = format_response(COMMANDID, json, true, "ok");
                 }
             }
