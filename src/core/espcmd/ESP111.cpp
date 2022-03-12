@@ -24,7 +24,7 @@
 #include "../settings_esp3d.h"
 #include "../../modules/network/netconfig.h"
 #include "../../modules/authentication/authentication_service.h"
-#define COMMANDID   104
+#define COMMANDID   111
 //Get current IP
 //[ESP111]
 bool Commands::ESP111(const char* cmd_params, level_authenticate_type auth_type, ESP3DOutput * output)
