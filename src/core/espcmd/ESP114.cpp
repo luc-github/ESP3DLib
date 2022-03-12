@@ -57,16 +57,18 @@ bool Commands::ESP114(const char* cmd_params, level_authenticate_type auth_type,
                 errorCode = 401;
             }
 #endif //AUTHENTICATION_FEATURE
-            parameter.toUpperCase();
-            if (!((parameter == "ON") || (parameter == "OFF"))) {
-                response = format_response(COMMANDID, json, false, "Only ON or OFF mode supported");
-                noError = false;
-            } else {
-                if (!Settings_ESP3D::write_byte (ESP_BOOT_RADIO_STATE, (parameter == "ON")?1:0)) {
-                    response = format_response(COMMANDID, json, false, "Set failed");
+            if (noError) {
+                parameter.toUpperCase();
+                if (!((parameter == "ON") || (parameter == "OFF"))) {
+                    response = format_response(COMMANDID, json, false, "Only ON or OFF mode supported");
                     noError = false;
                 } else {
-                    response = format_response(COMMANDID, json, true, "ok");
+                    if (!Settings_ESP3D::write_byte (ESP_BOOT_RADIO_STATE, (parameter == "ON")?1:0)) {
+                        response = format_response(COMMANDID, json, false, "Set failed");
+                        noError = false;
+                    } else {
+                        response = format_response(COMMANDID, json, true, "ok");
+                    }
                 }
             }
         }
