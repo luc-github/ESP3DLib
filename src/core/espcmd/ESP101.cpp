@@ -54,7 +54,6 @@ bool Commands::ESP101(const char* cmd_params, level_authenticate_type auth_type,
                 noError = false;
             } else {
                 if(!Settings_ESP3D::write_string(ESP_STA_PASSWORD, parameter.c_str())) {
-                    output->printERROR ("Set failed!");
                     response = format_response(COMMANDID, json, false, "Set failed");
                     noError = false;
 
