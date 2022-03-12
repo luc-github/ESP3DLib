@@ -59,7 +59,7 @@ const char * help[]= {"[ESP] (id) - display this help",
                       "[ESP131](Port) - display/set Telnet port",
 #endif //TELNET_FEATURE
 #if defined(TIMESTAMP_FEATURE)
-                      "[ESP140](SYNC) (srv1=xxxx) (srv2=xxxx) (srv3=xxxx) (zone=xxx) (dst=YES/NO) (time=YYYY-MM-DD#H24:MM:SS) - sync/display/set current time/time servers",
+                      "[ESP140](SYNC) (srv1=xxxx) (srv2=xxxx) (srv3=xxxx) (zone=xxx) (dst=YES/NO) (time=YYYY-MM-DD#H24:MM:SS) (SYNC) (NOW)- sync/display/set current time/time servers",
 #endif //TIMESTAMP_FEATURE
                       "[ESP150](delay=time) (verbose=ON/OFF)- display/set boot delay in ms / Verbose boot",
 #if defined(WS_DATA_FEATURE)
