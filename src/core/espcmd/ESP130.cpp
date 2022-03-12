@@ -34,7 +34,6 @@ bool Commands::ESP130(const char* cmd_params, level_authenticate_type auth_type,
     String response;
     String parameter;
     int errorCode = 200; //unless it is a server error use 200 as default and set error in json instead
-
 #ifdef AUTHENTICATION_FEATURE
     if (auth_type == LEVEL_GUEST) {
         response = format_response(COMMANDID, json, false, "Guest user can't use this command");
