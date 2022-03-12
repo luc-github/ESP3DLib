@@ -171,7 +171,7 @@ const char *  Commands::format_response(uint cmdID, bool isjson, bool isok, cons
         } else {
             res += "error";
         }
-        res += "\",\"msg\":";
+        res += "\",\"data\":";
         if (message[0]!='{') {
             res+="\"";
         }
@@ -199,6 +199,11 @@ const char * Commands::clean_param (const char * cmd_params)
     if(tmp.indexOf("json=") != -1) {
         //remove formating flag
         res = tmp.substring(0,tmp.indexOf("json="));
+    } else {
+        if(tmp.endsWith(" json")) {
+            //remove formating flag
+            res = tmp.substring(0,tmp.length()-5);
+        }
     }
     return res.c_str();
 }

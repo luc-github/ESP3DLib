@@ -1,18 +1,22 @@
 Note:
 1 - add space to separate parameters
-2 -  if parameter has space add \ in front of space to not be seen as separator
+2 - if parameter has space add \ in front of space to not be seen as separator
+3 - json json=YES json=TRUE json=1 are paremeters to switch output to json
+
+*Show commands help
+[ESP]<command id> json=<no> 
 
 * Set/Get STA SSID 
-[ESP100]<SSID>pwd=<admin password>
+[ESP100]<SSID> json=<no> pwd=<admin password for set/get & user password to get>
 
 * Set STA Password 
-[ESP101]<Password>pwd=<admin password>
+[ESP101]<Password> json=<no> pwd=<admin password>
 
 * Set/Get STA IP mode (DHCP/STATIC) 
-[ESP102]<mode>pwd=<admin password>
+[ESP102]<mode> json=<no> pwd=<admin password>
 
 * Set/Get STA IP/Mask/GW/DNS
-[ESP103]IP=<IP> MSK=<IP> GW=<IP> DNS=<IP> pwd=<admin password>
+[ESP103]IP=<IP> MSK=<IP> GW=<IP> DNS=<IP> json=<no> pwd=<admin password>
 
 * Set/Get sta fallback mode which can be WIFI-AP, BT, OFF
 [ESP104]<state>pwd=<admin password>

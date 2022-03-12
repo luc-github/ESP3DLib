@@ -21,7 +21,7 @@
 #include "../commands.h"
 #include "../esp3doutput.h"
 #include "../settings_esp3d.h"
-const char * help[]= {"[ESP] - display this help",
+const char * help[]= {"[ESP] (id) - display this help",
 #if defined (WIFI_FEATURE)
                       "[ESP100](SSID) - display/set STA SSID",
                       "[ESP101](Password) - set STA password",
@@ -289,7 +289,7 @@ const uint cmdlist[]= {0,
 //[ESP0] or [ESP]<command>
 bool Commands::ESP0(const char* cmd_params, level_authenticate_type auth_type, ESP3DOutput * output)
 {
-    bool response = true;
+    bool noError = true;
     String parameter;
     const uint cmdNb = sizeof(help)/sizeof(char*);
     (void)auth_type;
@@ -298,7 +298,7 @@ bool Commands::ESP0(const char* cmd_params, level_authenticate_type auth_type, E
     if (parameter.length() == 0) {
 
         if (json) {
-            output->print("{\"cmd\":\"0\",\"status\":\"ok\",\"msg\":[");
+            output->print("{\"cmd\":\"0\",\"status\":\"ok\",\"data\":[");
         } else {
             output->printLN("[List of ESP3D commands]");
         }
@@ -323,7 +323,7 @@ bool Commands::ESP0(const char* cmd_params, level_authenticate_type auth_type, E
         }
     } else {
         bool found = false;
-        uint cmdval = String(cmd_params).toInt();
+        uint cmdval = parameter.toInt();
         if (sizeof(help)/sizeof(char*) != sizeof(cmdlist)/sizeof(uint)) {
             String s = "Error in code:" + String(sizeof(help)/sizeof(char*)) + "entries vs " + String(sizeof(cmdlist)/sizeof(uint));
             output->printLN(s.c_str());
@@ -332,9 +332,11 @@ bool Commands::ESP0(const char* cmd_params, level_authenticate_type auth_type, E
         for (uint i = 0; i < cmdNb-1; i++) {
             if (cmdlist[i] == cmdval) {
                 if (json) {
-                    output->print("{\"cmd\":\"0\",\"status\":\"ok\",\"msg\":\"");
-                    output->print(String(help[i]).c_str());
-                    output->printLN("\"}");
+                    output->print("{\"cmd\":\"0\",\"status\":\"ok\",\"data\":{\"id\":\"");
+                    output->print(String(cmdval).c_str());
+                    output->print("\",\"help\":\"");
+                    output->print(help[i]);
+                    output->printLN("\"}}");
                 } else {
                     output->printLN(help[i]);
                 }
@@ -342,16 +344,16 @@ bool Commands::ESP0(const char* cmd_params, level_authenticate_type auth_type, E
             }
         }
         if (!found) {
-            String tmp = "This command is not supported: ";
-            tmp+= cmd_params;
+            String msg = "This command is not supported: ";
+            msg+= parameter;
+            noError=false;
+            String response = format_response(0, json, noError, msg.c_str());
             if (json) {
-                output->print("{\"cmd\":\"0\",\"status\":\"error\",\"msg\":\"");
-                output->print(tmp.c_str());
-                output->printLN("\"}");
+                output->printLN (response.c_str() );
             } else {
-                output->printLN(tmp.c_str());
+                output->printERROR (response.c_str() );
             }
         }
     }
-    return response;
+    return noError;
 }
