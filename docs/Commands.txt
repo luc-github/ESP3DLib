@@ -97,23 +97,27 @@ label can be: light/framesize/quality/contrast/brightness/saturation/gainceiling
 [ESP191]<port> json=<no> pwd=<admin password>
 
 * Get/Set SD Card Status
-[ESP200] <json=YES/NO> <RELEASE> <REFRESH> pwd=<user/admin password>
+[ESP200]<RELEASE> <REFRESH> json=<no> pwd=<user/admin password>
 RELEASE will force the release of SD from ESP3D if SD is shared
 REFRESH will refresh the SD info is available
 
 *Get/Set pin value
-[ESP201]P<pin> V<value> [PULLUP=YES RAW=YES]pwd=<admin password>
-if no V<value> get P<pin> value
-if V<value> 0/1 set INPUT_PULLUP value, but for GPIO16(ESP8266) INPUT_PULLDOWN_16
+[ESP201]P=<pin> V=<value> [PULLUP=YES RAW=YES ANALOG=NO ANALOG_RANGE=255]pwd=<admin password>
+if no V=<value> get P=<pin> value
+if V=<value> 0/1 set INPUT_PULLUP value, but for GPIO16(ESP8266) INPUT_PULLDOWN_16
 if PULLUP=YES set input pull up (for GPIO16(ESP8266) INPUT_PULLDOWN_16), if not set input
 if RAW=YES do not set pinmode just read value
+
 Flash pins (6~11) cannot be used
 
 *Get/Set SD card Speed factor 1 2 4 6 8 16 32
-[ESP202]SPEED=<value>pwd=<user/admin password>
+[ESP202]SPEED=<value> json=<no> pwd=<user/admin password>
+
+*Get Sensor Value / type/Set Sensor type
+[ESP210]<type=NONE/xxx> <interval=XXX in millisec> json=<no> pwd=<user/admin password>
 
 * Output to esp screen status
-[ESP214]<Text>pwd=<user password>
+[ESP214]<Text> json=<no> pwd=<user/admin password>
 
 * Touch Calibration 
 [ESP215]<CALIBRATE>[pwd=<user password>]

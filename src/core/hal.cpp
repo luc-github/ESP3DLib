@@ -243,6 +243,7 @@ bool Hal::is_pin_usable(uint pin)
     }
 #endif //ARDUINO_ARCH_ESP8266
 #ifdef ARDUINO_ARCH_ESP32
+    //TODO: Add support for ESP32 S2 S3 C2 C3
     if  ((pin <= 5) || ((pin >= 12) && (pin <= 39))) {
         return true;
     } else {
