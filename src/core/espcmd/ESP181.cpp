@@ -127,8 +127,8 @@ bool Commands::ESP181(const char* cmd_params, level_authenticate_type auth_type,
                     }
                 }
                 if (noError && !hasParam) {
-                    output->printERROR ("Only ctrl, active and passive settings are supported!");
-                    response = false;
+                    response = format_response(COMMANDID, json, false, "Only ctrl, active and passive settings are supported!");
+                    noError = false;
                 } else {
                     if(noError) {
                         response = format_response(COMMANDID, json, true, "ok");
