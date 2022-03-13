@@ -112,8 +112,9 @@ bool Commands::ESP750(const char* cmd_params, level_authenticate_type auth_type,
         if (parameter.length() == 0) {
             output->printERROR ("Incorrect command!");
         }
-        return response;;
+
     }
+    return response;
 }
 
 #endif //SD_DEVICE
