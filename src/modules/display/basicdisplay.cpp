@@ -64,7 +64,10 @@ TFT_eSPI esp3d_screen = TFT_eSPI();
 #endif //WIFI_FEATURE || ETH_FEATURE) ||BLUETOOTH_FEATURE
 #define DISPLAY_REFRESH_TIME 1000
 
-
+//TODO : need to change this to a better way
+//just set a bool value to enable calibration
+//add check of value in handle to do the calibration
+//so it won't be blocking call
 bool Display::startCalibration()
 {
     bool res = false;
