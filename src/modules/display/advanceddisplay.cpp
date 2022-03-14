@@ -645,7 +645,10 @@ void Display::progress(uint8_t v)
 }
 
 
-
+//TODO : need to change this to a better way
+//just set a bool value to enable snapshot
+//add check of this value in handle to do the snapshot
+//so it won't be blocking call
 bool Display::snapshot(char * filename)
 {
     bool res = false;
