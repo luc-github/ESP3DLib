@@ -73,6 +73,7 @@ extern "C" {
 
 NotificationsService notificationsservice;
 
+//TODO: put error in variable to allow better error handling
 bool Wait4Answer(TSecureClient & client, const char * linetrigger, const char * expected_answer,  uint32_t timeout)
 {
     if(client.connected()) {
@@ -186,6 +187,7 @@ bool NotificationsService::sendMSG(const char * title, const char * message)
 }
 //Messages are currently limited to 1024 4-byte UTF-8 characters
 //but we do not do any check
+//TODO: put error in variable to allow better error handling
 bool NotificationsService::sendPushoverMSG(const char * title, const char * message)
 {
     String data;
@@ -234,6 +236,7 @@ bool NotificationsService::sendPushoverMSG(const char * title, const char * mess
 }
 
 //Telegram
+//TODO: put error in variable to allow better error handling
 bool NotificationsService::sendTelegramMSG(const char * title, const char * message)
 {
     String data;
@@ -279,6 +282,7 @@ bool NotificationsService::sendTelegramMSG(const char * title, const char * mess
     return res;
 }
 
+//TODO: put error in variable to allow better error handling
 bool NotificationsService::sendEmailMSG(const char * title, const char * message)
 {
 #pragma GCC diagnostic push
