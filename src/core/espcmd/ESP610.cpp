@@ -72,23 +72,31 @@ bool Commands::ESP610(const char* cmd_params, level_authenticate_type auth_type,
             default:
                 tmp+= "NONE";
             }
-
             if (json) {
-                tmp += "\",\"TS\":\"";
-            } else {
-                tmp += ", TS=";
+                tmp +="\"";
             }
-            tmp+= Settings_ESP3D::read_string(ESP_NOTIFICATION_SETTINGS);
+            String ts = Settings_ESP3D::read_string(ESP_NOTIFICATION_SETTINGS);
+            if (ts.length() > 0 && ts!="NONE") {
+                if (json) {
+                    tmp += ",\"TS\":\"";
+                } else {
+                    tmp += ", TS=";
+                }
+                tmp+= ts;
+                if (json) {
+                    tmp += "\"}";
+                }
+            }
             if (json) {
-                tmp += "\"}";
+                tmp += "}";
             }
-            response = format_response(COMMANDID, json, true, tmp);
+            response = format_response(COMMANDID, json, true, tmp.c_str());
         } else {
             //type
             parameter = get_param (cmd_params, "type=");
             if (parameter.length() > 0) {
-                hasParam = true
-                           uint8_t Ntype;
+                hasParam = true;
+                uint8_t Ntype;
                 parameter.toUpperCase();
                 if (parameter == "NONE") {
                     Ntype = 0;
@@ -115,9 +123,9 @@ bool Commands::ESP610(const char* cmd_params, level_authenticate_type auth_type,
             if (noError) {
                 parameter = get_param (cmd_params, "TS=");
                 if (parameter.length() > 0) {
-                    hasParam = true
+                    hasParam = true;
                     if(!Settings_ESP3D::write_string(ESP_NOTIFICATION_SETTINGS, parameter.c_str())) {
-                        response = format_response(COMMANDID, json, false, "Set failed");
+                        response = format_response(COMMANDID, json, false, "Set TS failed");
                         noError = false;
                     }
                 }
@@ -128,7 +136,7 @@ bool Commands::ESP610(const char* cmd_params, level_authenticate_type auth_type,
                 if (parameter.length() > 0) {
                     hasParam = true;
                     if(!Settings_ESP3D::write_string(ESP_NOTIFICATION_TOKEN1, parameter.c_str())) {
-                        response = format_response(COMMANDID, json, false, "Set failed");
+                        response = format_response(COMMANDID, json, false, "Set T1 failed");
                         noError = false;
                     }
                 }
@@ -139,7 +147,7 @@ bool Commands::ESP610(const char* cmd_params, level_authenticate_type auth_type,
                 if (parameter.length() > 0) {
                     hasParam = true;
                     if(!Settings_ESP3D::write_string(ESP_NOTIFICATION_TOKEN2, parameter.c_str())) {
-                        response = format_response(COMMANDID, json, false, "Set failed");
+                        response = format_response(COMMANDID, json, false, "Set T2 failed");
                         noError = false;
                     } else {
                         response = true;
@@ -152,7 +160,7 @@ bool Commands::ESP610(const char* cmd_params, level_authenticate_type auth_type,
                     notificationsservice.begin();
                     response = format_response(COMMANDID, json, true, "ok");
                 } else {
-                    response = format_response(COMMANDID, json, false, "Only type, T1, T2 and TS are supported");
+                    response = format_response(COMMANDID, json, false, "Only type, T1, T2 and TS not empty are supported");
                     noError = false;
                 }
             }
