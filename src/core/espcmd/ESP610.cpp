@@ -24,97 +24,150 @@
 #include "../settings_esp3d.h"
 #include "../../modules/authentication/authentication_service.h"
 #include "../../modules/notifications/notifications_service.h"
+#define COMMANDID   610
 //Set/Get Notification settings
-//[ESP610]type=<NONE/PUSHOVER/EMAIL/LINE> T1=<token1> T2=<token2> TS=<Settings> [pwd=<admin password>]
+//[ESP610]type=<NONE/PUSHOVER/EMAIL/LINE> T1=<token1> T2=<token2> TS=<Settings> json=<no> [pwd=<admin password>]
 //Get will give type and settings only not the protected T1/T2
 bool Commands::ESP610(const char* cmd_params, level_authenticate_type auth_type, ESP3DOutput * output)
 {
-    bool response = true;
+    bool noError = true;
+    bool json = has_tag (cmd_params, "json");
+    String response;
     String parameter;
+    bool hasParam = false;
+    int errorCode = 200; //unless it is a server error use 200 as default and set error in json instead
 #ifdef AUTHENTICATION_FEATURE
     if (auth_type == LEVEL_GUEST) {
-        output->printERROR("Wrong authentication!", 401);
-        return false;
+        response = format_response(COMMANDID, json, false, "Guest user can't use this command");
+        noError = false;
+        errorCode = 401;
     }
 #else
     (void)auth_type;
 #endif //AUTHENTICATION_FEATURE
-    parameter = get_param (cmd_params, "");
-    //get
-    if (parameter.length() == 0) {
-        uint8_t Ntype =  Settings_ESP3D::read_byte(ESP_NOTIFICATION_TYPE);
-        static String tmp;
-        tmp = (Ntype == ESP_PUSHOVER_NOTIFICATION)?"PUSHOVER":(Ntype == ESP_EMAIL_NOTIFICATION)?"EMAIL":(Ntype == ESP_LINE_NOTIFICATION)?"LINE":(Ntype == ESP_TELEGRAM_NOTIFICATION)?"TELEGRAM":"NONE";
-        tmp+= " ";
-        tmp+= Settings_ESP3D::read_string(ESP_NOTIFICATION_SETTINGS);
-        output->printMSG (tmp.c_str());
-    } else {
-        response = false;
-        //type
-        parameter = get_param (cmd_params, "type=");
-        if (parameter.length() > 0) {
-            uint8_t Ntype;
-            parameter.toUpperCase();
-            if (parameter == "NONE") {
-                Ntype = 0;
-            } else if (parameter == "PUSHOVER") {
-                Ntype = ESP_PUSHOVER_NOTIFICATION;
-            } else if (parameter == "EMAIL") {
-                Ntype = ESP_EMAIL_NOTIFICATION;
-            } else if (parameter == "LINE") {
-                Ntype = ESP_LINE_NOTIFICATION;
-            } else if (parameter == "TELEGRAM") {
-                Ntype = ESP_TELEGRAM_NOTIFICATION;
+    if (noError) {
+        parameter = clean_param(get_param (cmd_params, ""));
+        //get
+        if (parameter.length() == 0) {
+            uint8_t Ntype =  Settings_ESP3D::read_byte(ESP_NOTIFICATION_TYPE);
+            String tmp;
+            if (json) {
+                tmp = "{\"type\":\"";
             } else {
-                output->printERROR("Only NONE, PUSHOVER, EMAIL, LINE are supported!");
-                return false;
+                tmp = "type=";
             }
-            if(!Settings_ESP3D::write_byte(ESP_NOTIFICATION_TYPE, Ntype)) {
-                output->printERROR ("Set failed!");
-                return false;
+            switch(Ntype) {
+            case ESP_PUSHOVER_NOTIFICATION:
+                tmp += "PUSHOVER";
+                break;
+            case ESP_EMAIL_NOTIFICATION:
+                tmp += "EMAIL";
+                break;
+            case ESP_LINE_NOTIFICATION:
+                tmp += "LINE";
+                break;
+            case ESP_TELEGRAM_NOTIFICATION:
+                tmp += "TELEGRAM";
+                break;
+            default:
+                tmp+= "NONE";
+            }
+
+            if (json) {
+                tmp += "\",\"TS\":\"";
             } else {
-                response = true;
+                tmp += ", TS=";
             }
-        }
-        //Settings
-        parameter = get_param (cmd_params, "TS=");
-        if (parameter.length() > 0) {
-            if(!Settings_ESP3D::write_string(ESP_NOTIFICATION_SETTINGS, parameter.c_str())) {
-                output->printERROR ("Set failed!");
-                return false;
-            } else {
-                response = true;
+            tmp+= Settings_ESP3D::read_string(ESP_NOTIFICATION_SETTINGS);
+            if (json) {
+                tmp += "\"}";
             }
-        }
-        //Token1
-        parameter = get_param (cmd_params, "T1=");
-        if (parameter.length() > 0) {
-            if(!Settings_ESP3D::write_string(ESP_NOTIFICATION_TOKEN1, parameter.c_str())) {
-                output->printERROR ("Set failed!");
-                return false;
-            } else {
-                response = true;
-            }
-        }
-        //Token2
-        parameter = get_param (cmd_params, "T2=");
-        if (parameter.length() > 0) {
-            if(!Settings_ESP3D::write_string(ESP_NOTIFICATION_TOKEN2, parameter.c_str())) {
-                output->printERROR ("Set failed!");
-                return false;
-            } else {
-                response = true;
-            }
-        }
-        if (response) {
-            //Restart service
-            notificationsservice.begin();
-            output->printMSG ("ok");
+            response = format_response(COMMANDID, json, true, tmp);
         } else {
-            output->printERROR ("Invalid parameter! Only type, T1, T2 and TS are supported");
+            //type
+            parameter = get_param (cmd_params, "type=");
+            if (parameter.length() > 0) {
+                hasParam = true
+                           uint8_t Ntype;
+                parameter.toUpperCase();
+                if (parameter == "NONE") {
+                    Ntype = 0;
+                } else if (parameter == "PUSHOVER") {
+                    Ntype = ESP_PUSHOVER_NOTIFICATION;
+                } else if (parameter == "EMAIL") {
+                    Ntype = ESP_EMAIL_NOTIFICATION;
+                } else if (parameter == "LINE") {
+                    Ntype = ESP_LINE_NOTIFICATION;
+                } else if (parameter == "TELEGRAM") {
+                    Ntype = ESP_TELEGRAM_NOTIFICATION;
+                } else {
+                    response = format_response(COMMANDID, json, false, "Only NONE, PUSHOVER, EMAIL, LINE are supported");
+                    noError = false;
+                }
+                if (noError) {
+                    if(!Settings_ESP3D::write_byte(ESP_NOTIFICATION_TYPE, Ntype)) {
+                        response = format_response(COMMANDID, json, false, "Set failed");
+                        noError = false;
+                    }
+                }
+            }
+            //Settings
+            if (noError) {
+                parameter = get_param (cmd_params, "TS=");
+                if (parameter.length() > 0) {
+                    hasParam = true
+                    if(!Settings_ESP3D::write_string(ESP_NOTIFICATION_SETTINGS, parameter.c_str())) {
+                        response = format_response(COMMANDID, json, false, "Set failed");
+                        noError = false;
+                    }
+                }
+            }
+            //Token1
+            if (noError) {
+                parameter = get_param (cmd_params, "T1=");
+                if (parameter.length() > 0) {
+                    hasParam = true;
+                    if(!Settings_ESP3D::write_string(ESP_NOTIFICATION_TOKEN1, parameter.c_str())) {
+                        response = format_response(COMMANDID, json, false, "Set failed");
+                        noError = false;
+                    }
+                }
+            }
+            //Token2
+            if (noError) {
+                parameter = get_param (cmd_params, "T2=");
+                if (parameter.length() > 0) {
+                    hasParam = true;
+                    if(!Settings_ESP3D::write_string(ESP_NOTIFICATION_TOKEN2, parameter.c_str())) {
+                        response = format_response(COMMANDID, json, false, "Set failed");
+                        noError = false;
+                    } else {
+                        response = true;
+                    }
+                }
+            }
+            if (noError) {
+                if (hasParam) {
+                    //Restart service
+                    notificationsservice.begin();
+                    response = format_response(COMMANDID, json, true, "ok");
+                } else {
+                    response = format_response(COMMANDID, json, false, "Only type, T1, T2 and TS are supported");
+                    noError = false;
+                }
+            }
         }
     }
-    return response;
+    if (noError) {
+        if (json) {
+            output->printLN (response.c_str() );
+        } else {
+            output->printMSG (response.c_str() );
+        }
+    } else {
+        output->printERROR(response.c_str(), errorCode);
+    }
+    return noError;
 }
 
 #endif //NOTIFICATION_FEATURE
