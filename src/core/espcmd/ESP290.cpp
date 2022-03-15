@@ -44,7 +44,9 @@ bool Commands::ESP290(const char* cmd_params, level_authenticate_type auth_type,
         parameter = get_param (cmd_params, "");
         //get time
         if (parameter.length() != 0) {
-            output->printMSG ("Pause");
+            if(!json) {
+                output->printMSG ("Pause");
+            }
             Hal::wait(parameter.toInt());
             response = format_response(COMMANDID, json, true, "ok");
         } else {

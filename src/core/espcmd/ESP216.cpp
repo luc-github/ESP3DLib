@@ -62,7 +62,7 @@ bool Commands::ESP216(const char* cmd_params, level_authenticate_type auth_type,
                     noError = false;
                 }
             } else {
-                output->printERROR("Invalid parameter!");
+                response = format_response(COMMANDID, json, false, "Invalid parameter");
                 response = false;
             }
         }
