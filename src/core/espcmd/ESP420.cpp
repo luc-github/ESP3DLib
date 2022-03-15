@@ -97,346 +97,382 @@ bool Commands::ESP420(const char* cmd_params, level_authenticate_type auth_type,
     if (noError) {
         parameter = clean_param(get_param (cmd_params, ""));
         if (parameter.length() == 0) {
-
+            String line = "";
             if(json) {
-                output->print ("{\"cmd\":\"420\",\"status\":\"ok\",\"data\":[");
+                line = "{\"cmd\":\"420\",\"status\":\"ok\",\"data\":[";
             }
             //Chip ID
             if (json) {
-                output->print ("{\"id\":\"");
+                line += "{\"id\":\"";
             }
-            output->print ("chip id");
+            line +="chip id";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
-            output->printf("%d",Hal::getChipID());
+            line +=Hal::getChipID();
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
             //CPU freq
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print ("CPU Freq");
+            line +="CPU Freq";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
-            output->printf("%d Mhz",ESP.getCpuFreqMHz());
+            line +=ESP.getCpuFreqMHz();
+            line +="Mhz";
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
             //CPU temp
             if (Hal::has_temperature_sensor()) {
                 if (json) {
-                    output->print (",{\"id\":\"");
+                    line +=",{\"id\":\"";
                 }
-                output->print ("CPU Temp");
+                line +="CPU Temp";
                 if (json) {
-                    output->print ("\",\"value\":\"");
+                    line +="\",\"value\":\"";
                 } else {
-                    output->print (": ");
+                    line +=": ";
                 }
-                output->printf("%s C",String (Hal::temperature(), 1).c_str());
+                line +=String(Hal::temperature(), 1);
+                line +="C";
                 if (json) {
-                    output->print ("\"}");
+                    line +="\"}";
+                    output->print (line.c_str());
                 } else {
-                    output->printLN("");
+                    output->printMSGLine(line.c_str());
                 }
+                line="";
             }
             //Free Memory
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print ("free mem");
+            line+="free mem";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
 #ifdef FILESYSTEM_FEATURE
-            output->print(ESP_FileSystem::formatBytes (ESP.getFreeHeap()).c_str());
+            line+=ESP_FileSystem::formatBytes (ESP.getFreeHeap()).c_str();
 #else
-            output->print(ESP.getFreeHeap());
+            line+=ESP.getFreeHeap();
 #endif//FILESYSTEM_FEATURE
 
 #ifdef ARDUINO_ARCH_ESP32
 #ifdef BOARD_HAS_PSRAM
-            output->print(" - PSRAM:");
-            output->print(ESP_FileSystem::formatBytes (ESP.getFreePsram()).c_str());
+            line+=" - PSRAM:";
+            line+=ESP_FileSystem::formatBytes (ESP.getFreePsram());
 
 #endif //BOARD_HAS_PSRAM
 #endif //ARDUINO_ARCH_ESP32
-
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
             //SDK version
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print ("SDK");
+            line +="SDK";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
-            output->printf("%s", ESP.getSdkVersion());
+            line+= ESP.getSdkVersion();
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
             //Flash size
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print ("flash size");
+            line +="flash size";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
 #ifdef FILESYSTEM_FEATURE
-            output->print(ESP_FileSystem::formatBytes (ESP.getFlashChipSize()).c_str());
+            line+=ESP_FileSystem::formatBytes (ESP.getFlashChipSize());
 #else
-            output->print(ESP.getFlashChipSize());
+            line+=ESP.getFlashChipSize();
 #endif//FILESYSTEM_FEATURE
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
 
 #if (defined (WIFI_FEATURE) || defined (ETH_FEATURE)) && (defined(OTA_FEATURE) || defined(WEB_UPDATE_FEATURE))
             //update space
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print ("size for update");
+            line +="size for update";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
-            output->print(ESP_FileSystem::formatBytes (ESP_FileSystem::max_update_size()).c_str());
+            line+=ESP_FileSystem::formatBytes (ESP_FileSystem::max_update_size());
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
 #endif //WIFI_FEATURE || ETH_FEATURE
 #if defined(FILESYSTEM_FEATURE)
             //FileSystem type
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print ("FS type");
+            line +="FS type";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
-            output->print (ESP_FileSystem::FilesystemName());
+            line +=ESP_FileSystem::FilesystemName();
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
             //FileSystem capacity
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print ("FS usage");
+            line +="FS usage";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
-            output->print (ESP_FileSystem::formatBytes (ESP_FileSystem::usedBytes()).c_str());
-            output->print ("/");
-            output->print (ESP_FileSystem::formatBytes (ESP_FileSystem::totalBytes()).c_str());
+            line +=ESP_FileSystem::formatBytes (ESP_FileSystem::usedBytes());
+            line +="/";
+            line +=ESP_FileSystem::formatBytes (ESP_FileSystem::totalBytes());
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
 #endif //FILESYSTEM_FEATURE
 #if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
             //baud rate
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print ("baud");
+            line +="baud";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
-            output->printf ("%ld", serial_service.baudRate());
+            line+=serial_service.baudRate();
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
 #endif //COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
 #if defined (WIFI_FEATURE)
             if (WiFi.getMode() != WIFI_OFF) {
                 //sleep mode
                 if (json) {
-                    output->print (",{\"id\":\"");
+                    line +=",{\"id\":\"";
                 }
-                output->print ("sleep mode");
+                line +="sleep mode";
                 if (json) {
-                    output->print ("\",\"value\":\"");
+                    line +="\",\"value\":\"";
                 } else {
-                    output->print (": ");
+                    line +=": ";
                 }
-                output->print (WiFiConfig::getSleepModeString ());
+                line +=WiFiConfig::getSleepModeString ();
                 if (json) {
-                    output->print ("\"}");
+                    line +="\"}";
+                    output->print (line.c_str());
                 } else {
-                    output->printLN("");
+                    output->printMSGLine(line.c_str());
                 }
+                line="";
             }
 #endif //WIFI_FEATURE
 #if defined (WIFI_FEATURE) || defined (ETH_FEATURE)
             //Wifi enabled
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print ("wifi");
+            line +="wifi";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
-            output->print ((WiFi.getMode() == WIFI_OFF)?"OFF":"ON");
+            line +=(WiFi.getMode() == WIFI_OFF)?"OFF":"ON";
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
 #if defined (ETH_FEATURE)
             //Ethernet enabled
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print ("ethernet");
+            line +="ethernet";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
-            output->print ((EthConfig::started())?"ON":"OFF");
+            line +=(EthConfig::started())?"ON":"OFF";
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
 #endif //ETH_FEATURE
 #if defined (BLUETOOTH_FEATURE)
             //BT enabled
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print("bt");
+            line+="bt";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
-            output->print ((bt_service.started())?"ON":"OFF");
+            line +=(bt_service.started())?"ON":"OFF";
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
 #endif //BLUETOOTH_FEATURE
             //Hostname
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print ("hostname");
+            line +="hostname";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
             if (json) {
-                output->print (ESP3DOutput::encodeString(NetConfig::hostname()));
+                line +=ESP3DOutput::encodeString(NetConfig::hostname());
             } else {
-                output->print (NetConfig::hostname());
+                line +=NetConfig::hostname();
             }
-
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
 #if defined (HTTP_FEATURE)
             if (HTTP_Server::started()) {
                 //http port
                 if (json) {
-                    output->print (",{\"id\":\"");
+                    line +=",{\"id\":\"";
                 }
-                output->print ("HTTP port");
+                line +="HTTP port";
                 if (json) {
-                    output->print ("\",\"value\":\"");
+                    line +="\",\"value\":\"";
                 } else {
-                    output->print (": ");
+                    line +=": ";
                 }
-                output->printf ("%d",HTTP_Server::port());
+                line+=HTTP_Server::port();
                 if (json) {
-                    output->print ("\"}");
+                    line +="\"}";
+                    output->print (line.c_str());
                 } else {
-                    output->printLN("");
+                    output->printMSGLine(line.c_str());
                 }
+                line="";
             }
 #endif //HTTP_FEATURE
 #if defined (TELNET_FEATURE)
             if (telnet_server.started()) {
                 //telnet port
                 if (json) {
-                    output->print (",{\"id\":\"");
+                    line +=",{\"id\":\"";
                 }
-                output->print ("Telnet port");
+                line +="Telnet port";
                 if (json) {
-                    output->print ("\",\"value\":\"");
+                    line +="\",\"value\":\"";
                 } else {
-                    output->print (": ");
+                    line +=": ";
                 }
-                output->printf ("%d",telnet_server.port());
+                line+=telnet_server.port();
                 if (json) {
-                    output->print ("\"}");
+                    line +="\"}";
+                    output->print (line.c_str());
                 } else {
-                    output->printLN("");
+                    output->printMSGLine(line.c_str());
                 }
-            }
-            if (telnet_server.isConnected()) {
-                if (json) {
-                    output->print (",{\"id\":\"");
-                }
-                output->print ("Telnet Client");
-                if (json) {
-                    output->print ("\",\"value\":\"");
-                } else {
-                    output->print (": ");
-                }
-                output->printf ("%s",telnet_server.clientIPAddress());
-                if (json) {
-                    output->print ("\"}");
-                } else {
-                    output->printLN("");
+                line="";
+                if (telnet_server.isConnected()) {
+                    if (json) {
+                        line +=",{\"id\":\"";
+                    }
+                    line +="Telnet Client";
+                    if (json) {
+                        line +="\",\"value\":\"";
+                    } else {
+                        line +=": ";
+                    }
+                    line+=telnet_server.clientIPAddress();
+                    if (json) {
+                        line +="\"}";
+                        output->print (line.c_str());
+                    } else {
+                        output->printMSGLine(line.c_str());
+                    }
+                    line="";
                 }
             }
 #endif //TELNET_FEATURE
@@ -444,36 +480,40 @@ bool Commands::ESP420(const char* cmd_params, level_authenticate_type auth_type,
             if (webdav_server.started()) {
                 //WebDav port
                 if (json) {
-                    output->print (",{\"id\":\"");
+                    line +=",{\"id\":\"";
                 }
-                output->print ("WebDav port");
+                line +="WebDav port";
                 if (json) {
-                    output->print ("\",\"value\":\"");
+                    line +="\",\"value\":\"";
                 } else {
-                    output->print (": ");
+                    line +=": ";
                 }
-                output->printf ("%d",webdav_server.port());
+                line+=webdav_server.port();
                 if (json) {
-                    output->print ("\"}");
+                    line +="\"}";
+                    output->print (line.c_str());
                 } else {
-                    output->printLN("");
+                    output->printMSGLine(line.c_str());
                 }
-            }
-            if (webdav_server.isConnected()) {
-                if (json) {
-                    output->print (",{\"id\":\"");
-                }
-                output->print ("WebDav Client");
-                if (json) {
-                    output->print ("\",\"value\":\"");
-                } else {
-                    output->print (": ");
-                }
-                output->printf ("%s",webdav_server.clientIPAddress());
-                if (json) {
-                    output->print ("\"}");
-                } else {
-                    output->printLN("");
+                line="";
+                if (webdav_server.isConnected()) {
+                    if (json) {
+                        line +=",{\"id\":\"";
+                    }
+                    line +="WebDav Client";
+                    if (json) {
+                        line +="\",\"value\":\"";
+                    } else {
+                        line +=": ";
+                    }
+                    line+=webdav_server.clientIPAddress();
+                    if (json) {
+                        line +="\"}";
+                        output->print (line.c_str());
+                    } else {
+                        output->printMSGLine(line.c_str());
+                    }
+                    line="";
                 }
             }
 #endif //WEBDAV_FEATURE
@@ -481,36 +521,41 @@ bool Commands::ESP420(const char* cmd_params, level_authenticate_type auth_type,
             if (ftp_server.started()) {
                 //ftp ports
                 if (json) {
-                    output->print (",{\"id\":\"");
+                    line +=",{\"id\":\"";
                 }
-                output->print ("Ftp ports");
+                line +="Ftp ports";
                 if (json) {
-                    output->print ("\",\"value\":\"");
+                    line +="\",\"value\":\"";
                 } else {
-                    output->print (": ");
+                    line +=": ";
                 }
-                output->printf ("%d, %d, %d",ftp_server.ctrlport(),ftp_server.dataactiveport(), ftp_server.datapassiveport());
+                line+=String(ftp_server.ctrlport())+","+String(ftp_server.dataactiveport())+","+String(ftp_server.datapassiveport());
                 if (json) {
-                    output->print ("\"}");
+                    line +="\"}";
+                    output->print (line.c_str());
                 } else {
-                    output->printLN("");
+                    output->printMSGLine(line.c_str());
                 }
-            }
-            if (ftp_server.isConnected()) {
-                if (json) {
-                    output->print (",{\"id\":\"");
-                }
-                output->print ("Ftp Client");
-                if (json) {
-                    output->print ("\",\"value\":\"");
-                } else {
-                    output->print (": ");
-                }
-                output->printf ("%s",ftp_server.clientIPAddress());
-                if (json) {
-                    output->print ("\"}");
-                } else {
-                    output->printLN("");
+                line="";
+
+                if (ftp_server.isConnected()) {
+                    if (json) {
+                        line +=",{\"id\":\"";
+                    }
+                    line +="Ftp Client";
+                    if (json) {
+                        line +="\",\"value\":\"";
+                    } else {
+                        line +=": ";
+                    }
+                    line+=ftp_server.clientIPAddress();
+                    if (json) {
+                        line +="\"}";
+                        output->print (line.c_str());
+                    } else {
+                        output->printMSGLine(line.c_str());
+                    }
+                    line="";
                 }
             }
 #endif //FTP_FEATURE
@@ -518,40 +563,44 @@ bool Commands::ESP420(const char* cmd_params, level_authenticate_type auth_type,
             if (websocket_data_server.started()) {
                 //websocket port
                 if (json) {
-                    output->print (",{\"id\":\"");
+                    line +=",{\"id\":\"";
                 }
-                output->print ("Websocket port");
+                line +="Websocket port";
                 if (json) {
-                    output->print ("\",\"value\":\"");
+                    line +="\",\"value\":\"";
                 } else {
-                    output->print (": ");
+                    line +=": ";
                 }
-                output->printf ("%d",websocket_data_server.port());
+                line+=websocket_data_server.port();
                 if (json) {
-                    output->print ("\"}");
+                    line +="\"}";
+                    output->print (line.c_str());
                 } else {
-                    output->printLN("");
+                    output->printMSGLine(line.c_str());
                 }
+                line="";
             }
 #endif //WS_DATA_FEATURE
 #if defined (CAMERA_DEVICE)
             if (esp3d_camera.started()) {
                 //camera name
                 if (json) {
-                    output->print (",{\"id\":\"");
+                    line +=",{\"id\":\"";
                 }
-                output->print ("camera name");
+                line +="camera name";
                 if (json) {
-                    output->print ("\",\"value\":\"");
+                    line +="\",\"value\":\"";
                 } else {
-                    output->print (": ");
+                    line +=": ";
                 }
-                output->printf ("%s(%d)",esp3d_camera.GetModelString(),esp3d_camera.GetModel());
+                line+= esp3d_camera.GetModelString() + "(" + esp3d_camera.GetModel()+")";
                 if (json) {
-                    output->print ("\"}");
+                    line +="\"}";
+                    output->print (line.c_str());
                 } else {
-                    output->printLN("");
+                    output->printMSGLine(line.c_str());
                 }
+                line="";
             }
 #endif //CAMERA_DEVICE
 
@@ -559,857 +608,949 @@ bool Commands::ESP420(const char* cmd_params, level_authenticate_type auth_type,
             if (bt_service.started()) {
                 //BT mode
                 if (json) {
-                    output->print (",{\"id\":\"");
+                    line +=",{\"id\":\"";
                 }
-                output->print ("bt");
+                line +="bt";
                 if (json) {
-                    output->print ("\",\"value\":\"");
+                    line +="\",\"value\":\"";
                 } else {
-                    output->print (": ");
+                    line +=": ";
                 }
-                output->print (BTService::macAddress());
+                line +=BTService::macAddress();
 
                 if (json) {
-                    output->print ("\"}");
+                    line +="\"}";
+                    output->print (line.c_str());
                 } else {
-                    output->printLN("");
+                    output->printMSGLine(line.c_str());
                 }
+                line="";
                 //BT status
                 if (json) {
-                    output->print (",{\"id\":\"");
+                    line +=",{\"id\":\"";
                 }
-                output->print ("BT Status");
+                line +="BT Status";
                 if (json) {
-                    output->print ("\",\"value\":\"");
+                    line +="\",\"value\":\"";
                 } else {
-                    output->print (": ");
+                    line +=": ";
                 }
-                output->print ((bt_service.isConnected())?"connected":"disconnected");
+                line +=(bt_service.isConnected())?"connected":"disconnected";
                 if (bt_service.isConnected()) {
-                    output->print (" (client: ");
-                    output->print (BTService::clientmacAddress());
-                    output->print (")");
+                    line +=" (client: ";
+                    line +=BTService::clientmacAddress();
+                    line +=")";
                 }
                 if (json) {
-                    output->print ("\"}");
+                    line +="\"}";
+                    output->print (line.c_str());
                 } else {
-                    output->printLN("");
+                    output->printMSGLine(line.c_str());
                 }
+                line="";
             }
 #endif //BLUETOOTH_FEATURE
 #if defined (ETH_FEATURE)
             if (EthConfig::started()) {
                 //Ethernet mode
                 if (json) {
-                    output->print (",{\"id\":\"");
+                    line +=",{\"id\":\"";
                 }
-                output->print ("ethernet");
+                line +="ethernet";
                 if (json) {
-                    output->print ("\",\"value\":\"");
+                    line +="\",\"value\":\"";
                 } else {
-                    output->print (": ");
+                    line +=": ";
                 }
-                output->print (ETH.macAddress().c_str());
+                line +=ETH.macAddress();
                 if (json) {
-                    output->print ("\"}");
+                    line +="\"}";
+                    output->print (line.c_str());
                 } else {
-                    output->printLN("");
+                    output->printMSGLine(line.c_str());
                 }
+                line="";
                 //Ethernet cable
                 if (json) {
-                    output->print (",{\"id\":\"");
+                    line +=",{\"id\":\"";
                 }
-                output->print ("cable");
+                line +="cable";
                 if (json) {
-                    output->print ("\",\"value\":\"");
+                    line +="\",\"value\":\"";
                 } else {
-                    output->print (": ");
+                    line +=": ";
                 }
-                output->print ((ETH.linkUp())?"connected":"disconnected");
+                line +=(ETH.linkUp())?"connected":"disconnected";
                 if(ETH.linkUp()) {
-                    output->print (" (");
-                    output->print (ETH.linkSpeed());
-                    output->printLN("Mbps)");
+                    line +=" (";
+                    line +=ETH.linkSpeed();
+                    line+="Mbps)";
                 }
                 if (json) {
-                    output->print ("\"}");
+                    line +="\"}";
+                    output->print (line.c_str());
                 } else {
-                    output->printLN("");
+                    output->printMSGLine(line.c_str());
                 }
+                line="";
                 //IP mode
                 if (json) {
-                    output->print (",{\"id\":\"");
+                    line +=",{\"id\":\"";
                 }
-                output->print ("ip mode");
+                line +="ip mode";
                 if (json) {
-                    output->print ("\",\"value\":\"");
+                    line +="\",\"value\":\"";
                 } else {
-                    output->print (": ");
+                    line +=": ";
                 }
-                output->print ((NetConfig::isIPModeDHCP(ESP_ETH_STA))?"dhcp":"static");
+                line +=(NetConfig::isIPModeDHCP(ESP_ETH_STA))?"dhcp":"static";
                 if (json) {
-                    output->print ("\"}");
+                    line +="\"}";
+                    output->print (line.c_str());
                 } else {
-                    output->printLN("");
+                    output->printMSGLine(line.c_str());
                 }
+                line="";
                 //IP value
                 if (json) {
-                    output->print (",{\"id\":\"");
+                    line +=",{\"id\":\"";
                 }
-                output->print ("ip");
+                line +="ip";
                 if (json) {
-                    output->print ("\",\"value\":\"");
+                    line +="\",\"value\":\"";
                 } else {
-                    output->print (": ");
+                    line +=": ";
                 }
-                output->print (ETH.localIP().toString().c_str());
+                line +=ETH.localIP().toString();
                 if (json) {
-                    output->print ("\"}");
+                    line +="\"}";
+                    output->print (line.c_str());
                 } else {
-                    output->printLN("");
+                    output->printMSGLine(line.c_str());
                 }
+                line="";
                 //GW value
                 if (json) {
-                    output->print (",{\"id\":\"");
+                    line +=",{\"id\":\"";
                 }
-                output->print ("gw");
+                line +="gw";
                 if (json) {
-                    output->print ("\",\"value\":\"");
+                    line +="\",\"value\":\"";
                 } else {
-                    output->print (": ");
+                    line +=": ";
                 }
-                output->print (ETH.gatewayIP().toString().c_str());
+                line +=ETH.gatewayIP().toString();
                 if (json) {
-                    output->print ("\"}");
+                    line +="\"}";
+                    output->print (line.c_str());
                 } else {
-                    output->printLN("");
+                    output->printMSGLine(line.c_str());
                 }
+                line="";
                 //Mask value
                 if (json) {
-                    output->print (",{\"id\":\"");
+                    line +=",{\"id\":\"";
                 }
-                output->print ("msk");
+                line +="msk";
                 if (json) {
-                    output->print ("\",\"value\":\"");
+                    line +="\",\"value\":\"";
                 } else {
-                    output->print (": ");
+                    line +=": ";
                 }
-                output->print (ETH.subnetMask().toString().c_str());
+                line +=ETH.subnetMask().toString();
                 if (json) {
-                    output->print ("\"}");
+                    line +="\"}";
+                    output->print (line.c_str());
                 } else {
-                    output->printLN("");
+                    output->printMSGLine(line.c_str());
                 }
+                line="";
                 //DNS value
                 if (json) {
-                    output->print (",{\"id\":\"");
+                    line +=",{\"id\":\"";
                 }
-                output->print ("DNS");
+                line +="DNS";
                 if (json) {
-                    output->print ("\",\"value\":\"");
+                    line +="\",\"value\":\"";
                 } else {
-                    output->print (": ");
+                    line +=": ";
                 }
-                output->print (ETH.dnsIP().toString().c_str());
+                line +=ETH.dnsIP().toString();
                 if (json) {
-                    output->print ("\"}");
+                    line +="\"}";
+                    output->print (line.c_str());
                 } else {
-                    output->printLN("");
+                    output->printMSGLine(line.c_str());
                 }
+                line="";
             }
 #endif //ETH_FEATURE
 #if defined (WIFI_FEATURE)
             if (WiFi.getMode() != WIFI_OFF) {
                 //WiFi Mode
                 if (json) {
-                    output->print (",{\"id\":\"");
+                    line +=",{\"id\":\"";
                 }
                 if (WiFi.getMode() == WIFI_STA) {
-                    output->print ("sta");
+                    line +="sta";
                 } else if (WiFi.getMode() == WIFI_AP) {
-                    output->print ("ap");
+                    line +="ap";
                 } else if (WiFi.getMode() == WIFI_AP_STA) { //we should not be in this state but just in case ....
-                    output->print ("mixed");
+                    line +="mixed";
                 } else {
-                    output->print ("unknown");
+                    line +="unknown";
                 }
 
                 if (json) {
-                    output->print ("\",\"value\":\"");
+                    line +="\",\"value\":\"";
                 } else {
-                    output->print (": ");
+                    line +=": ";
                 }
-                output->print ("ON");
+                line +="ON";
                 if (json) {
-                    output->print ("\"}");
+                    line +="\"}";
+                    output->print (line.c_str());
                 } else {
-                    output->printLN("");
+                    output->printMSGLine(line.c_str());
                 }
+                line="";
 
                 //WiFi mac
                 if (json) {
-                    output->print (",{\"id\":\"");
+                    line +=",{\"id\":\"";
                 }
-                output->print ("mac");
+                line +="mac";
                 if (json) {
-                    output->print ("\",\"value\":\"");
+                    line +="\",\"value\":\"";
                 } else {
-                    output->print (": ");
+                    line +=": ";
                 }
                 if (WiFi.getMode() == WIFI_STA) {
-                    output->print ( WiFi.macAddress().c_str());
+                    line += WiFi.macAddress();
                 } else if (WiFi.getMode() == WIFI_AP) {
-                    output->print (WiFi.softAPmacAddress().c_str());
+                    line +=WiFi.softAPmacAddress();
                 } else if (WiFi.getMode() == WIFI_AP_STA) { //we should not be in this state but just in case ....
-                    output->print (WiFi.macAddress().c_str());
-                    output->print ("/");
-                    output->print (WiFi.softAPmacAddress().c_str());
+                    line +=WiFi.macAddress();
+                    line +="/";
+                    line +=WiFi.softAPmacAddress();
                 } else {
-                    output->print ("unknown");
+                    line +="unknown";
                 }
                 if (json) {
-                    output->print ("\"}");
+                    line +="\"}";
+                    output->print (line.c_str());
                 } else {
-                    output->printLN("");
+                    output->printMSGLine(line.c_str());
                 }
+                line="";
 
                 //WiFi Station
                 if (WiFi.getMode() == WIFI_STA) {
                     //Connected to SSID
                     if (json) {
-                        output->print (",{\"id\":\"");
+                        line +=",{\"id\":\"";
                     }
-                    output->print ("SSID");
+                    line +="SSID";
                     if (json) {
-                        output->print ("\",\"value\":\"");
+                        line +="\",\"value\":\"";
                     } else {
-                        output->print (": ");
+                        line +=": ";
                     }
                     if (WiFi.isConnected()) {
                         if (json) {
-                            output->print (ESP3DOutput::encodeString(WiFi.SSID().c_str()));
+                            line +=ESP3DOutput::encodeString(WiFi.SSID().c_str());
                         } else {
-                            output->print (WiFi.SSID().c_str());
+                            line +=WiFi.SSID();
                         }
                     }
                     if (json) {
-                        output->print ("\"}");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     if (WiFi.isConnected()) { //in case query come from serial
                         //Signal strength
                         if (json) {
-                            output->print (",{\"id\":\"");
+                            line +=",{\"id\":\"";
                         }
-                        output->print ("signal");
+                        line +="signal";
                         if (json) {
-                            output->print ("\",\"value\":\"");
+                            line +="\",\"value\":\"";
                         } else {
-                            output->print (": ");
+                            line +=": ";
                         }
-                        output->printf ("%d %%",WiFiConfig::getSignal(WiFi.RSSI()));
+                        line+=WiFiConfig::getSignal(WiFi.RSSI());
+                        line+="%";
                         if (json) {
-                            output->print ("\"}");
+                            line +="\"}";
+                            output->print (line.c_str());
                         } else {
-                            output->printLN("");
+                            output->printMSGLine(line.c_str());
                         }
+                        line="";
                         //Phy Mode
                         if (json) {
-                            output->print (",{\"id\":\"");
+                            line +=",{\"id\":\"";
                         }
-                        output->print ("phy mode");
+                        line +="phy mode";
                         if (json) {
-                            output->print ("\",\"value\":\"");
+                            line +="\",\"value\":\"";
                         } else {
-                            output->print (": ");
+                            line +=": ";
                         }
-                        output->print (WiFiConfig::getPHYModeString (WIFI_STA));
+                        line +=WiFiConfig::getPHYModeString (WIFI_STA);
                         if (json) {
-                            output->print ("\"}");
+                            line +="\"}";
+                            output->print (line.c_str());
                         } else {
-                            output->printLN("");
+                            output->printMSGLine(line.c_str());
                         }
+                        line="";
                         //Channel
                         if (json) {
-                            output->print (",{\"id\":\"");
+                            line +=",{\"id\":\"";
                         }
-                        output->print ("channel");
+                        line +="channel";
                         if (json) {
-                            output->print ("\",\"value\":\"");
+                            line +="\",\"value\":\"";
                         } else {
-                            output->print (": ");
+                            line +=": ";
                         }
-                        output->printf ("%d",WiFi.channel());
+                        line+=WiFi.channel();
                         if (json) {
-                            output->print ("\"}");
+                            line +="\"}";
+                            output->print (line.c_str());
                         } else {
-                            output->printLN("");
+                            output->printMSGLine(line.c_str());
                         }
+                        line="";
                         //IP Mode
                         if (json) {
-                            output->print (",{\"id\":\"");
+                            line +=",{\"id\":\"";
                         }
-                        output->print ("ip mode");
+                        line +="ip mode";
                         if (json) {
-                            output->print ("\",\"value\":\"");
+                            line +="\",\"value\":\"";
                         } else {
-                            output->print (": ");
+                            line +=": ";
                         }
-                        output->print ((NetConfig::isIPModeDHCP(ESP_WIFI_STA))?"dhcp":"static");
+                        line +=(NetConfig::isIPModeDHCP(ESP_WIFI_STA))?"dhcp":"static";
                         if (json) {
-                            output->print ("\"}");
+                            line +="\"}";
+                            output->print (line.c_str());
                         } else {
-                            output->printLN("");
+                            output->printMSGLine(line.c_str());
                         }
+                        line="";
                         //IP value
                         if (json) {
-                            output->print (",{\"id\":\"");
+                            line +=",{\"id\":\"";
                         }
-                        output->print ("ip");
+                        line +="ip";
                         if (json) {
-                            output->print ("\",\"value\":\"");
+                            line +="\",\"value\":\"";
                         } else {
-                            output->print (": ");
+                            line +=": ";
                         }
-                        output->print (WiFi.localIP().toString().c_str());
+                        line +=WiFi.localIP().toString();
                         if (json) {
-                            output->print ("\"}");
+                            line +="\"}";
+                            output->print (line.c_str());
                         } else {
-                            output->printLN("");
+                            output->printMSGLine(line.c_str());
                         }
+                        line="";
                         //Gateway value
                         if (json) {
-                            output->print (",{\"id\":\"");
+                            line +=",{\"id\":\"";
                         }
-                        output->print ("gw");
+                        line +="gw";
                         if (json) {
-                            output->print ("\",\"value\":\"");
+                            line +="\",\"value\":\"";
                         } else {
-                            output->print (": ");
+                            line +=": ";
                         }
-                        output->print (WiFi.gatewayIP().toString().c_str());
+                        line +=WiFi.gatewayIP().toString();
                         if (json) {
-                            output->print ("\"}");
+                            line +="\"}";
+                            output->print (line.c_str());
                         } else {
-                            output->printLN("");
+                            output->printMSGLine(line.c_str());
                         }
+                        line="";
                         //Mask value
                         if (json) {
-                            output->print (",{\"id\":\"");
+                            line +=",{\"id\":\"";
                         }
-                        output->print ("msk");
+                        line +="msk";
                         if (json) {
-                            output->print ("\",\"value\":\"");
+                            line +="\",\"value\":\"";
                         } else {
-                            output->print (": ");
+                            line +=": ";
                         }
-                        output->print (WiFi.subnetMask().toString().c_str());
+                        line +=WiFi.subnetMask().toString();
                         if (json) {
-                            output->print ("\"}");
+                            line +="\"}";
+                            output->print (line.c_str());
                         } else {
-                            output->printLN("");
+                            output->printMSGLine(line.c_str());
                         }
+                        line="";
                         //DNS value
                         if (json) {
-                            output->print (",{\"id\":\"");
+                            line +=",{\"id\":\"";
                         }
-                        output->print ("DNS");
+                        line +="DNS";
                         if (json) {
-                            output->print ("\",\"value\":\"");
+                            line +="\",\"value\":\"";
                         } else {
-                            output->print (": ");
+                            line +=": ";
                         }
-                        output->print (WiFi.dnsIP().toString().c_str());
+                        line +=WiFi.dnsIP().toString();
                         if (json) {
-                            output->print ("\"}");
+                            line +="\"}";
+                            output->print (line.c_str());
                         } else {
-                            output->printLN("");
+                            output->printMSGLine(line.c_str());
                         }
+                        line="";
                     }
                     //Disabled Mode
                     if (json) {
-                        output->print (",{\"id\":\"");
+                        line +=",{\"id\":\"";
                     }
-                    output->print ("ap");
+                    line +="ap";
 
                     if (json) {
-                        output->print ("\",\"value\":\"");
+                        line +="\",\"value\":\"";
                     } else {
-                        output->print (": ");
+                        line +=": ";
                     }
-                    output->print ("OFF");
+                    line +="OFF";
                     if (json) {
-                        output->print ("\"}");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //Disabled Mode
                     if (json) {
-                        output->print (",{\"id\":\"");
+                        line +=",{\"id\":\"";
                     }
-                    output->print ("mac");
+                    line +="mac";
                     if (json) {
-                        output->print ("\",\"value\":\"");
+                        line +="\",\"value\":\"";
                     } else {
-                        output->print (": ");
+                        line +=": ";
                     }
-                    output->print (WiFi.softAPmacAddress().c_str());
+                    line +=WiFi.softAPmacAddress();
                     if (json) {
-                        output->print ("\"}");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                 } else if (WiFi.getMode() == WIFI_AP) {
                     //AP SSID
                     if (json) {
-                        output->print (",{\"id\":\"");
+                        line +=",{\"id\":\"";
                     }
-                    output->print ("SSID");
+                    line +="SSID";
                     if (json) {
-                        output->print ("\",\"value\":\"");
+                        line +="\",\"value\":\"";
                     } else {
-                        output->print (": ");
-                    }
-                    if (json) {
-                        output->print (ESP3DOutput::encodeString(WiFiConfig::AP_SSID()));
-                    } else {
-                        output->print (WiFiConfig::AP_SSID());
+                        line +=": ";
                     }
                     if (json) {
-                        output->print ("\"}");
+                        line +=ESP3DOutput::encodeString(WiFiConfig::AP_SSID());
                     } else {
-                        output->printLN("");
+                        line +=WiFiConfig::AP_SSID();
                     }
+                    if (json) {
+                        line +="\"}";
+                        output->print (line.c_str());
+                    } else {
+                        output->printMSGLine(line.c_str());
+                    }
+                    line="";
                     //AP Visibility
                     if (json) {
-                        output->print (",{\"id\":\"");
+                        line +=",{\"id\":\"";
                     }
-                    output->print ("visible");
+                    line +="visible";
                     if (json) {
-                        output->print ("\",\"value\":\"");
+                        line +="\",\"value\":\"";
                     } else {
-                        output->print (": ");
+                        line +=": ";
                     }
-                    output->print ((WiFiConfig::is_AP_visible()) ? "yes" : "no");
+                    line +=(WiFiConfig::is_AP_visible()) ? "yes" : "no";
                     if (json) {
-                        output->print ("\"}");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //AP Authentication
                     if (json) {
-                        output->print (",{\"id\":\"");
+                        line +=",{\"id\":\"";
                     }
-                    output->print ("authentication");
+                    line +="authentication";
                     if (json) {
-                        output->print ("\",\"value\":\"");
+                        line +="\",\"value\":\"";
                     } else {
-                        output->print (": ");
+                        line +=": ";
                     }
-                    output->print (WiFiConfig::AP_Auth_String());
+                    line +=WiFiConfig::AP_Auth_String();
                     if (json) {
-                        output->print ("\"}");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //DHCP Server
                     if (json) {
-                        output->print (",{\"id\":\"");
+                        line +=",{\"id\":\"";
                     }
-                    output->print ("DHCP Server");
+                    line +="DHCP Server";
                     if (json) {
-                        output->print ("\",\"value\":\"");
+                        line +="\",\"value\":\"";
                     } else {
-                        output->print (": ");
+                        line +=": ";
                     }
-                    output->print ((NetConfig::isDHCPServer (ESP_WIFI_AP))?"ON":"OFF");
+                    line +=(NetConfig::isDHCPServer (ESP_WIFI_AP))?"ON":"OFF";
                     if (json) {
-                        output->print ("\"}");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //IP Value
                     if (json) {
-                        output->print (",{\"id\":\"");
+                        line +=",{\"id\":\"";
                     }
-                    output->print ("ip");
+                    line +="ip";
                     if (json) {
-                        output->print ("\",\"value\":\"");
+                        line +="\",\"value\":\"";
                     } else {
-                        output->print (": ");
+                        line +=": ";
                     }
-                    output->print (WiFi.softAPIP().toString());
+                    line +=WiFi.softAPIP().toString();
                     if (json) {
-                        output->print ("\"}");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //Gateway Value
                     if (json) {
-                        output->print (",{\"id\":\"");
+                        line +=",{\"id\":\"";
                     }
-                    output->print ("gw");
+                    line +="gw";
                     if (json) {
-                        output->print ("\",\"value\":\"");
+                        line +="\",\"value\":\"";
                     } else {
-                        output->print (": ");
+                        line +=": ";
                     }
-                    output->print (WiFiConfig::AP_Gateway_String());
+                    line +=WiFiConfig::AP_Gateway_String();
                     if (json) {
-                        output->print ("\"}");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //Mask Value
                     if (json) {
-                        output->print (",{\"id\":\"");
+                        line +=",{\"id\":\"";
                     }
-                    output->print ("msk");
+                    line +="msk";
                     if (json) {
-                        output->print ("\",\"value\":\"");
+                        line +="\",\"value\":\"";
                     } else {
-                        output->print (": ");
+                        line +=": ";
                     }
-                    output->print (WiFiConfig::AP_Mask_String());
+                    line +=WiFiConfig::AP_Mask_String();
                     if (json) {
-                        output->print ("\"}");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //Connected clients
                     const char * entry = NULL;
                     uint8_t nb = 0;
                     entry = WiFiConfig::getConnectedSTA(&nb, true);
                     if (json) {
-                        output->print (",{\"id\":\"");
+                        line +=",{\"id\":\"";
                     }
-                    output->print ("clients");
+                    line +="clients";
                     if (json) {
-                        output->print ("\",\"value\":\"");
+                        line +="\",\"value\":\"";
                     } else {
-                        output->print (": ");
+                        line +=": ";
                     }
-                    output->print (nb);
+                    line +=nb;
                     if (json) {
-                        output->print ("\"}");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     for (uint8_t i = 0; i < nb; i++) {
                         //Client
                         if (json) {
-                            output->print (",{\"id\":\"");
+                            line +=",{\"id\":\"";
                         }
-                        output->printf ("# %d",i);
+                        line+="# "+String(i);
+
                         if (json) {
-                            output->print ("\",\"value\":\"");
+                            line +="\",\"value\":\"";
                         } else {
-                            output->print (": ");
+                            line +=": ";
                         }
-                        output->print (entry);
+                        line +=entry;
                         if (json) {
-                            output->print ("\"}");
+                            line +="\"}";
+                            output->print (line.c_str());
                         } else {
-                            output->printLN("");
+                            output->printMSGLine(line.c_str());
                         }
+                        line="";
                         //get next
                         entry = WiFiConfig::getConnectedSTA();
                     }
                     //Disabled Mode
                     if (json) {
-                        output->print (",{\"id\":\"");
+                        line +=",{\"id\":\"";
                     }
-                    output->print ("sta");
+                    line +="sta";
 
                     if (json) {
-                        output->print ("\",\"value\":\"");
+                        line +="\",\"value\":\"";
                     } else {
-                        output->print (": ");
+                        line +=": ";
                     }
-                    output->print ("OFF");
+                    line +="OFF";
                     if (json) {
-                        output->print ("\"}");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //Disabled Mode
                     if (json) {
-                        output->print (",{\"id\":\"");
+                        line +=",{\"id\":\"";
                     }
-                    output->print ("mac");
+                    line +="mac";
                     if (json) {
-                        output->print ("\",\"value\":\"");
+                        line +="\",\"value\":\"";
                     } else {
-                        output->print (": ");
+                        line +=": ";
                     }
-                    output->print (WiFi.macAddress().c_str());
+                    line +=WiFi.macAddress();
                     if (json) {
-                        output->print ("\"}");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
-
+                    line="";
                 }
             }
 #endif //WIFI_FEATURE
 #endif //WIFI_FEATURE || ETH FEATURE
 #if defined (TIMESTAMP_FEATURE)
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print ("i-time");
+            line +="i-time";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
-            output->print (timeserver.started()?"ON":"OFF");
+            line +=timeserver.started()?"ON":"OFF";
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
 #endif //TIMESTAMP_FEATURE
 #if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print ("serial");
+            line +="serial";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
-            output->print (serial_service.started()?"ON":"OFF");
+            line +=serial_service.started()?"ON":"OFF";
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
 #endif //COMMUNICATION_PROTOCOL
 #if defined (AUTHENTICATION_FEATURE)
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print ("authentication");
+            line +="authentication";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
-            output->print ("ON");
+            line +="ON";
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
 #endif //AUTHENTICATION_FEATURE
 #if defined (NOTIFICATION_FEATURE)
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print ("notification");
+            line +="notification";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
-            output->print (notificationsservice.started()?"ON":"OFF");
+            line +=notificationsservice.started()?"ON":"OFF";
             if (notificationsservice.started()) {
-                output->print ("(");
-                output->print (notificationsservice.getTypeString());
-                output->print (")");
+                line +="(";
+                line +=notificationsservice.getTypeString();
+                line +=")";
             }
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
 #endif //NOTIFICATION_FEATURE
 #ifdef SD_DEVICE
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print ("sd");
+            line +="sd";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
-            output->print ((Settings_ESP3D::GetSDDevice() == ESP_DIRECT_SD)?"direct":(Settings_ESP3D::GetSDDevice() == ESP_SHARED_SD)?"shared":"none");
-            output->print ("(");
-            output->print (ESP_SD::FilesystemName());
-            output->print (")");
+            line +=(Settings_ESP3D::GetSDDevice() == ESP_DIRECT_SD)?"direct":(Settings_ESP3D::GetSDDevice() == ESP_SHARED_SD)?"shared":"none";
+            line +="(";
+            line +=ESP_SD::FilesystemName();
+            line +=")";
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
 #ifdef SD_UPDATE_FEATURE
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print ("SD updater");
+            line +="SD updater";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
-            output->print (Settings_ESP3D::read_byte (ESP_SD_CHECK_UPDATE_AT_BOOT)!=0?"ON":"OFF");
+            line +=Settings_ESP3D::read_byte (ESP_SD_CHECK_UPDATE_AT_BOOT)!=0?"ON":"OFF";
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
 #endif //SD_UPDATE_FEATURE
 
 #endif //SD_DEVICE
 #if defined (SENSOR_DEVICE)
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print ("sensor");
+            line +="sensor";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
-            output->print (esp3d_sensor.started()?"ON":"OFF");
-            output->print ("(");
-            output->print (esp3d_sensor.GetModelString());
-            output->print (")");
+            line +=esp3d_sensor.started()?"ON":"OFF";
+            line +="(";
+            line +=esp3d_sensor.GetModelString();
+            line +=")";
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
 #endif //SENSOR_DEVICE
 #if defined (BUZZER_DEVICE)
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print ("buzzer");
+            line +="buzzer";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
-            output->print (esp3d_buzzer.started()?"ON":"OFF");
+            line +=esp3d_buzzer.started()?"ON":"OFF";
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
 #endif //BUZZER_DEVICE
 #if defined (ESP_DEBUG_FEATURE)
             //debug
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print ("debug");
+            line +="debug";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->print (": ");
+                output->printMSGLine(line.c_str());
             }
+            line="";
 #if ESP_DEBUG_FEATURE == DEBUG_OUTPUT_SERIAL0
-            output->print ("Serial");
+            line +="Serial";
 #endif //DEBUG_OUTPUT_SERIAL0
 #if ESP_DEBUG_FEATURE == DEBUG_OUTPUT_SERIAL1
-            output->print ("Serial1");
+            line +="Serial1";
 #endif //DEBUG_OUTPUT_SERIAL1
 #if ESP_DEBUG_FEATURE == DEBUG_OUTPUT_SERIAL2
-            output->print ("Serial2");
+            line +="Serial2";
 #endif //DEBUG_OUTPUT_SERIAL2   
 #if ESP_DEBUG_FEATURE == DEBUG_OUTPUT_TELNET
-            output->printf ("Telnet(%d)", DEBUG_ESP3D_OUTPUT_PORT);
+            line+="Telnet("+String( DEBUG_ESP3D_OUTPUT_PORT) +")";
 #endif //DEBUG_OUTPUT_TELNET    
 #if ESP_DEBUG_FEATURE == DEBUG_OUTPUT_WEBSOCKET
-            output->printf ("Websocket(%d)", DEBUG_ESP3D_OUTPUT_PORT);
+            line+="Websocket("+ String(DEBUG_ESP3D_OUTPUT_PORT)+")";
 #endif //DEBUG_OUTPUT_WEBSOCKET         
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
 #endif //ESP_DEBUG_FEATURE
 #if COMMUNICATION_PROTOCOL == MKS_SERIAL
 //Target Firmware
             if (json) {
-                output->print (",{\"id\":\"serial");
+                line +=",{\"id\":\"serial";
             } else {
-                output->print ("Serial");
+                line +="Serial";
             }
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
-            output->print ("MKS");
+            line +="MKS";
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
 #endif //COMMUNICATION_PROTOCOL
             //Target Firmware
             if (json) {
-                output->print (",{\"id\":\"targetfw");
+                line +=",{\"id\":\"targetfw";
             } else {
-                output->print ("Target Fw");
+                line +="Target Fw";
             }
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
-            output->print (Settings_ESP3D::GetFirmwareTargetShortName());
+            line +=Settings_ESP3D::GetFirmwareTargetShortName();
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
+            line="";
             //FW version
             if (json) {
-                output->print (",{\"id\":\"");
+                line +=",{\"id\":\"";
             }
-            output->print ("FW ver");
+            line +="FW ver";
             if (json) {
-                output->print ("\",\"value\":\"");
+                line +="\",\"value\":\"";
             } else {
-                output->print (": ");
+                line +=": ";
             }
 #if defined (SHORT_BUILD_VERSION)
-            output->print(SHORT_BUILD_VERSION);
-            output->print("-");
+            line+=SHORT_BUILD_VERSION "-";
 #endif //SHORT_BUILD_VERSION
-            output->print (FW_VERSION);
+            line +=FW_VERSION;
             if (json) {
-                output->print ("\"}");
+                line +="\"}";
+                output->print (line.c_str());
             } else {
-                output->printLN("");
+                output->printMSGLine(line.c_str());
             }
-            if (json) {
-                output->print (",{\"id\":\"");
-            }
+            line="";
             //FW architecture
-            output->print ("FW arch");
             if (json) {
-                output->print ("\",\"value\":\"");
-            } else {
-                output->print (": ");
-            }
-            output->print (Settings_ESP3D::TargetBoard());
-            if (json) {
-                output->print ("\"}");
-            } else {
-                output->printLN("");
+                line +=",{\"id\":\"";
             }
 
+            line +="FW arch";
             if (json) {
-                output->print ("]}");
-                output->printLN ("");
+                line +="\",\"value\":\"";
+            } else {
+                line +=": ";
+            }
+            line +=Settings_ESP3D::TargetBoard();
+            if (json) {
+                line +="\"}";
+                output->print (line.c_str());
+            } else {
+                output->printMSGLine(line.c_str());
+            }
+            if (json) {
+                output->printLN ("]}");
             }
             return true;
         } else {

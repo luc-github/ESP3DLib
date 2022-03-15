@@ -359,6 +359,84 @@ size_t ESP3DOutput::printLN(const char * s)
     return println(s);
 }
 
+size_t ESP3DOutput::printMSGLine(const char * s)
+{
+
+    if (_client == ESP_ALL_CLIENTS) {
+        //process each client one by one
+        log_esp3d("PrintMSG to all clients");
+        for (uint8_t c=0; c < sizeof(activeClients); c++) {
+            if (activeClients[c]) {
+                log_esp3d("Sending PrintMSG to client %d", activeClients[c]);
+                _client = activeClients[c];
+                printMSG(s);
+            }
+        }
+        _client = ESP_ALL_CLIENTS;
+        return strlen(s);
+    }
+    if (!isOutput(_client)) {
+        return 0;
+    }
+    String display;
+    log_esp3d("PrintMSG to client %d", _client);
+    if (_client == ESP_HTTP_CLIENT) {
+#ifdef HTTP_FEATURE
+        if (_webserver) {
+            if (!_headerSent && !_footerSent) {
+                _webserver->setContentLength(CONTENT_LENGTH_UNKNOWN);
+                _webserver->sendHeader("Content-Type","text/html");
+                _webserver->sendHeader("Cache-Control","no-cache");
+                _webserver->send(_code);
+                _headerSent = true;
+            }
+            if (_headerSent && !_footerSent) {
+                _webserver->sendContent_P((const char*)s,strlen(s));
+                _webserver->sendContent_P((const char*)"\n",1);
+                return strlen(s+1);
+            }
+        }
+
+#endif //HTTP_FEATURE
+        return 0;
+    }
+    //this is not supposed to be displayed on any screen
+    if (_client == ESP_SCREEN_CLIENT || _client == ESP_REMOTE_SCREEN_CLIENT ||_client == ESP_SCREEN_CLIENT ) {
+        return print(s);
+    }
+    switch(Settings_ESP3D::GetFirmwareTarget()) {
+    case GRBL:
+        display = "[MSG:";
+        display += s;
+        display += "]";
+        break;
+    case MARLIN_EMBEDDED:
+    case MARLIN:
+        if ((_client == ESP_ECHO_SERIAL_CLIENT) && (strcmp(s, "ok") == 0)) {
+            return 0;
+        }
+
+        if (_client == ESP_ECHO_SERIAL_CLIENT) {
+            display = "echo: ";
+        } else {
+            display = ";echo: ";
+        }
+
+        display += s;
+        break;
+    case SMOOTHIEWARE:
+    case REPETIER:
+    default:
+
+        display = ";";
+
+        display += s;
+    }
+
+    return printLN(display.c_str());
+
+}
+
 size_t ESP3DOutput::printMSG(const char * s, bool withNL)
 {
 

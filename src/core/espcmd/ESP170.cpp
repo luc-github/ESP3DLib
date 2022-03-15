@@ -61,325 +61,378 @@ bool Commands::ESP170(const char* cmd_params, level_authenticate_type auth_type,
                     response = format_response(COMMANDID, json, false, "No camera initialized");
                     noError = false;
                 } else {
+                    String line = ""
                     if (json) {
                         output->print ("{\"cmd\":\"170\",\"status\":\"ok\",\"data\":\"[");
                     }
                     //framesize
                     if (json) {
-                        output->print ("{\"id\":\"framesize\",\"value\":\"");
+                        line +="{\"id\":\"framesize\",\"value\":\"";
                     } else {
-                        output->print ("framesize:");
+                        line +="framesize:";
                     }
-                    output->print (s->status.framesize);
+                    line +=s->status.framesize;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //quality
                     if (json) {
-                        output->print ("{\"id\":\"quality\",\"value\":\"");
+                        line +="{\"id\":\"quality\",\"value\":\"";
                     } else {
-                        output->print ("quality:");
+                        line +="quality:";
                     }
-                    output->print (s->status.quality);
+                    line +=s->status.quality;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //brightness
                     if (json) {
-                        output->print ("{\"id\":\"brightness\",\"value\":\"");
+                        line +="{\"id\":\"brightness\",\"value\":\"";
                     } else {
-                        output->print ("brightness:");
+                        line +="brightness:";
                     }
-                    output->print (s->status.brightness);
+                    line +=s->status.brightness;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //contrast
                     if (json) {
-                        output->print ("{\"id\":\"contrast\",\"value\":\"");
+                        line +="{\"id\":\"contrast\",\"value\":\"";
                     } else {
-                        output->print ("contrast:");
+                        line +="contrast:";
                     }
-                    output->print (s->status.contrast);
+                    line +=s->status.contrast;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //saturation
                     if (json) {
-                        output->print ("{\"id\":\"saturation\",\"value\":\"");
+                        line +="{\"id\":\"saturation\",\"value\":\"";
                     } else {
-                        output->print ("saturation:");
+                        line +="saturation:";
                     }
-                    output->print (s->status.saturation);
+                    line +=s->status.saturation;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //sharpness
                     if (json) {
-                        output->print ("{\"id\":\"sharpness\",\"value\":\"");
+                        line +="{\"id\":\"sharpness\",\"value\":\"";
                     } else {
-                        output->print ("sharpness:");
+                        line +="sharpness:";
                     }
-                    output->print (s->status.sharpness);
+                    line +=s->status.sharpness;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //special_effect
                     if (json) {
-                        output->print ("{\"id\":\"special_effect\",\"value\":\"");
+                        line +="{\"id\":\"special_effect\",\"value\":\"";
                     } else {
-                        output->print ("special_effect:");
+                        line +="special_effect:";
                     }
-                    output->print (s->status.special_effect);
+                    line +=s->status.special_effect;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //wb_mode
                     if (json) {
-                        output->print ("{\"id\":\"wb_mode\",\"value\":\"");
+                        line +="{\"id\":\"wb_mode\",\"value\":\"";
                     } else {
-                        output->print ("wb_mode:");
+                        line +="wb_mode:";
                     }
-                    output->print (s->status.wb_mode);
+                    line +=s->status.wb_mode;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //awb
                     if (json) {
-                        output->print ("{\"id\":\"awb\",\"value\":\"");
+                        line +="{\"id\":\"awb\",\"value\":\"";
                     } else {
-                        output->print ("awb:");
+                        line +="awb:";
                     }
-                    output->print (s->status.awb);
+                    line +=s->status.awb;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //awb_gain
                     if (json) {
-                        output->print ("{\"id\":\"awb_gain\",\"value\":\"");
+                        line +="{\"id\":\"awb_gain\",\"value\":\"";
                     } else {
-                        output->print ("awb_gain:");
+                        line +="awb_gain:";
                     }
-                    output->print (s->status.awb_gain);
+                    line +=s->status.awb_gain;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //aec
                     if (json) {
-                        output->print ("{\"id\":\"aec\",\"value\":\"");
+                        line +="{\"id\":\"aec\",\"value\":\"";
                     } else {
-                        output->print ("aec:");
+                        line +="aec:";
                     }
-                    output->print (s->status.aec);
+                    line +=s->status.aec;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //aec2
                     if (json) {
-                        output->print ("{\"id\":\"aec2\",\"value\":\"");
+                        line +="{\"id\":\"aec2\",\"value\":\"";
                     } else {
-                        output->print ("aec2:");
+                        line +="aec2:";
                     }
-                    output->print (s->status.aec2);
+                    line +=s->status.aec2;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //ae_level
                     if (json) {
-                        output->print ("{\"id\":\"ae_level\",\"value\":\"");
+                        line +="{\"id\":\"ae_level\",\"value\":\"");
                     } else {
-                        output->print ("ae_level:");
+                        line +="ae_level:";
                     }
-                    output->print (s->status.ae_level);
+                    line +=s->status.ae_level;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //aec_value
                     if (json) {
-                        output->print ("{\"id\":\"aec_value\",\"value\":\"");
+                        line +="{\"id\":\"aec_value\",\"value\":\"";
                     } else {
-                        output->print ("aec_value:");
+                        line +="aec_value:";
                     }
-                    output->print (s->status.aec_value);
+                    line +=s->status.aec_value;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //agc
                     if (json) {
-                        output->print ("{\"id\":\"agc\",\"value\":\"");
+                        line +="{\"id\":\"agc\",\"value\":\"";
                     } else {
-                        output->print ("agc:");
+                        line +="agc:";
                     }
-                    output->print (s->status.agc);
+                    line +=s->status.agc;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //agc_gain
                     if (json) {
-                        output->print ("{\"id\":\"agc_gain\",\"value\":\"");
+                        line +="{\"id\":\"agc_gain\",\"value\":\"";
                     } else {
-                        output->print ("agc_gain:");
+                        line +="agc_gain:";
                     }
-                    output->print (s->status.agc_gain);
-                    if (!plain) {
-                        output->print ("\"},");
+                    line +=s->status.agc_gain;
+                    if (json) {
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //gainceiling
                     if (json) {
-                        output->print ("{\"id\":\"gainceiling\",\"value\":\"");
+                        line +="{\"id\":\"gainceiling\",\"value\":\"";
                     } else {
-                        output->print ("gainceiling:");
+                        line +="gainceiling:";
                     }
-                    output->print (s->status.gainceiling);
+                    line +=s->status.gainceiling;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //bpc
                     if (json) {
-                        output->print ("{\"id\":\"bpc\",\"value\":\"");
+                        line +="{\"id\":\"bpc\",\"value\":\"";
                     } else {
-                        output->print ("bpc:");
+                        line +="bpc:";
                     }
-                    output->print (s->status.bpc);
+                    line +=s->status.bpc;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //wpc
                     if (json) {
-                        output->print ("{\"id\":\"wpc\",\"value\":\"");
+                        line +="{\"id\":\"wpc\",\"value\":\"";
                     } else {
-                        output->print ("wpc:");
+                        line +="wpc:";
                     }
-                    output->print (s->status.wpc);
+                    line +=s->status.wpc;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //raw_gma
                     if (json) {
-                        output->print ("{\"id\":\"raw_gma\",\"value\":\"");
+                        line +="{\"id\":\"raw_gma\",\"value\":\"";
                     } else {
-                        output->print ("raw_gma:");
+                        line +="raw_gma:";
                     }
-                    output->print (s->status.raw_gma);
+                    line +=s->status.raw_gma;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //lenc
                     if (json) {
-                        output->print ("{\"id\":\"lenc\",\"value\":\"");
+                        line +="{\"id\":\"lenc\",\"value\":\"";
                     } else {
-                        output->print ("lenc:");
+                        line +="lenc:";
                     }
-                    output->print (s->status.lenc);
+                    line +=s->status.lenc;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //vflip
                     if (json) {
-                        output->print ("{\"id\":\"vflip\",\"value\":\"");
+                        line +="{\"id\":\"vflip\",\"value\":\"";
                     } else {
-                        output->print ("vflip:");
+                        line +="vflip:";
                     }
-                    output->print (s->status.vflip);
+                    line +=s->status.vflip;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //hmirror
                     if (json) {
-                        output->print ("{\"id\":\"hmirror\",\"value\":\"");
+                        line +="{\"id\":\"hmirror\",\"value\":\"";
                     } else {
-                        output->print ("hmirror:");
+                        line +="hmirror:";
                     }
-                    output->print (s->status.hmirror);
+                    line +=s->status.hmirror;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //dcw
                     if (json) {
-                        output->print ("{\"id\":\"dcw\",\"value\":\"");
+                        line +="{\"id\":\"dcw\",\"value\":\"";
                     } else {
-                        output->print ("dcw:");
+                        line +="dcw:";
                     }
-                    output->print (s->status.dcw);
+                    line +=s->status.dcw;
                     if (json) {
-                        output->print ("\"},");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
                     //colorbar
                     if (json) {
-                        output->print ("{\"id\":\"colorbar\",\"value\":\"");
+                        line +="{\"id\":\"colorbar\",\"value\":\"";
                     } else {
-                        output->print ("colorbar:");
+                        line +="colorbar:";
                     }
-                    output->print (s->status.colorbar);
+                    line +=s->status.colorbar;
                     if (json) {
-                        output->print ("\"}");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
 #if CAM_LED_PIN != -1
                     //light
                     if (json) {
-                        output->print ("{\"id\":\"light\",\"value\":\"");
+                        line +="{\"id\":\"light\",\"value\":\"";
                     } else {
-                        output->print ("light:");
+                        line +="light:";
                     }
-                    output->print (digitalRead(CAM_LED_PIN)==HIGH?1:0);
+                    line +=digitalRead(CAM_LED_PIN)==HIGH?1:0;
                     if (json) {
-                        output->print ("\"}");
+                        line +="\"}";
+                        output->print (line.c_str());
                     } else {
-                        output->printLN("");
+                        output->printMSGLine(line.c_str());
                     }
+                    line="";
 #endif //CAM_LED_PIN 
                     if (json) {
-                        output->print ("]}");
+                        output->printLN ("]}");
                     }
                     return true
                 }

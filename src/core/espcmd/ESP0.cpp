@@ -300,7 +300,7 @@ bool Commands::ESP0(const char* cmd_params, level_authenticate_type auth_type, E
         if (json) {
             output->print("{\"cmd\":\"0\",\"status\":\"ok\",\"data\":[");
         } else {
-            output->printLN("[List of ESP3D commands]");
+            output->printMSGLine("[List of ESP3D commands]");
         }
 
         for (uint i = 0; i < cmdNb -1; i++) {
@@ -314,7 +314,8 @@ bool Commands::ESP0(const char* cmd_params, level_authenticate_type auth_type, E
                     output->print(",");
                 }
             } else {
-                output->printLN(help[i]);
+                output->printMSGLine(help[i]);
+
             }
 
         }
@@ -338,7 +339,7 @@ bool Commands::ESP0(const char* cmd_params, level_authenticate_type auth_type, E
                     output->print(help[i]);
                     output->printLN("\"}}");
                 } else {
-                    output->printLN(help[i]);
+                    output->printMSGLine(help[i]);
                 }
                 found = true;
             }

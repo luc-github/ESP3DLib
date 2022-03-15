@@ -53,7 +53,7 @@ bool Commands::ESP410(const char* cmd_params, level_authenticate_type auth_type,
             int n = 0;
             uint8_t total = 0;
             if (!json) {
-                output->printLN ("Start Scan");
+                output->printMSGLine ("Start Scan");
             }
             if(currentmode==WIFI_AP) {
                 WiFi.mode(WIFI_AP_STA);
@@ -65,49 +65,54 @@ bool Commands::ESP410(const char* cmd_params, level_authenticate_type auth_type,
             if (json) {
                 output->print ("{\"cmd\":\"410\",\"status\":\"ok\",\"data\":[");
             }
+            String line;
             for (int i = 0; i < n; ++i) {
+                line = "";
                 if (WiFi.RSSI (i)>= MIN_RSSI) {
                     if (total > 0) {
                         if (json) {
-                            output->print (",");
-                        } else {
-                            output->printLN ("");
+                            line+=",";
                         }
                     }
                     total++;
                     if (json) {
-                        output->print ("{\"SSID\":\"");
-                        output->print (ESP3DOutput::encodeString(WiFi.SSID (i).c_str()));
+                        line += "{\"SSID\":\"";
+                        line +=ESP3DOutput::encodeString(WiFi.SSID (i).c_str());
                     } else {
-                        output->print (WiFi.SSID (i).c_str());
+                        line +=WiFi.SSID (i).c_str();
                     }
                     if (json) {
-                        output->print ("\",\"SIGNAL\":\"");
+                        line +="\",\"SIGNAL\":\"";
                     } else {
-                        output->print ("\t");
+                        line +="\t";
                     }
-                    output->print (String(WiFiConfig::getSignal (WiFi.RSSI (i) )));
+                    line += String(WiFiConfig::getSignal (WiFi.RSSI (i) ));
                     if (!json) {
-                        output->print("%");
+                        line +="%";
                     }
                     if (json) {
-                        output->print ("\",\"IS_PROTECTED\":\"");
+                        line +="\",\"IS_PROTECTED\":\"";
                     }
                     if (WiFi.encryptionType (i) == ENC_TYPE_NONE) {
                         if (json) {
-                            output->print ("0");
+                            line +="0";
                         } else {
-                            output->print ("\tOpen");
+                            line +="\tOpen";
                         }
                     } else {
                         if (json) {
-                            output->print ("1");
+                            line +="1";
                         } else {
-                            output->print ("\tSecure");
+                            line +="\tSecure";
                         }
                     }
                     if (json) {
-                        output->print ("\"}");
+                        line +="\"}";
+                    }
+                    if (json) {
+                        output->print (line.c_str());
+                    } else {
+                        output->printMSGLine (line.c_str());
                     }
                 }
             }
@@ -115,10 +120,7 @@ bool Commands::ESP410(const char* cmd_params, level_authenticate_type auth_type,
             if (json) {
                 output->printLN ("]}");
             } else {
-                if(total>0) {
-                    output->printLN ("");
-                }
-                output->printLN ("End Scan");
+                output->printMSGLine ("End Scan");
             }
             return true;
         } else {
