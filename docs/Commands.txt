@@ -130,7 +130,7 @@ No parameter just play beep
 [ESP250]F=<frequency> D=<duration> json=<no> [pwd=<user password>]
 
 * Delay command
-[ESP290]<delay in ms>[pwd=<user password>]
+[ESP290]<delay in ms> json=<no>[pwd=<user password>]
 
 * Get full EEPROM settings content
 but do not give any passwords
@@ -138,7 +138,7 @@ but do not give any passwords
 
 *Set EEPROM setting
 position in EEPROM, type: B(byte), I(integer/long), S(string), A(IP address / mask)
-[ESP401]P=<position> T=<type> V=<value> pwd=<user/admin password>
+[ESP401]P=<position> T=<type> V=<value> json=<no> pwd=<user/admin password>
 Description:        Positions:
 ESP_RADIO_MODE          0       //1 byte = flag
 ESP_STA_SSID            1       //33 bytes 32+1 = string  ; warning does not support multibyte char like chinese
@@ -206,7 +206,7 @@ ESP_STA_DNS_VALUE       1029    //4  bytes= int
 ESP_SECURE_SERIAL       1033    //1 byte = flag
 
 * Get/Set Check update at boot state which can be ON, OFF
-[ESP402]<state>pwd=<admin password>
+[ESP402]<state> json=<no> pwd=<admin password>
 
 *Get available AP list (limited to 30)
 output is JSON or plain text according parameter
@@ -218,23 +218,29 @@ output is plain text
 
 * Set ESP State
 cmd are RESTART / RESET
-[ESP444]<cmd><pwd=admin>
+[ESP444]<cmd> json=<no><pwd=admin>
 
 * Change admin password
-[ESP550]<password>pwd=<admin password>
+[ESP550]<password>json=<no> pwd=<admin password>
 
 * Change user password
-[ESP555]<password>pwd=<admin/user password>
+[ESP555]<password> json=<no> pwd=<admin/user password>
 
 * Send Notification
-[ESP600]msg [pwd=<admin password>]
+[ESP600]msg json=<no> pwd=<admin password>
 
 * Set/Get Notification settings
-[ESP610]type=<NONE/PUSHOVER/EMAIL/LINE> T1=<token1> T2=<token2> TS=<Settings> [pwd=<admin password>]
+[ESP610]type=<NONE/PUSHOVER/EMAIL/LINE> T1=<token1> T2=<token2> TS=<Settings> json=<no> [pwd=<admin password>]
 Get will give type and settings only, not the protected T1/T2
 
+* Send Notification using URL
+[ESP620]URL=<encoded url> json=<no>[pwd=<admin/user password>]
+
+* Read FS file
+[ESP700]<filename> json=<no>[pwd=<admin/user password>]
+
 * Format ESP Filesystem
-[ESP710]FORMAT pwd=<admin password>
+[ESP710]FORMAT json=<no> pwd=<admin password>
 
 * Format SD Filesystem
 [ESP715]FORMATSD pwd=<admin password>
