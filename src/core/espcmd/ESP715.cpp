@@ -24,57 +24,55 @@
 #include "../settings_esp3d.h"
 #include "../../modules/authentication/authentication_service.h"
 #include "../../modules/filesystem/esp_sd.h"
+#define COMMANDID   715
 //Format SD Filesystem
-//[ESP715]FORMATSD pwd=<admin password>
+//[ESP715]FORMATSD json=<no> pwd=<admin password>
 bool Commands::ESP715(const char* cmd_params, level_authenticate_type auth_type, ESP3DOutput * output)
 {
     bool noError = true;
-    String res;
-    bool json = has_tag(cmd_params, "json");
-    bool formatSD = has_tag (cmd_params, "FORMATSD");
+    bool json = has_tag (cmd_params, "json");
+    String response;
+    String parameter;
+    int errorCode = 200; //unless it is a server error use 200 as default and set error in json instead
 #ifdef AUTHENTICATION_FEATURE
     if (auth_type != LEVEL_ADMIN) {
         output->printERROR("Wrong authentication!", 401);
         response = false;
-    } else
+    }
 #else
     (void)auth_type;
 #endif //AUTHENTICATION_FEATURE
-    {
-        if (formatSD) {
+    if (noError) {
+        if (has_tag (cmd_params, "FORMATSD")) {
             if (!ESP_SD::accessSD()) {
-                res ="Not available!";
+                response = format_response(COMMANDID, json, false, "Not available");
                 noError = false;
             } else {
                 ESP_SD::setState(ESP_SDCARD_BUSY);
                 if (!json) {
-                    output->print("Start Formating...");
+                    output->printMSGLine("Start Formating");
                 }
                 if (ESP_SD::format(output)) {
-                    res= "Format Done";
+                    response = format_response(COMMANDID, json, true, "ok");
                 } else {
-                    res="Format failed!";
+                    response = format_response(COMMANDID, json, false, "Format failed");
                     noError = false;
                 }
                 ESP_SD::releaseSD();
             }
         } else {
-            res = "Invalid parameter!";
+            response = format_response(COMMANDID, json, false, "Invalid parameter");
             noError = false;
         }
     }
-    if (json) {
-        output->print("{\"status\":\"");
-        output->print(noError ? "ok" : "error");
-        output->print("\",\"message\":\"");
-        output->print(res.c_str());
-        output->printLN("\"}");
-    } else {
-        if(noError) {
-            output->printMSG(res.c_str());
+    if (noError) {
+        if (json) {
+            output->printLN (response.c_str() );
         } else {
-            output->printERROR(res.c_str());
+            output->printMSGLine (response.c_str() );
         }
+    } else {
+        output->printERROR(response.c_str(), errorCode);
     }
     return noError;
 }
