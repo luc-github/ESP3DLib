@@ -60,7 +60,7 @@ bool Commands::ESP900(const char* cmd_params, level_authenticate_type auth_type,
                     response = format_response(COMMANDID, json, false, "Cannot enable serial communication");
                     noError = false;
                 }
-            } else  if (parameter == "DISABLE" ) {
+            } else if (parameter == "DISABLE" ) {
                 response = format_response(COMMANDID, json, true, "ok");
                 serial_service.end();
             } else {
