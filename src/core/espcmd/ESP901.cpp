@@ -22,42 +22,56 @@
 #include "../esp3doutput.h"
 #include "../settings_esp3d.h"
 #include "../../modules/authentication/authentication_service.h"
+#define COMMANDID   901
 //Get state / Set Enable / Disable Verbose Boot
-//[ESP901]<ENABLE/DISABLE>[pwd=<admin password>]
+//[ESP901]<ENABLE/DISABLE> json=<no>[pwd=<admin password>]
 bool Commands::ESP901(const char* cmd_params, level_authenticate_type auth_type, ESP3DOutput * output)
 {
-    bool response = true;
+    bool noError = true;
+    bool json = has_tag (cmd_params, "json");
+    String response;
     String parameter;
+    int errorCode = 200; //unless it is a server error use 200 as default and set error in json instead
 #ifdef AUTHENTICATION_FEATURE
     if (auth_type == LEVEL_GUEST) {
-        output->printERROR("Wrong authentication!", 401);
-        return false;
+        response = format_response(COMMANDID, json, false, "Guest user can't use this command");
+        noError = false;
+        errorCode = 401;
     }
 #else
     (void)auth_type;
 #endif //AUTHENTICATION_FEATURE
-    parameter = get_param (cmd_params, "");
-    //get
-    if (parameter.length() == 0) {
-        if (Settings_ESP3D::isVerboseBoot()) {
-            output->printMSG("ENABLED");
-        } else {
-            output->printMSG("DISABLED");
-        }
-    } else { //set
-        if (parameter == "ENABLE" ) {
-            if (Settings_ESP3D::write_byte(ESP_VERBOSE_BOOT, 1))  {
-                output->printMSG ("Verbose boot enabled");
+    if (noError) {
+        parameter = clean_param(get_param (cmd_params, ""));
+        //get
+        if (parameter.length() == 0) {
+            if (Settings_ESP3D::isVerboseBoot(true)) {
+                response = format_response(COMMANDID, json, true, "ENABLED");
             } else {
-                output->printERROR("Cannot enable verbose boot!", 500);
-                response = false;
+                response = format_response(COMMANDID, json, true, "DISABLED");
             }
-        } else   if (Settings_ESP3D::write_byte(ESP_VERBOSE_BOOT, 0)) {
-            output->printMSG ("Verbose boot disabled");
-        } else {
-            output->printERROR("Incorrect command!");
-            response = false;
+        } else { //set
+            if (parameter == "ENABLE" || parameter == "DISABLE" ) {
+                if (Settings_ESP3D::write_byte(ESP_VERBOSE_BOOT, parameter == "ENABLE"?1:0))  {
+                    response = format_response(COMMANDID, json, true, "ok");
+                } else {
+                    response = format_response(COMMANDID, json, false, "Set failed");
+                    noError = false;
+                }
+            } else {
+                response = format_response(COMMANDID, json, false, "Incorrect command");
+                noError = false;
+            }
         }
     }
-    return response;
+    if (noError) {
+        if (json) {
+            output->printLN (response.c_str() );
+        } else {
+            output->printMSG (response.c_str() );
+        }
+    } else {
+        output->printERROR(response.c_str(), errorCode);
+    }
+    return noError;
 }
