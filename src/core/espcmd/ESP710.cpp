@@ -26,7 +26,7 @@
 #include "../../modules/filesystem/esp_filesystem.h"
 #define COMMANDID   710
 //Format ESP Filesystem
-//[ESP710]FORMAT json=<no> pwd=<admin password>
+//[ESP710]FORMATFS json=<no> pwd=<admin password>
 bool Commands::ESP710(const char* cmd_params, level_authenticate_type auth_type, ESP3DOutput * output)
 {
     bool noError = true;
@@ -43,11 +43,9 @@ bool Commands::ESP710(const char* cmd_params, level_authenticate_type auth_type,
     (void)auth_type;
 #endif //AUTHENTICATION_FEATURE
     {
-        if (has_tag (cmd_params, "FORMAT")) {
-            if (output->client()!=ESP_HTTP_CLIENT) {
-                if (!json) {
-                    output->printMSG("Start Formating");
-                }
+        if (has_tag (cmd_params, "FORMATFS")) {
+            if (!json) {
+                output->printMSGLine("Start Formating");
             }
             ESP_FileSystem::format();
             response = format_response(COMMANDID, json, true, "ok");
@@ -60,7 +58,7 @@ bool Commands::ESP710(const char* cmd_params, level_authenticate_type auth_type,
         if (json) {
             output->printLN (response.c_str() );
         } else {
-            output->printMSG (response.c_str() );
+            output->printMSGLine (response.c_str() );
         }
     } else {
         output->printERROR(response.c_str(), errorCode);

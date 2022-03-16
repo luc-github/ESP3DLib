@@ -240,7 +240,7 @@ Get will give type and settings only, not the protected T1/T2
 [ESP700]<filename> json=<no>[pwd=<admin/user password>]
 
 * Format ESP Filesystem
-[ESP710]FORMAT json=<no> pwd=<admin password>
+[ESP710]FORMATFS json=<no> pwd=<admin password>
 
 * Format SD Filesystem
 [ESP715]FORMATSD pwd=<admin password>

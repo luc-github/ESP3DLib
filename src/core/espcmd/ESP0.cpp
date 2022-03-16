@@ -125,7 +125,7 @@ const char * help[]= {"[ESP] (id) - display this help",
                       "[ESP700](filename) - read ESP Filesystem file",
 #endif //FILESYSTEM_FEATURE
 #if defined(FILESYSTEM_FEATURE)
-                      "[ESP710]FORMAT - Format ESP Filesystem",
+                      "[ESP710]FORMATFS - Format ESP Filesystem",
 #endif //FILESYSTEM_FEATURE
 #if defined (SD_DEVICE)
                       "[ESP715]FORMATSD - Format SD Filesystem",
