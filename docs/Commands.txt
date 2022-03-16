@@ -1,6 +1,6 @@
 Note:
 1 - add space to separate parameters
-2 - if parameter has space add \ in front of space to not be seen as separator
+2 - if parameter has space add \\ in front of space to not be seen as separator
 3 - json json=YES json=TRUE json=1 are paremeters to switch output to json
 By default output is plain text, to get json formated output
 add json or json=yes after main parameters   
@@ -243,14 +243,14 @@ Get will give type and settings only, not the protected T1/T2
 [ESP710]FORMATFS json=<no> pwd=<admin password>
 
 * Format SD Filesystem
-[ESP715]FORMATSD pwd=<admin password>
+[ESP715]FORMATSD json=<no> pwd=<admin password>
 
 * List ESP Filesystem
-[ESP720]<Root> pwd=<admin password>
+[ESP720]<Root> json=<no> pwd=<admin password>
 
 * Action on ESP Filesystem
 rmdir / remove / mkdir / exists / create
-[ESP730]<Action>=<path> pwd=<admin password>
+[ESP730]<Action>=<path> json=<no> pwd=<admin password>
 
 * List SD Filesystem
 [ESP740]<Root> pwd=<admin password>
