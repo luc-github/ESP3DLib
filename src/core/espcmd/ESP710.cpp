@@ -36,13 +36,14 @@ bool Commands::ESP710(const char* cmd_params, level_authenticate_type auth_type,
     int errorCode = 200; //unless it is a server error use 200 as default and set error in json instead
 #ifdef AUTHENTICATION_FEATURE
     if (auth_type != LEVEL_ADMIN) {
-        output->printERROR("Wrong authentication!", 401);
-        response = false;
-    } else
+        response = format_response(COMMANDID, json, false, "Guest user can't use this command");
+        noError = false;
+        errorCode = 401;
+    }
 #else
     (void)auth_type;
 #endif //AUTHENTICATION_FEATURE
-    {
+    if (noError) {
         if (has_tag (cmd_params, "FORMATFS")) {
             if (!json) {
                 output->printMSGLine("Start Formating");
