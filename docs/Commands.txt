@@ -260,16 +260,16 @@ rmdir / remove / mkdir / exists / create
 [ESP750]<Action>=<path> pwd=<admin password>
 
 * FW Informations
-[ESP800]<plain> pwd=<admin password>
+[ESP800]json=<no> pwd=<admin password>
 
 * Get state / Set Enable / Disable Serial Communication
-[ESP900]<ENABLE/DISABLE>[pwd=<admin/user password>]
+[ESP900]<ENABLE/DISABLE> json=<no> [pwd=<admin/user password>]
 
 * Get state / Set Enable / Disable verbose boot
-[ESP901]<ENABLE/DISABLE>[pwd=<admin/user password>]
+[ESP901]<ENABLE/DISABLE> json=<no> [pwd=<admin/user password>]
 
 * Get state / Set Enable / Disable buzzer
-[ESP910]<ENABLE/DISABLE>[pwd=<admin/user password>]
+[ESP910]<ENABLE/DISABLE> json=<no> [pwd=<admin/user password>]
 
 *Get state / Set state of  output message clients
-[ESP920]<SERIAL / SCREEN / REMOTE_SCREEN/ WEBSOCKET / TELNET /BT / ALL>=<ON/OFF>[pwd=<admin/user password>]
+[ESP920]<SERIAL / SCREEN / REMOTE_SCREEN/ WEBSOCKET / TELNET /BT / ALL>=<ON/OFF> json=<no> [pwd=<admin/user password>]
