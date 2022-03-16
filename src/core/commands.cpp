@@ -632,6 +632,17 @@ bool Commands::execute_internal_command (int cmd, const char* cmd_params, level_
     case 710:
         response = ESP710(cmd_params, auth_type, output);
         break;
+    //List ESP Filesystem
+    //[ESP720]<Root> pwd=<admin password>
+    case 720:
+        response = ESP720(cmd_params, auth_type, output);
+        break;
+    //Action on ESP Filesystem
+    //rmdir / remove / mkdir / exists
+    //[ESP730]<Action>=<path> pwd=<admin password>
+    case 730:
+        response = ESP730(cmd_params, auth_type, output);
+        break;
 #endif //FILESYSTEM_FEATURE 
 #if defined(SD_DEVICE)
     //Format ESP Filesystem
@@ -645,18 +656,6 @@ bool Commands::execute_internal_command (int cmd, const char* cmd_params, level_
     //[ESP700]<filename>
     case 700:
         response = ESP700(cmd_params, auth_type, output);
-        break;
-
-    //List ESP Filesystem
-    //[ESP720]<Root> pwd=<admin password>
-    case 720:
-        response = ESP720(cmd_params, auth_type, output);
-        break;
-    //Action on ESP Filesystem
-    //rmdir / remove / mkdir / exists
-    //[ESP730]<Action>=<path> pwd=<admin password>
-    case 730:
-        response = ESP730(cmd_params, auth_type, output);
         break;
 #endif //FILESYSTEM_FEATURE
 #if defined (SD_DEVICE)
