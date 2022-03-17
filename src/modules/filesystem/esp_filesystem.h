@@ -67,6 +67,8 @@ class ESP_FileSystem
 public:
     static String & formatBytes (uint64_t bytes);
     static bool begin();
+    static bool  accessFS();
+    static void  releaseFS();
     static void end();
     static size_t totalBytes();
     static size_t usedBytes();

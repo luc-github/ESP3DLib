@@ -499,7 +499,7 @@ bool UpdateService::begin()
 {
     bool res = false;
     if(Settings_ESP3D::read_byte(ESP_SD_CHECK_UPDATE_AT_BOOT)!=0) {
-        bool isactive = ESP_SD::accessSD();
+        bool isactive = ESP_SD::accessFS();
         log_esp3d("Update SD for update requestest");
         if(ESP_SD::getState(true) == ESP_SDCARD_IDLE) {
             ESP_ConfigFile updateConfig(CONFIG_FILE, processingFileFunction);
@@ -523,7 +523,7 @@ bool UpdateService::begin()
             }
         }
         if (!isactive) {
-            ESP_SD::releaseSD();
+            ESP_SD::releaseFS();
         }
     } else {
         log_esp3d("No need to check for update");

@@ -92,7 +92,7 @@ uint8_t ESP_SD::setState(uint8_t flag)
     return _state;
 }
 
-bool  ESP_SD::accessSD()
+bool  ESP_SD::accessFS()
 {
     //if card is busy do not let another task access SD and so prevent a release
     if (_state == ESP_SDCARD_BUSY) {
@@ -104,7 +104,7 @@ bool  ESP_SD::accessSD()
         return false;
     }
 }
-void  ESP_SD::releaseSD()
+void  ESP_SD::releaseFS()
 {
 #if SD_DEVICE_CONNECTION == ESP_SHARED_SD
 #if defined (ESP_FLAG_SHARED_SD_PIN)

@@ -27,7 +27,7 @@
 #define COMMANDID   730
 // Action on ESP Filesystem
 //rmdir / remove / mkdir / exists / create
-//[ESP730]<Action>=<path> pwd=<admin password>
+//[ESP730]<Action>=<path> json=<no> pwd=<admin password>
 bool Commands::ESP730(const char* cmd_params, level_authenticate_type auth_type, ESP3DOutput * output)
 {
     bool noError = true;
@@ -38,7 +38,7 @@ bool Commands::ESP730(const char* cmd_params, level_authenticate_type auth_type,
     int errorCode = 200; //unless it is a server error use 200 as default and set error in json instead;
 #ifdef AUTHENTICATION_FEATURE
     if (auth_type != LEVEL_ADMIN) {
-        response = format_response(COMMANDID, json, false, "Guest user can't use this command");
+        response = format_response(COMMANDID, json, false, "Wrong authentication level");
         noError = false;
         errorCode = 401;
     }

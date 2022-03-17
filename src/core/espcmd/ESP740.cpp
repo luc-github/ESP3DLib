@@ -39,7 +39,7 @@ bool Commands::ESP740(const char* cmd_params, level_authenticate_type auth_type,
     int errorCode = 200; //unless it is a server error use 200 as default and set error in json instead
 #ifdef AUTHENTICATION_FEATURE
     if (auth_type != LEVEL_ADMIN) {
-        response = format_response(COMMANDID, json, false, "Guest user can't use this command");
+        response = format_response(COMMANDID, json, false, "Wrong authentication level");
         noError = false;
         errorCode = 401;
     }
@@ -51,7 +51,7 @@ bool Commands::ESP740(const char* cmd_params, level_authenticate_type auth_type,
         if (parameter.length() == 0) {
             parameter = "/";
         }
-        if (!ESP_SD::accessSD()) {
+        if (!ESP_SD::accessFS()) {
             response = format_response(COMMANDID, json, false, "Not available");
             noError = false;
         } else {
@@ -174,7 +174,7 @@ bool Commands::ESP740(const char* cmd_params, level_authenticate_type auth_type,
                             line+=ESP_SD::formatBytes(ESP_SD::freeBytes());
                             output->printMSGLine(line.c_str());
                         }
-                        ESP_SD::releaseSD();
+                        ESP_SD::releaseFS();
                         return true;
                     } else {
                         response = format_response(COMMANDID, json, false, "Invalid directory");
@@ -185,7 +185,7 @@ bool Commands::ESP740(const char* cmd_params, level_authenticate_type auth_type,
                     noError = false;
                 }
             }
-            ESP_SD::releaseSD();
+            ESP_SD::releaseFS();
         }
     }
     if (noError) {

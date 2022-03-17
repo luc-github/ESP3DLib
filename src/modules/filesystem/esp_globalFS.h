@@ -81,6 +81,8 @@ private:
 class ESP_GBFS
 {
 public:
+    static bool  accessFS();
+    static void  releaseFS();
     static bool isavailable(uint8_t FS=FS_UNKNOWN);
     static uint64_t totalBytes(uint8_t FS=FS_UNKNOWN);
     static uint64_t usedBytes(uint8_t FS=FS_UNKNOWN);

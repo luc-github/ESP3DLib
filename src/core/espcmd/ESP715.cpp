@@ -36,7 +36,7 @@ bool Commands::ESP715(const char* cmd_params, level_authenticate_type auth_type,
     int errorCode = 200; //unless it is a server error use 200 as default and set error in json instead
 #ifdef AUTHENTICATION_FEATURE
     if (auth_type != LEVEL_ADMIN) {
-        response = format_response(COMMANDID, json, false, "Guest user can't use this command");
+        response = format_response(COMMANDID, json, false, "Wrong authentication level");
         noError = false;
         errorCode = 401;
     }
@@ -45,7 +45,7 @@ bool Commands::ESP715(const char* cmd_params, level_authenticate_type auth_type,
 #endif //AUTHENTICATION_FEATURE
     if (noError) {
         if (has_tag (cmd_params, "FORMATSD")) {
-            if (!ESP_SD::accessSD()) {
+            if (!ESP_SD::accessFS()) {
                 response = format_response(COMMANDID, json, false, "Not available");
                 noError = false;
             } else {
@@ -59,7 +59,7 @@ bool Commands::ESP715(const char* cmd_params, level_authenticate_type auth_type,
                     response = format_response(COMMANDID, json, false, "Format failed");
                     noError = false;
                 }
-                ESP_SD::releaseSD();
+                ESP_SD::releaseFS();
             }
         } else {
             response = format_response(COMMANDID, json, false, "Invalid parameter");

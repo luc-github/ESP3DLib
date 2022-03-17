@@ -62,7 +62,7 @@ void HTTP_Server:: handle_not_found()
     if (path.startsWith("/sd/")) {
         path = path.substring(3);
         pathWithGz = path + ".gz";
-        bool isactive = ESP_SD::accessSD();
+        bool isactive = ESP_SD::accessFS();
         if(ESP_SD::exists(pathWithGz.c_str()) || ESP_SD::exists(path.c_str())) {
             if(ESP_SD::exists(pathWithGz.c_str())) {
                 _webserver->sendHeader("Content-Encoding", "gzip");
@@ -72,12 +72,12 @@ void HTTP_Server:: handle_not_found()
                 log_esp3d("Stream `%s` failed", path.c_str());
             }
             if (!isactive) {
-                ESP_SD::releaseSD();
+                ESP_SD::releaseFS();
             }
             return;
         }
         if (!isactive) {
-            ESP_SD::releaseSD();
+            ESP_SD::releaseFS ();
         }
     }
 #endif //#if defined (SD_DEVICE)

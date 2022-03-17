@@ -47,7 +47,7 @@ void HTTP_Server::SDFileupload ()
             //Upload start
             if (upload.status == UPLOAD_FILE_START) {
                 _upload_status = UPLOAD_STATUS_ONGOING;
-                if (!ESP_SD::accessSD()) {
+                if (!ESP_SD::accessFS()) {
                     _upload_status=UPLOAD_STATUS_FAILED;
                     pushError(ESP_ERROR_NOT_ENOUGH_SPACE, "Upload rejected");
                     return;
@@ -150,12 +150,12 @@ void HTTP_Server::SDFileupload ()
                     _upload_status=UPLOAD_STATUS_FAILED;
                     pushError(ESP_ERROR_FILE_CLOSE, "File close failed");
                 }
-                ESP_SD::releaseSD();
+                ESP_SD::releaseFS();
                 //Upload cancelled
             } else {
                 if (_upload_status == UPLOAD_STATUS_ONGOING) {
                     _upload_status = UPLOAD_STATUS_FAILED;
-                    ESP_SD::releaseSD();
+                    ESP_SD::releaseFS();
                 }
             }
         }
@@ -171,7 +171,7 @@ void HTTP_Server::SDFileupload ()
                 ESP_SD::remove (filename.c_str());
             }
         }
-        ESP_SD::releaseSD();
+        ESP_SD::releaseFS();
     }
     Hal::wait(5);
 }

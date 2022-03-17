@@ -37,7 +37,7 @@ bool Commands::ESP106(const char* cmd_params, level_authenticate_type auth_type,
 
 #ifdef AUTHENTICATION_FEATURE
     if (auth_type != LEVEL_ADMIN) {
-        response = format_response(COMMANDID, json, false, "Only admin can use this command");
+        response = format_response(COMMANDID, json, false, "Wrong authentication level");
         noError = false;
         errorCode = 401;
     }

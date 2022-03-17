@@ -56,7 +56,7 @@ void HTTP_Server::handleSDFileList ()
             return;
         }
     }
-    bool isactive = ESP_SD::accessSD();
+    bool isactive = ESP_SD::accessFS();
     //get current path
     if (_webserver->hasArg ("path") ) {
         path += _webserver->arg ("path") ;
@@ -218,7 +218,7 @@ void HTTP_Server::handleSDFileList ()
     _webserver->sendContent("");
     _upload_status = UPLOAD_STATUS_NONE;
     if (!isactive) {
-        ESP_SD::releaseSD();
+        ESP_SD::releaseFS();
     }
 }
 

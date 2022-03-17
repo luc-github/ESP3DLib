@@ -48,11 +48,11 @@ bool Commands::ESP200(const char* cmd_params, level_authenticate_type auth_type,
 #endif //AUTHENTICATION_FEATURE
     if (noError) {
         if (releaseSD) {
-            ESP_SD::releaseSD();
+            ESP_SD::releaseFS();
             response = format_response(COMMANDID, json, true, " SD card released");
         }
 
-        if (!ESP_SD::accessSD()) {
+        if (!ESP_SD::accessFS()) {
             if (ESP_SD::getState() == ESP_SDCARD_BUSY) {
                 response = format_response(COMMANDID, json, true, "Busy");
             } else {
@@ -66,7 +66,7 @@ bool Commands::ESP200(const char* cmd_params, level_authenticate_type auth_type,
                     ESP_SD::refreshStats(true);
                 }
             }
-            ESP_SD::releaseSD();
+            ESP_SD::releaseFS();
             parameter = clean_param(get_param (cmd_params, ""));
             if (parameter.length()!=0 && parameter.indexOf("REFRESH")==-1 && parameter.indexOf("RELEASE")==-1) {
                 response = format_response(COMMANDID, json, false, "Unknown parameter");
