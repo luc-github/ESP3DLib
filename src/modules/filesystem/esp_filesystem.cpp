@@ -50,148 +50,166 @@ String & ESP_FileSystem::formatBytes (uint64_t bytes)
 bool  ESP_FileSystem::accessFS()
 {
     if (!_started) {
-        _started = begin() {
-        }
-        return _started;
+        _started = begin();
     }
-    void  ESP_FileSystem::releaseFS() {
-        //nothing to do
-    }
+    return _started;
+}
+void  ESP_FileSystem::releaseFS()
+{
+    //nothing to do
+}
 
-    size_t ESP_FileSystem::max_update_size() {
-        size_t  flashsize = 0;
+size_t ESP_FileSystem::max_update_size()
+{
+    size_t  flashsize = 0;
 #if defined (ARDUINO_ARCH_ESP8266)
-        flashsize = ESP.getFlashChipSize();
-        //if higher than 1MB or not (no more support for 512KB flash)
-        if (flashsize <= 1024 * 1024) {
-            flashsize = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
-        } else {
-            flashsize = flashsize - ESP.getSketchSize()-totalBytes()-1024;
-            //max OTA partition is 1019Kb
-            if (flashsize > 1024 * 1024) {
-                flashsize = (1024 * 1024) - 1024;
-            }
+    flashsize = ESP.getFlashChipSize();
+    //if higher than 1MB or not (no more support for 512KB flash)
+    if (flashsize <= 1024 * 1024) {
+        flashsize = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
+    } else {
+        flashsize = flashsize - ESP.getSketchSize()-totalBytes()-1024;
+        //max OTA partition is 1019Kb
+        if (flashsize > 1024 * 1024) {
+            flashsize = (1024 * 1024) - 1024;
         }
+    }
 #endif //ARDUINO_ARCH_ESP8266
 #if defined (ARDUINO_ARCH_ESP32)
-        //Is OTA available ?
-        const esp_partition_t* mainpartition = esp_ota_get_running_partition();
-        if (mainpartition) {
-            const esp_partition_t* partition = esp_ota_get_next_update_partition(mainpartition);
-            if (partition) {
-                const esp_partition_t* partition2 = esp_ota_get_next_update_partition(partition);
-                if (partition2 && (partition->address!=partition2->address)) {
-                    flashsize = partition2->size;
-                }
+    //Is OTA available ?
+    const esp_partition_t* mainpartition = esp_ota_get_running_partition();
+    if (mainpartition) {
+        const esp_partition_t* partition = esp_ota_get_next_update_partition(mainpartition);
+        if (partition) {
+            const esp_partition_t* partition2 = esp_ota_get_next_update_partition(partition);
+            if (partition2 && (partition->address!=partition2->address)) {
+                flashsize = partition2->size;
             }
         }
+    }
 #endif //ARDUINO_ARCH_ESP32
-        return flashsize;
-    }
+    return flashsize;
+}
 
-    ESP_File::ESP_File(const char * name, const char * filename, bool isdir, size_t size) {
-        _isdir = isdir;
-        _dirlist = "";
-        _isfakedir = isdir;
-        _index = -1;
-        _filename = filename;
-        _name = name;
-        _lastwrite = 0;
-        _iswritemode = false;
-        _size = size;
-    }
+ESP_File::ESP_File(const char * name, const char * filename, bool isdir, size_t size)
+{
+    _isdir = isdir;
+    _dirlist = "";
+    _isfakedir = isdir;
+    _index = -1;
+    _filename = filename;
+    _name = name;
+    _lastwrite = 0;
+    _iswritemode = false;
+    _size = size;
+}
 
-    ESP_File::~ESP_File() {
-        //log_esp3d("Destructor %s index %d",(_isdir)?"Dir":"File", _index);
-    }
+ESP_File::~ESP_File()
+{
+    //log_esp3d("Destructor %s index %d",(_isdir)?"Dir":"File", _index);
+}
 
-    ESP_File::operator bool() const {
-        if ((_index != -1) || (_filename.length() > 0)) {
-            //log_esp3d("Bool yes %d %d",_index,  _filename.length());
-            return true;
-        } else {
-            return false;
-        }
+ESP_File::operator bool() const
+{
+    if ((_index != -1) || (_filename.length() > 0)) {
+        //log_esp3d("Bool yes %d %d",_index,  _filename.length());
+        return true;
+    } else {
+        return false;
     }
+}
 
-    bool ESP_File::isOpen() {
-        return !(_index == -1);
-    }
+bool ESP_File::isOpen()
+{
+    return !(_index == -1);
+}
 
-    const char* ESP_File::name() const {
-        return _name.c_str();
-    }
+const char* ESP_File::name() const
+{
+    return _name.c_str();
+}
 
-    const char* ESP_File::filename() const {
-        return _filename.c_str();
-    }
+const char* ESP_File::filename() const
+{
+    return _filename.c_str();
+}
 
-    bool ESP_File::isDirectory() {
-        return _isdir;
-    }
+bool ESP_File::isDirectory()
+{
+    return _isdir;
+}
 
-    size_t ESP_File::size() {
-        return _size;
-    }
+size_t ESP_File::size()
+{
+    return _size;
+}
 
-    time_t ESP_File::getLastWrite() {
-        return _lastwrite;
-    }
+time_t ESP_File::getLastWrite()
+{
+    return _lastwrite;
+}
 
-    int ESP_File::available() {
-        if (_index == -1 || _isdir) {
-            return 0;
-        }
-        return tFile_handle[_index].available();
+int ESP_File::available()
+{
+    if (_index == -1 || _isdir) {
+        return 0;
     }
+    return tFile_handle[_index].available();
+}
 
-    size_t ESP_File::write(uint8_t i) {
-        if ((_index == -1) || _isdir) {
-            return 0;
-        }
-        return tFile_handle[_index].write (i);
+size_t ESP_File::write(uint8_t i)
+{
+    if ((_index == -1) || _isdir) {
+        return 0;
     }
+    return tFile_handle[_index].write (i);
+}
 
-    size_t ESP_File::write(const uint8_t *buf, size_t size) {
-        if ((_index == -1) || _isdir) {
-            return 0;
-        }
-        return tFile_handle[_index].write (buf, size);
+size_t ESP_File::write(const uint8_t *buf, size_t size)
+{
+    if ((_index == -1) || _isdir) {
+        return 0;
     }
+    return tFile_handle[_index].write (buf, size);
+}
 
-    int ESP_File::read() {
-        if ((_index == -1) || _isdir) {
-            return -1;
-        }
-        return tFile_handle[_index].read();
+int ESP_File::read()
+{
+    if ((_index == -1) || _isdir) {
+        return -1;
     }
+    return tFile_handle[_index].read();
+}
 
-    size_t ESP_File::read(uint8_t* buf, size_t size) {
-        if ((_index == -1) || _isdir) {
-            return -1;
-        }
-        return tFile_handle[_index].read(buf, size);
+size_t ESP_File::read(uint8_t* buf, size_t size)
+{
+    if ((_index == -1) || _isdir) {
+        return -1;
     }
+    return tFile_handle[_index].read(buf, size);
+}
 
-    void ESP_File::flush() {
-        if ((_index == -1) || _isdir) {
-            return;
-        }
-        tFile_handle[_index].flush();
+void ESP_File::flush()
+{
+    if ((_index == -1) || _isdir) {
+        return;
     }
+    tFile_handle[_index].flush();
+}
 
-    ESP_File& ESP_File::operator=(const ESP_File & other) {
-        //log_esp3d("Copy %s", other._filename.c_str());
-        _isdir = other._isdir;
-        _isfakedir = other._isfakedir;
-        _index = other._index;
-        _filename = other._filename;
-        _name = other._name;
-        _size = other._size;
-        _iswritemode = other._iswritemode;
-        _dirlist = other._dirlist;
-        _lastwrite = other._lastwrite;
-        return *this;
-    }
+ESP_File& ESP_File::operator=(const ESP_File & other)
+{
+    //log_esp3d("Copy %s", other._filename.c_str());
+    _isdir = other._isdir;
+    _isfakedir = other._isfakedir;
+    _index = other._index;
+    _filename = other._filename;
+    _name = other._name;
+    _size = other._size;
+    _iswritemode = other._iswritemode;
+    _dirlist = other._dirlist;
+    _lastwrite = other._lastwrite;
+    return *this;
+}
 
 #endif //FILESYSTEM_FEATURE
