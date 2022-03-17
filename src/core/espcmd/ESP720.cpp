@@ -61,12 +61,9 @@ bool Commands::ESP720(const char* cmd_params, level_authenticate_type auth_type,
             if (f) {
                 if(json) {
                     line = "{\"cmd\":\"720\",\"status\":\"ok\",\"data\":{\"path\":\"" + parameter + "\",\"files\":[";
-                } else {
-                    line = "Directory on FS : " + parameter;
-                }
-                if (json) {
                     output->print (line.c_str());
                 } else {
+                    line = "Directory on FS : " + parameter;
                     output->printMSGLine(line.c_str());
                 }
                 //Check directories
