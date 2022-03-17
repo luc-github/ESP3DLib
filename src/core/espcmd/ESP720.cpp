@@ -145,7 +145,15 @@ bool Commands::ESP720(const char* cmd_params, level_authenticate_type auth_type,
                     line += "\",\"used\":\"";
                     line += ESP_FileSystem::formatBytes(ESP_FileSystem::usedBytes());
                     line+="\",\"occupation\":\"";
-                    line+= String(100*ESP_FileSystem::usedBytes()/ESP_FileSystem::totalBytes());
+                    uint64_t total =ESP_FileSystem::totalBytes();
+                    if (total==0) {
+                        total=1;
+                    }
+                    float occupation = 100.0*ESP_FileSystem::usedBytes()/total;
+                    if ((occupation < 1) && (ESP_FileSystem::usedBytes()>0)) {
+                        occupation=1;
+                    }
+                    line+= String((int)round(occupation));
                     line+="\"}}";
                     output->printLN (line.c_str());
                 } else {

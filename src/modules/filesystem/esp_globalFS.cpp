@@ -17,12 +17,10 @@
   License along with This code; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
 #include "../../include/esp3d_config.h"
 #if defined(GLOBAL_FILESYSTEM_FEATURE)
 #include "esp_globalFS.h"
 //#include "../../core/genLinkedList.h"
-
 
 //to verify FS is accessible
 bool ESP_GBFS::isavailable(uint8_t FS)
@@ -70,7 +68,6 @@ uint64_t ESP_GBFS::totalBytes(uint8_t FS)
 #ifdef SD_DEVICE
     if(FS == FS_SD) {
         return ESP_SD::totalBytes();
-        \;
     }
 #endif //SD_DEVICE   
     return 0;
@@ -107,8 +104,11 @@ uint ESP_GBFS::maxPathLength()
     return size;
 }
 
-bool  ESP_GBFS::accessFS()
+bool  ESP_GBFS::accessFS(uint8_t FS)
 {
+    if(FS == FS_ROOT) {
+        return true;
+    }
 #ifdef FILESYSTEM_FEATURE
     if(FS == FS_FLASH) {
         return ESP_FileSystem::accessFS();
@@ -116,24 +116,34 @@ bool  ESP_GBFS::accessFS()
 #endif //FILESYSTEM_FEATURE 
 #ifdef SD_DEVICE
     if(FS == FS_SD) {
-        return ESP_SD::accessFS();
+        bool canAccess =  ESP_SD::accessFS();
+        if(canAccess) {
+            if (ESP_SD::getState(true) == ESP_SDCARD_NOT_PRESENT) {
+                canAccess = false;
+                ESP_SD::releaseFS();
+            } else {
+                ESP_SD::setState(ESP_SDCARD_BUSY );
+                canAccess = true;
+            }
+
+        }
+        return canAccess;
     }
 #endif //SD_DEVICE   
     return false;
 }
-void  ESP_GBFS::releaseFS()
+void  ESP_GBFS::releaseFS(uint8_t FS)
 {
 #ifdef FILESYSTEM_FEATURE
     if(FS == FS_FLASH) {
-        return ESP_FileSystem::releaseFS();
+        ESP_FileSystem::releaseFS();
     }
 #endif //FILESYSTEM_FEATURE 
 #ifdef SD_DEVICE
     if(FS == FS_SD) {
-        return ESP_SD::releaseFS();
+        ESP_SD::releaseFS();
     }
 #endif //SD_DEVICE   
-    return false;
 }
 
 uint64_t ESP_GBFS::freeBytes(uint8_t FS)
@@ -222,7 +232,6 @@ const char * ESP_GBFS::getRealPath(const char * path)
 //path exists on / or SD or FS
 bool ESP_GBFS::exists(const char* path)
 {
-
 #if defined (FILESYSTEM_FEATURE) || defined(SD_DEVICE)
     uint8_t t = getFSType(path);
     if (t == FS_ROOT) {
@@ -343,8 +352,7 @@ ESP_GBFile ESP_GBFS::open(const char* path, uint8_t mode)
 #if defined (FILESYSTEM_FEATURE) || defined(SD_DEVICE)
     uint8_t t = getFSType(path);
     if ((t == FS_ROOT) &&  (mode == ESP_FILE_READ)) {
-        f = ESP_GBFile(FS_ROOT);
-        //reset index;
+        f = ESP_GBFile(FS_ROOT,"/" );
         getNextFS(true);
     }
 #if defined (FILESYSTEM_FEATURE)
@@ -369,9 +377,10 @@ ESP_GBFile::ESP_GBFile()
 }
 
 //File handle for the root
-ESP_GBFile::ESP_GBFile(uint8_t FS)
+ESP_GBFile::ESP_GBFile(uint8_t FS, const char *name)
 {
     _type = FS;
+    _name = name;
 }
 
 //Handle for flash file
@@ -427,7 +436,7 @@ bool ESP_GBFile::seek(uint32_t pos, uint8_t mode)
 {
 #if defined(FILESYSTEM_FEATURE) || defined(SD_DEVICE)
     if (_type == FS_ROOT) {
-        //TBD
+        return false;
     }
 #endif //FILESYSTEM_FEATURE || SD_DEVICE
 #ifdef FILESYSTEM_FEATURE
@@ -440,6 +449,7 @@ bool ESP_GBFile::seek(uint32_t pos, uint8_t mode)
         return _sdFile.seek(pos,mode);
     }
 #endif //SD_DEVICE 
+    return false;
 }
 
 void ESP_GBFile::close()
@@ -486,7 +496,7 @@ const char* ESP_GBFile::name() const
     static String s;
 #if defined(FILESYSTEM_FEATURE) || defined(SD_DEVICE)
     if (_type == FS_ROOT) {
-        return "/";
+        return _name.c_str();
     }
 #endif //FILESYSTEM_FEATURE || SD_DEVICE
 #ifdef FILESYSTEM_FEATURE
@@ -714,6 +724,7 @@ ESP_GBFile& ESP_GBFile::operator=(const ESP_GBFile & other)
     _sdFile = other._sdFile;
 #endif //SD_DEVICE 
     _type = other._type;
+    _name= other._name;
     return *this;
 }
 
@@ -762,6 +773,7 @@ const char * ESP_GBFS::getNextFS(bool reset)
         index++;
         return _rootlist[i].c_str();
     }
+    index = 0;
     return "";
 }
 
@@ -771,8 +783,7 @@ ESP_GBFile ESP_GBFile::openNextFile()
     if (_type == FS_ROOT) {
         String path = ESP_GBFS::getNextFS();
         if (path.length() > 0) {
-            f = ESP_GBFS::open(path.c_str());
-            f.close();
+            f = ESP_GBFile(FS_ROOT, &path[1]);
         }
     }
 #ifdef FILESYSTEM_FEATURE

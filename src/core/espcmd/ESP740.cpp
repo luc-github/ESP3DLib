@@ -149,7 +149,11 @@ bool Commands::ESP740(const char* cmd_params, level_authenticate_type auth_type,
                             line += "\",\"used\":\"";
                             line += ESP_SD::formatBytes(ESP_SD::usedBytes());
                             line+="\",\"occupation\":\"";
-                            float occupation = 100.0*ESP_SD::usedBytes()/ESP_SD::totalBytes();
+                            uint64_t total =ESP_SD::totalBytes();
+                            if (total==0) {
+                                total=1;
+                            }
+                            float occupation = 100.0*ESP_SD::usedBytes()/total;
                             if ((occupation < 1) && (ESP_SD::usedBytes()>0)) {
                                 occupation=1;
                             }
