@@ -108,11 +108,11 @@ bool Commands::ESP740(const char* cmd_params, level_authenticate_type auth_type,
                             if (!sub.isDirectory()) {
                                 String time = "";
                                 line="";
+                                countf++;
 #ifdef FILESYSTEM_TIMESTAMP_FEATURE
                                 time = timeserver.current_time(sub.getLastWrite());
 #endif //FILESYSTEM_TIMESTAMP_FEATURE
                                 if (json) {
-                                    line="";
                                     if (countd > 0 || countf>1) {
                                         line += ",";
                                     }
