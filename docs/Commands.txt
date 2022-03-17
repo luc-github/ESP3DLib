@@ -262,6 +262,10 @@ rmdir / remove / mkdir / exists / create
 * List Global Filesystem
 [ESP780]<Root> json=<no> pwd=<admin password>
 
+* Action on Global Filesystem
+rmdir / remove / mkdir / exists /create
+[ESP790]<Action>=<path> json=<no> pwd=<admin password>
+
 * FW Informations
 [ESP800]json=<no> pwd=<admin password>
 

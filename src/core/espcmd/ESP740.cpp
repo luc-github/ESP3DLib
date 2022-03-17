@@ -70,7 +70,7 @@ bool Commands::ESP740(const char* cmd_params, level_authenticate_type auth_type,
                             line = "{\"cmd\":\"720\",\"status\":\"ok\",\"data\":{\"path\":\"" + parameter + "\",\"files\":[";
                             output->print (line.c_str());
                         } else {
-                            line = "Directory on FS : " + parameter;
+                            line = "Directory on SD : " + parameter;
                             output->printMSGLine(line.c_str());
                         }
                         //Check directories
