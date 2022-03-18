@@ -44,10 +44,6 @@ void HTTP_Server::handleSDFileList ()
         status = "Upload failed";
         _upload_status = UPLOAD_STATUS_NONE;
     }
-    if (ESP_SD::getState(true) != ESP_SDCARD_IDLE) {
-        _webserver->send (200, "text/plain", "{\"status\":\"no SD card\"}");
-        return;
-    }
 
     if (_webserver->hasArg ("quiet")) {
         if(_webserver->arg ("quiet") == "yes") {
@@ -56,7 +52,20 @@ void HTTP_Server::handleSDFileList ()
             return;
         }
     }
-    bool isactive = ESP_SD::accessFS();
+
+    if (!ESP_SD::accessFS()) {
+        _upload_status = UPLOAD_STATUS_NONE;
+        _webserver->send (200, "text/plain", "{\"status\":\"not available\"}");
+        return;
+    }
+
+    if (ESP_SD::getState(true) == ESP_SDCARD_NOT_PRESENT)  {
+        _webserver->send (200, "text/plain", "{\"status\":\"no SD card\"}");
+        ESP_SD::releaseFS();
+        return;
+    }
+    ESP_SD::setState(ESP_SDCARD_BUSY );
+
     //get current path
     if (_webserver->hasArg ("path") ) {
         path += _webserver->arg ("path") ;
@@ -217,9 +226,7 @@ void HTTP_Server::handleSDFileList ()
     _webserver->sendContent_P(buffer2send.c_str(),buffer2send.length());
     _webserver->sendContent("");
     _upload_status = UPLOAD_STATUS_NONE;
-    if (!isactive) {
-        ESP_SD::releaseFS();
-    }
+    ESP_SD::releaseFS();
 }
 
 #endif //HTTP_FEATURE && SD_DEVICE
