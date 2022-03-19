@@ -49,9 +49,17 @@ void HTTP_Server::SDFileupload ()
                 _upload_status = UPLOAD_STATUS_ONGOING;
                 if (!ESP_SD::accessFS()) {
                     _upload_status=UPLOAD_STATUS_FAILED;
-                    pushError(ESP_ERROR_NOT_ENOUGH_SPACE, "Upload rejected");
+                    pushError(ESP_ERROR_NO_SD, "Upload rejected");
                     return;
                 }
+                if (ESP_SD::getState(true) == ESP_SDCARD_NOT_PRESENT)  {
+                    ESP_SD::releaseFS();
+                    _upload_status=UPLOAD_STATUS_FAILED;
+                    pushError(ESP_ERROR_NO_SD, "Upload rejected");
+                    return;
+                }
+                ESP_SD::setState(ESP_SDCARD_BUSY );
+
                 if (upload_filename[0] != '/') {
                     filename = "/" + upload_filename;
                 } else {
