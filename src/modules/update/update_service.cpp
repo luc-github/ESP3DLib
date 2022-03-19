@@ -499,30 +499,30 @@ bool UpdateService::begin()
 {
     bool res = false;
     if(Settings_ESP3D::read_byte(ESP_SD_CHECK_UPDATE_AT_BOOT)!=0) {
-        bool isactive = ESP_SD::accessFS();
-        log_esp3d("Update SD for update requestest");
-        if(ESP_SD::getState(true) == ESP_SDCARD_IDLE) {
-            ESP_ConfigFile updateConfig(CONFIG_FILE, processingFileFunction);
-            if (updateConfig.processFile()) {
-                log_esp3d("Processing ini file done");
-                if(updateConfig.revokeFile()) {
-                    log_esp3d("Revoking ini file done");
+        if (ESP_SD::accessFS()) {
+            log_esp3d("Update SD for update requestest");
+            if(ESP_SD::getState(true) != ESP_SDCARD_NOT_PRESENT) {
+                ESP_SD::setState(ESP_SDCARD_BUSY );
+                ESP_ConfigFile updateConfig(CONFIG_FILE, processingFileFunction);
+                if (updateConfig.processFile()) {
+                    log_esp3d("Processing ini file done");
+                    if(updateConfig.revokeFile()) {
+                        log_esp3d("Revoking ini file done");
+                        res = true;
+                    } else {
+                        log_esp3d("Revoking ini file failed");
+                    }
+                } else {
+                    log_esp3d("Processing ini file failed");
+                }
+                if (flash(FW_FILE,U_FLASH)) {
                     res = true;
                 } else {
-                    log_esp3d("Revoking ini file failed");
-                }
-            } else {
-                log_esp3d("Processing ini file failed");
-            }
-            if (flash(FW_FILE,U_FLASH)) {
-                res = true;
-            } else {
-                if (flash(FS_FILE,U_FS)) {
-                    res = true;
+                    if (flash(FS_FILE,U_FS)) {
+                        res = true;
+                    }
                 }
             }
-        }
-        if (!isactive) {
             ESP_SD::releaseFS();
         }
     } else {
