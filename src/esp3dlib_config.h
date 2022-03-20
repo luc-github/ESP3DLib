@@ -214,6 +214,12 @@
 #define DEBUG_ESP3D_OUTPUT_PORT  8000
 #endif //ESP_DEBUG_FEATURE
 
+/************************************
+ *
+ * Benchmark report
+ *
+ * **********************************/
+#define ESP_BENCHMARK_FEATURE
 
 /************************************
  *

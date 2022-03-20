@@ -29,9 +29,17 @@
 #endif //ARDUINO_ARCH_ESP8266
 #include "../../filesystem/esp_sd.h"
 #include "../../authentication/authentication_service.h"
+#ifdef ESP_BENCHMARK_FEATURE
+#include "../../../core/benchmark.h"
+#endif //ESP_BENCHMARK_FEATURE
+
 //SD files uploader handle
 void HTTP_Server::SDFileupload ()
 {
+#ifdef ESP_BENCHMARK_FEATURE
+    static uint64_t bench_start;
+    static size_t bench_transfered;
+#endif//ESP_BENCHMARK_FEATURE
     //get authentication status
     level_authenticate_type auth_level= AuthenticationService::authenticated_level();
     static String filename;
@@ -47,6 +55,10 @@ void HTTP_Server::SDFileupload ()
 
             //Upload start
             if (upload.status == UPLOAD_FILE_START) {
+#ifdef ESP_BENCHMARK_FEATURE
+                bench_start = millis();
+                bench_transfered = 0;
+#endif//ESP_BENCHMARK_FEATURE
                 _upload_status = UPLOAD_STATUS_ONGOING;
                 if (!ESP_SD::accessFS()) {
                     _upload_status=UPLOAD_STATUS_FAILED;
@@ -115,6 +127,9 @@ void HTTP_Server::SDFileupload ()
             } else if(upload.status == UPLOAD_FILE_WRITE) {
                 //check if file is available and no error
                 if(fsUploadFile && _upload_status == UPLOAD_STATUS_ONGOING) {
+#ifdef ESP_BENCHMARK_FEATURE
+                    bench_transfered += upload.currentSize;
+#endif//ESP_BENCHMARK_FEATURE
                     //no error so write post date
                     int writeddatanb=fsUploadFile.write(upload.buf, upload.currentSize);
                     if(upload.currentSize != writeddatanb) {
@@ -136,6 +151,9 @@ void HTTP_Server::SDFileupload ()
                 if(fsUploadFile) {
                     //close it
                     fsUploadFile.close();
+#ifdef ESP_BENCHMARK_FEATURE
+                    benchMark("SD upload", bench_start, millis(), bench_transfered);
+#endif//ESP_BENCHMARK_FEATURE
                     //check size
                     String  sizeargname  = upload.filename + "S";
                     //fsUploadFile = ESP_SD::open (filename, ESP_FILE_READ);

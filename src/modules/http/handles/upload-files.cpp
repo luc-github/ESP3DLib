@@ -28,9 +28,18 @@
 #endif //ARDUINO_ARCH_ESP8266
 #include "../../filesystem/esp_filesystem.h"
 #include "../../authentication/authentication_service.h"
+
+#ifdef ESP_BENCHMARK_FEATURE
+#include "../../../core/benchmark.h"
+#endif //ESP_BENCHMARK_FEATURE
+
 //FS files uploader handle
 void HTTP_Server::FSFileupload ()
 {
+#ifdef ESP_BENCHMARK_FEATURE
+    static uint64_t bench_start;
+    static size_t bench_transfered;
+#endif//ESP_BENCHMARK_FEATURE
     //get authentication status
     level_authenticate_type auth_level= AuthenticationService::authenticated_level();
     static String filename;
@@ -46,6 +55,10 @@ void HTTP_Server::FSFileupload ()
 
             //Upload start
             if (upload.status == UPLOAD_FILE_START) {
+#ifdef ESP_BENCHMARK_FEATURE
+                bench_start = millis();
+                bench_transfered = 0;
+#endif//ESP_BENCHMARK_FEATURE
                 _upload_status = UPLOAD_STATUS_ONGOING;
                 if (upload_filename[0] != '/') {
                     filename = "/" + upload_filename;
@@ -95,6 +108,9 @@ void HTTP_Server::FSFileupload ()
                 //check if file is available and no error
                 if(fsUploadFile && _upload_status == UPLOAD_STATUS_ONGOING) {
                     //no error so write post date
+#ifdef ESP_BENCHMARK_FEATURE
+                    bench_transfered += upload.currentSize;
+#endif//ESP_BENCHMARK_FEATURE
                     if(upload.currentSize != fsUploadFile.write(upload.buf, upload.currentSize)) {
                         //we have a problem set flag UPLOAD_STATUS_FAILED
                         _upload_status=UPLOAD_STATUS_FAILED;
@@ -112,6 +128,9 @@ void HTTP_Server::FSFileupload ()
                 if(fsUploadFile) {
                     //close it
                     fsUploadFile.close();
+#ifdef ESP_BENCHMARK_FEATURE
+                    benchMark("FS upload", bench_start, millis(), bench_transfered);
+#endif//ESP_BENCHMARK_FEATURE
                     //check size
                     String  sizeargname  = upload.filename + "S";
                     //fsUploadFile = ESP_FileSystem::open (filename, ESP_FILE_READ);
