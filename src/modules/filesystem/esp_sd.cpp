@@ -17,7 +17,7 @@
   License along with This code; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
+//#define ESP_DEBUG_FEATURE DEBUG_OUTPUT_SERIAL0
 #include "../../include/esp3d_config.h"
 #ifdef SD_DEVICE
 #include "esp_sd.h"
@@ -72,10 +72,11 @@ bool ESP_SD::enableSharedSD()
 #endif // ESP_FLAG_SHARED_SD_PIN
 #if defined (ESP3DLIB_ENV)
     //check if card is not currently in use
-    if (card.isMounted() && (IS_SD_PRINTING() ||IS_SD_FETCHING() ||IS_SD_PAUSED() ||  IS_SD_FILE_OPEN())) {
+    if ((card.isMounted() && (IS_SD_PRINTING() ||IS_SD_FETCHING() ||IS_SD_PAUSED() ||  IS_SD_FILE_OPEN()))||card.flag.busy) {
         _enabled = false;
     } else {
         card.release();
+        card.flag.busy = true;
     }
 #endif // ESP3DLIB_ENV
     return _enabled;
@@ -96,11 +97,14 @@ bool  ESP_SD::accessFS()
 {
     //if card is busy do not let another task access SD and so prevent a release
     if (_state == ESP_SDCARD_BUSY) {
+        log_esp3d("SD Busy");
         return false;
     }
     if  (ESP_SD::enableSharedSD()) {
+        log_esp3d("Access SD");
         return true;
     } else {
+        log_esp3d("Enable shared SD failed");
         return false;
     }
 }
@@ -111,6 +115,8 @@ void  ESP_SD::releaseFS()
     digitalWrite(ESP_FLAG_SHARED_SD_PIN, !ESP_FLAG_SHARED_SD_VALUE);
 #endif // ESP_FLAG_SHARED_SD_PIN
 #if defined (ESP3DLIB_ENV)
+    log_esp3d("Release SD");
+    card.flag.busy = false;
     card.mount();
 #endif // ESP3DLIB_ENV
     _enabled = false;

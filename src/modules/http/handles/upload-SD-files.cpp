@@ -17,6 +17,7 @@
  License along with This code; if not, write to the Free Software
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+//#define ESP_DEBUG_FEATURE DEBUG_OUTPUT_SERIAL0
 #include "../../../include/esp3d_config.h"
 #if defined (HTTP_FEATURE) && defined(SD_DEVICE)
 #include "../http_server.h"
@@ -53,6 +54,7 @@ void HTTP_Server::SDFileupload ()
                     return;
                 }
                 if (ESP_SD::getState(true) == ESP_SDCARD_NOT_PRESENT)  {
+                    log_esp3d("Release Sd called");
                     ESP_SD::releaseFS();
                     _upload_status=UPLOAD_STATUS_FAILED;
                     pushError(ESP_ERROR_NO_SD, "Upload rejected");
@@ -81,12 +83,7 @@ void HTTP_Server::SDFileupload ()
                     fsUploadFile.close();
                 }
                 String  sizeargname  = upload.filename + "S";
-                //TODO add busy state and handle it for upload
                 log_esp3d("Uploading file %s", filename.c_str());
-                if (ESP_SD::getState(true) != ESP_SDCARD_IDLE) {
-                    _upload_status=UPLOAD_STATUS_FAILED;
-                    log_esp3d("SDcard is not available");
-                }
                 if (_upload_status!=UPLOAD_STATUS_FAILED) {
                     if (_webserver->hasArg (sizeargname.c_str()) ) {
                         size_t freespace = ESP_SD::totalBytes() - ESP_SD::usedBytes();
@@ -158,11 +155,13 @@ void HTTP_Server::SDFileupload ()
                     _upload_status=UPLOAD_STATUS_FAILED;
                     pushError(ESP_ERROR_FILE_CLOSE, "File close failed");
                 }
+                log_esp3d("Release Sd called");
                 ESP_SD::releaseFS();
                 //Upload cancelled
             } else {
                 if (_upload_status == UPLOAD_STATUS_ONGOING) {
                     _upload_status = UPLOAD_STATUS_FAILED;
+                    log_esp3d("Release Sd called");
                     ESP_SD::releaseFS();
                 }
             }
@@ -179,6 +178,7 @@ void HTTP_Server::SDFileupload ()
                 ESP_SD::remove (filename.c_str());
             }
         }
+        log_esp3d("Release Sd called");
         ESP_SD::releaseFS();
     }
     Hal::wait(5);

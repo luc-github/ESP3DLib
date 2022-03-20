@@ -30,31 +30,52 @@
 #if defined(SDSUPPORT) && defined (ESP3DLIB_ENV)
 
 typedef struct {
-  bool saving:1,
-       logging:1,
-       sdprinting:1,
-       sdprintdone:1,
-       mounted:1,
-       filenameIsDir:1,
-       workDirIsRoot:1,
-       abort_sd_printing:1
-    ;
+    bool saving:1,
+         logging:1,
+         sdprinting:1,
+         sdprintdone:1,
+         mounted:1,
+         filenameIsDir:1,
+         workDirIsRoot:1,
+         abort_sd_printing:1,
+         busy:1
+
+         ;
 } card_flags_t;
 
 
 
-class CardReader {
+class CardReader
+{
 public:
-  static card_flags_t flag;                         // Flags (above)
-  static void mount();
-  static void release();
-  static bool isMounted() { return flag.mounted; }
+    static card_flags_t flag;                         // Flags (above)
+    static void mount();
+    static void release();
+    static bool isMounted()
+    {
+        return flag.mounted;
+    }
 
-  static void abortFilePrintSoon() { flag.abort_sd_printing = isFileOpen(); }
-  static void pauseSDPrint()       { flag.sdprinting = false; }
-  static bool isPrinting()         { return flag.sdprinting; }
-  static bool isPaused()           { return isFileOpen() && !isPrinting(); }
-  static bool isFileOpen()         { return isMounted() && isPrinting(); }
+    static void abortFilePrintSoon()
+    {
+        flag.abort_sd_printing = isFileOpen();
+    }
+    static void pauseSDPrint()
+    {
+        flag.sdprinting = false;
+    }
+    static bool isPrinting()
+    {
+        return flag.sdprinting;
+    }
+    static bool isPaused()
+    {
+        return isFileOpen() && !isPrinting();
+    }
+    static bool isFileOpen()
+    {
+        return isMounted() && isPrinting();
+    }
 private:
 
 };

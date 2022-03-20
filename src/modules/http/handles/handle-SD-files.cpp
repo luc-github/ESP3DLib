@@ -17,6 +17,7 @@
  License along with This code; if not, write to the Free Software
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+//#define ESP_DEBUG_FEATURE DEBUG_OUTPUT_SERIAL0
 #include "../../../include/esp3d_config.h"
 #if defined (HTTP_FEATURE) && defined(SD_DEVICE)
 #include "../http_server.h"
@@ -61,6 +62,7 @@ void HTTP_Server::handleSDFileList ()
 
     if (ESP_SD::getState(true) == ESP_SDCARD_NOT_PRESENT)  {
         _webserver->send (200, "text/plain", "{\"status\":\"no SD card\"}");
+        log_esp3d("Release Sd called");
         ESP_SD::releaseFS();
         return;
     }
@@ -226,6 +228,7 @@ void HTTP_Server::handleSDFileList ()
     _webserver->sendContent_P(buffer2send.c_str(),buffer2send.length());
     _webserver->sendContent("");
     _upload_status = UPLOAD_STATUS_NONE;
+    log_esp3d("Release Sd called");
     ESP_SD::releaseFS();
 }
 

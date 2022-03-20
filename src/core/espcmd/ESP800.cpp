@@ -366,7 +366,7 @@ bool Commands::ESP800(const char* cmd_params, level_authenticate_type auth_type,
         if (json) {
             line+=",\"CameraID\":\"";
         } else {
-            line+= "CameraID:";
+            line+= "Camera ID:";
         }
         line+=esp3d_camera.GetModel();
         if (json) {

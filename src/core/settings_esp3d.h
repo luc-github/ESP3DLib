@@ -31,6 +31,8 @@
 #define MARLIN_EMBEDDED 30
 #define SMOOTHIEWARE    40
 #define REPETIER        50
+#define FLUIDNC         60
+#define REPRAP          70
 
 //Default flags
 #define DEFAULT_SERIAL_OUTPUT_FLAG 1
