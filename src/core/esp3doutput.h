@@ -23,13 +23,16 @@
 #define ESP_TELNET_CLIENT               2
 #define ESP_HTTP_CLIENT                 4
 #define ESP_WEBSOCKET_TERMINAL_CLIENT   8
-#define ESP_REMOTE_SCREEN_CLIENT       16
+#define ESP_REMOTE_SCREEN_CLIENT        16
+#define ESP_STREAM_HOST_CLIENT          30
 #define ESP_BT_CLIENT                   32
 #define ESP_SCREEN_CLIENT               64
 #define ESP_WEBSOCKET_CLIENT            128
 #define ESP_SOCKET_SERIAL_CLIENT        129
 #define ESP_ECHO_SERIAL_CLIENT          130
 #define ESP_ALL_CLIENTS                 255
+
+#define ESP_STREAM_HOST_OUTPUT        ESP_SERIAL_CLIENT
 
 #define ESP_OUTPUT_IP_ADDRESS          0
 #define ESP_OUTPUT_STATUS              1
@@ -86,10 +89,7 @@ public:
     {
         return write((uint8_t) n);
     }
-    uint8_t client()
-    {
-        return _client;
-    }
+    uint8_t client(uint8_t client = 0);
     size_t dispatch (uint8_t * sbuf, size_t len);
     size_t printMSG(const char * s, bool withNL = true);
     size_t printMSGLine(const char * s);

@@ -198,6 +198,10 @@
 #define NOTIFICATION_FEATURE
 #endif //DISABLE_NOTIFICATION_FEATURE
 
+//GCODE_HOST_FEATURE: allow to host gcode files on flash, SD etc..
+//Also used by ESP700
+#define GCODE_HOST_FEATURE
+
 /************************************
  *
  * DEBUG

@@ -239,6 +239,9 @@ Get will give type and settings only, not the protected T1/T2
 * Read FS file
 [ESP700]<filename> json=<no>[pwd=<admin/user password>]
 
+* Query and Control ESP700 stream
+[ESP701]action=<PAUSE/RESUME/ABORT> json=<no>[pwd=<admin/user password>]
+
 * Format ESP Filesystem
 [ESP710]FORMATFS json=<no> pwd=<admin password>
 

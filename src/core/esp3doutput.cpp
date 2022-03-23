@@ -165,6 +165,14 @@ ESP3DOutput::ESP3DOutput(uint8_t client)
 #endif //HTTP_FEATURE
 }
 
+uint8_t ESP3DOutput::client(uint8_t client )
+{
+    if(client != 0) {
+        _client = client;
+    }
+    return _client;
+}
+
 #ifdef HTTP_FEATURE
 //constructor
 ESP3DOutput::ESP3DOutput(WEBSERVER   * webserver)

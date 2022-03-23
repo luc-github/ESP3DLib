@@ -121,9 +121,10 @@ const char * help[]= {"[ESP] (id) - display this help",
                       "[ESP610]type=(NONE/PUSHOVER/EMAIL/LINE) (T1=xxx) (T2=xxx) (TS=xxx) - display/set Notification settings",
                       "[ESP620]URL=http://XXXXXX  - send GET notification",
 #endif //NOTIFICATION_FEATURE
-#if defined(FILESYSTEM_FEATURE) && defined(ESP_GCODE_HOST_FEATURE)
+#if defined(GCODE_HOST_FEATURE)
                       "[ESP700](filename) - read ESP Filesystem file",
-#endif //FILESYSTEM_FEATURE
+                      "[ESP701]action=(PAUSE/RESUME/ABORT) - query and control ESP700 stream",
+#endif //GCODE_HOST_FEATURE
 #if defined(FILESYSTEM_FEATURE)
                       "[ESP710]FORMATFS - Format ESP Filesystem",
 #endif //FILESYSTEM_FEATURE
@@ -250,9 +251,10 @@ const uint cmdlist[]= {0,
                        610,
                        620,
 #endif //NOTIFICATION_FEATURE
-#if defined(FILESYSTEM_FEATURE) && defined(ESP_GCODE_HOST_FEATURE)
+#if defined(GCODE_HOST_FEATURE)
                        700,
-#endif //FILESYSTEM_FEATURE
+                       701,
+#endif //GCODE_HOST_FEATURE
 #if defined(FILESYSTEM_FEATURE)
                        710,
 #endif //FILESYSTEM_FEATURE

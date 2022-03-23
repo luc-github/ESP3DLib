@@ -651,13 +651,18 @@ bool Commands::execute_internal_command (int cmd, const char* cmd_params, level_
         response = ESP715(cmd_params, auth_type, output);
         break;
 #endif //SD_DEVICE 
-#if defined(FILESYSTEM_FEATURE) && defined(ESP_GCODE_HOST_FEATURE)
+#if defined(GCODE_HOST_FEATURE)
     //Open local file
     //[ESP700]<filename>
     case 700:
         response = ESP700(cmd_params, auth_type, output);
         break;
-#endif //FILESYSTEM_FEATURE
+    //Query and Control ESP700 stream
+    //[ESP701]action=<PAUSE/RESUME/ABORT>
+    case 701:
+        response = ESP701(cmd_params, auth_type, output);
+        break;
+#endif //GCODE_HOST_FEATURE
 #if defined (SD_DEVICE)
     //List SD Filesystem
     //[ESP740]<Root> pwd=<admin password>

@@ -45,9 +45,9 @@
 #ifdef DISPLAY_DEVICE
 #include "../modules/display/display.h"
 #endif //DISPLAY_DEVICE
-#ifdef ESP_GCODE_HOST_FEATURE
+#ifdef GCODE_HOST_FEATURE
 #include "../modules/gcode_host/gcode_host.h"
-#endif //ESP_GCODE_HOST_FEATURE
+#endif //GCODE_HOST_FEATURE
 #ifdef ESP_LUA_INTERPRETER_FEATURE
 #include "../modules/lua_interpreter/lua_interpreter_service.h"
 #endif //#ifdef 
@@ -132,9 +132,14 @@ bool Esp3D::begin()
     }
 
 #endif //WIFI_FEATURE
+#if defined(GCODE_HOST_FEATURE)
 #if defined(ESP_AUTOSTART_SCRIPT)
-    esp3d_gcode_host.processscript(ESP_AUTOSTART_SCRIPT);
+    esp3d_gcode_host.processScript(ESP_AUTOSTART_SCRIPT);
 #endif //ESP_AUTOSTART_FEATURE
+#if defined(ESP_AUTOSTART_SCRIPT_FILE)
+    esp3d_gcode_host.processFile(ESP_AUTOSTART_SCRIPT_FILE);
+#endif //ESP_AUTOSTART_FEATURE
+#endif //GCODE_HOST_FEATURE
     return res;
 }
 

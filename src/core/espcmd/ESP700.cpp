@@ -18,17 +18,16 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "../../include/esp3d_config.h"
-#if defined (FILESYSTEM_FEATURE) && defined(ESP_GCODE_HOST_FEATURE)
+#if  defined(GCODE_HOST_FEATURE)
 #include "../commands.h"
 #include "../esp3doutput.h"
 #include "../settings_esp3d.h"
 #include "../../modules/authentication/authentication_service.h"
-#include "../../modules/filesystem/esp_filesystem.h"
 #include "../../modules/gcode_host/gcode_host.h"
 #define COMMANDID   700
 //TODO :
-// - on ESP3DLib or GRBL_ESP32 the file must be processed like a SD gcode file
-// - on ESP32 the file must be processed and/or streamed like a SD gcode file
+// - on ESP3DLib or GRBL_ESP32 the file/line must be processed like a SD gcode file
+// - on ESP3D the file/line must be processed and/or streamed like a SD gcode file
 
 //read local file
 //[ESP700]<filename>
@@ -52,8 +51,12 @@ bool Commands::ESP700(const char* cmd_params, level_authenticate_type auth_type,
         parameter = clean_param(get_param (cmd_params, ""));
         if (parameter.length() != 0) {
             //TODO check the file exists or not and raise error if not
-            esp3d_gcode_host.processFSFile(parameter.c_str(), auth_type, output);
-            response = format_response(COMMANDID, json, true, "ok");
+            if (esp3d_gcode_host.processFile(parameter.c_str(), auth_type, output)) {
+                response = format_response(COMMANDID, json, true, "ok");
+            } else {
+                response = format_response(COMMANDID, json, false, "Error processing file");
+                noError = false;
+            }
         } else {
             response = format_response(COMMANDID, json, false, "Missing parameter");
             noError = false;
@@ -71,4 +74,4 @@ bool Commands::ESP700(const char* cmd_params, level_authenticate_type auth_type,
     return noError;
 }
 
-#endif //FILESYSTEM_FEATURE && ESP_GCODE_HOST_FEATURE
+#endif //GCODE_HOST_FEATURE
