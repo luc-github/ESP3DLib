@@ -90,7 +90,7 @@ public:
         return write((uint8_t) n);
     }
     uint8_t client(uint8_t client = 0);
-    size_t dispatch (uint8_t * sbuf, size_t len);
+    size_t dispatch (const uint8_t * sbuf, size_t len, uint8_t ignoreClient = 0);
     size_t printMSG(const char * s, bool withNL = true);
     size_t printMSGLine(const char * s);
     size_t printERROR(const char * s, int code_error = 500);

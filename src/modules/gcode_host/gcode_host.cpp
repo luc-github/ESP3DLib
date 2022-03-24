@@ -71,28 +71,20 @@ void GcodeHost::end()
     _processedSize = 0;
 }
 
-bool GcodeHost::push(uint8_t * sbuf, size_t len)
+bool GcodeHost::push(const uint8_t * sbuf, size_t len)
 {
     log_esp3d("Push got %d bytes", len);
     if (_step == HOST_NO_STREAM) {
         return false;
     }
-    String tmp;
-    tmp.reserve(len+1);
-    tmp.concat((char*)sbuf, len);
-    log_esp3d("%s", (const char *)tmp.c_str());
-    tmp = "";
     for (size_t i = 0; i < len; i++) {
         //it is a line process it
         if (sbuf[i]=='\n' || sbuf[i]=='\r') {
-            tmp.concat((char*)_buffer, _bufferSize);
             flush();
         } else {
             //fill buffer until it is full
             if (_bufferSize < ESP_HOST_BUFFER_SIZE) {
                 _buffer[_bufferSize++] = sbuf[i];
-                tmp="";
-                tmp.concat((char*)_buffer, _bufferSize);
             } else {
                 //buffer is full flush it
                 flush();
@@ -111,15 +103,11 @@ void GcodeHost::flush()
     //analyze buffer and do action if needed
     //look for \n, ok , error, ack
     //then clean buffer accordingly
-
-    //in case response has not been processed
     if(_bufferSize==0) {
         return;
     }
-    if (_response.length() > 0) {
-        handle();
-    }
     _response = (const char*)_buffer;
+    log_esp3d("Stream got the response: %s", _response.c_str());
     _response.toLowerCase();
     if (_response.indexOf("ok") != -1) {
         //check if we have proper ok response
@@ -127,7 +115,7 @@ void GcodeHost::flush()
         if(_step == HOST_WAIT4_ACK) {
             _step=HOST_READ_LINE;
         } else {
-            log_esp3d("Got OK but out of the query");
+            log_esp3d("Got ok but out of the query");
         }
     } else {
         if (_response.indexOf("error") != -1) {
@@ -319,8 +307,13 @@ void GcodeHost::processCommand()
     } else {
         log_esp3d("Command %s is valid", _currentCommand.c_str());
         String cmd = _currentCommand + "\n";
-        esp3d_commands.process((uint8_t *)cmd.c_str(), cmd.length(),&_outputStream, _auth_type) ;
-        if (esp3d_commands.is_esp_command((uint8_t *)_currentCommand.c_str(), _currentCommand.length())) {
+        bool isESPcmd = esp3d_commands.is_esp_command((uint8_t *)_currentCommand.c_str(), _currentCommand.length());
+        //TODO need to change if ESP3D
+#if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+        ESP3DOutput output(ESP_SOCKET_SERIAL_CLIENT);
+#endif//COMMUNICATION_PROTOCOL
+        esp3d_commands.process((uint8_t *)cmd.c_str(), cmd.length(),&_outputStream, _auth_type,isESPcmd?nullptr: &output) ;
+        if (isESPcmd) {
             //we display error in output but it is not a blocking error
             log_esp3d("Command is ESP command");
             _step = HOST_READ_LINE;
@@ -377,15 +370,17 @@ void GcodeHost::handle()
         endStream();
         break;
     case HOST_ERROR_STREAM: {
-        ESP3DOutput output(ESP_ALL_CLIENTS);
         String Error;
         if (_error == ERROR_NO_ERROR) {
             //TODO check _response to put right error
             _error = ERROR_UNKNOW;
         }
         log_esp3d("Error %d", _error);
-        Error = "Stream failed: " + String(_error);
-        output.printERROR(Error.c_str());
+        Error = "error: stream failed: " + String(_error) + "\n";
+#if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+        ESP3DOutput output(ESP_SOCKET_SERIAL_CLIENT);
+#endif//COMMUNICATION_PROTOCOL
+        output.dispatch((const uint8_t *)Error.c_str(), Error.length());
         _step = HOST_STOP_STREAM;
     }
     break;

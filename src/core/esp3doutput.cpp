@@ -253,17 +253,16 @@ bool ESP3DOutput::isOutput(uint8_t flag, bool fromsettings)
     }
 }
 
-size_t ESP3DOutput::dispatch (uint8_t * sbuf, size_t len)
+size_t ESP3DOutput::dispatch (const uint8_t * sbuf, size_t len, uint8_t ignoreClient)
 {
     log_esp3d("Dispatch %d chars to client %d", len, _client);
 #if defined(GCODE_HOST_FEATURE)
-    if (_client != ESP_STREAM_HOST_CLIENT) {
+    if (!(_client == ESP_STREAM_HOST_CLIENT || _client==ignoreClient)) {
         esp3d_gcode_host.push(sbuf, len);
     }
 #endif //GCODE_HOST_FEATURE
 #if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
-    if (_client != ESP_SERIAL_CLIENT) {
-
+    if (!(_client == ESP_SERIAL_CLIENT || _client==ignoreClient)) {
         if (isOutput(ESP_SERIAL_CLIENT)) {
 #if COMMUNICATION_PROTOCOL == MKS_SERIAL
             MKSService::sendGcodeFrame((const char *)sbuf);
@@ -274,33 +273,36 @@ size_t ESP3DOutput::dispatch (uint8_t * sbuf, size_t len)
     }
 #endif //COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
 #if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
-    if (_client != ESP_SOCKET_SERIAL_CLIENT) {
+    if (!(_client == ESP_SOCKET_SERIAL_CLIENT || _client==ignoreClient)) {
         Serial2Socket.push(sbuf, len);
+    }
+    if (!(_client == ESP_ECHO_SERIAL_CLIENT || _client==ignoreClient)) {
+        MYSERIAL1.write(sbuf, len);
     }
 #endif //COMMUNICATION_PROTOCOL == SOCKET_SERIAL 
 #if defined (HTTP_FEATURE) //no need to block it never
-    if (!((_client == ESP_WEBSOCKET_TERMINAL_CLIENT) || (_client == ESP_HTTP_CLIENT))) {
+    if (!((_client == ESP_WEBSOCKET_TERMINAL_CLIENT) || (_client == ESP_HTTP_CLIENT)|| (_client==ignoreClient))) {
         if (websocket_terminal_server) {
             websocket_terminal_server.write(sbuf, len);
         }
     }
 #endif //HTTP_FEATURE    
 #if defined (BLUETOOTH_FEATURE)
-    if (_client != ESP_BT_CLIENT) {
+    if (_!(client == ESP_BT_CLIENT  || _client==ignoreClient)) {
         if (isOutput(ESP_BT_CLIENT) && bt_service.started()) {
             bt_service.write(sbuf, len);
         }
     }
 #endif //BLUETOOTH_FEATURE 
 #if defined (TELNET_FEATURE)
-    if (_client != ESP_TELNET_CLIENT) {
+    if (!(_client == ESP_TELNET_CLIENT || _client==ignoreClient)) {
         if (isOutput(ESP_TELNET_CLIENT) && telnet_server.started()) {
             telnet_server.write(sbuf, len);
         }
     }
 #endif //TELNET_FEATURE 
 #if defined (WS_DATA_FEATURE)
-    if (_client != ESP_WEBSOCKET_CLIENT) {
+    if (!(_client == ESP_WEBSOCKET_CLIENT || _client==ignoreClient)) {
         if (isOutput(ESP_WEBSOCKET_CLIENT) && websocket_data_server.started()) {
             log_esp3d("Dispatch to websocket data server");
             websocket_data_server.write(sbuf, len);
@@ -725,6 +727,15 @@ size_t ESP3DOutput::write(const uint8_t *buffer, size_t size)
         }
         break;
 #endif //WS_DATA_FEATURE
+#if defined(GCODE_HOST_FEATURE)
+    case  ESP_STREAM_HOST_CLIENT: {
+#if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+        dispatch(buffer, size);
+#endif //COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+    }
+    return size;
+    break;
+#endif //GCODE_HOST_FEATURE
 
 #if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
     case ESP_REMOTE_SCREEN_CLIENT:

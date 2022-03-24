@@ -63,7 +63,7 @@ public:
     bool begin();
     void end();
     void handle();
-    bool push(uint8_t * sbuf, size_t len);
+    bool push(const uint8_t * sbuf, size_t len);
     void flush();
     /*bool sendCommand(const char* command, bool checksum = false, bool wait4ack = true, const char * ack=nullptr);*/
     uint32_t currentCommandNumber()
