@@ -50,11 +50,15 @@ bool Commands::ESP700(const char* cmd_params, level_authenticate_type auth_type,
     if (noError) {
         parameter = clean_param(get_param (cmd_params, ""));
         if (parameter.length() != 0) {
-            //TODO check the file exists or not and raise error if not
-            if (esp3d_gcode_host.processFile(parameter.c_str(), auth_type, output)) {
-                response = format_response(COMMANDID, json, true, "ok");
+            if (esp3d_gcode_host.getStatus()==HOST_NO_STREAM) {
+                if (esp3d_gcode_host.processFile(parameter.c_str(), auth_type, output)) {
+                    response = format_response(COMMANDID, json, true, "ok");
+                } else {
+                    response = format_response(COMMANDID, json, false, "Error processing file");
+                    noError = false;
+                }
             } else {
-                response = format_response(COMMANDID, json, false, "Error processing file");
+                response = format_response(COMMANDID, json, false, "Streaming already in progress");
                 noError = false;
             }
         } else {

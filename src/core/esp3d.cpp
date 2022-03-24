@@ -162,6 +162,9 @@ void Esp3D::handle()
 #if defined(CONNECTED_DEVICES_FEATURE)
     DevicesServices::handle();
 #endif //CONNECTED_DEVICES_FEATURE
+#if defined(GCODE_HOST_FEATURE)
+    esp3d_gcode_host.handle();
+#endif //GCODE_HOST_FEATURE
 }
 
 //End ESP3D

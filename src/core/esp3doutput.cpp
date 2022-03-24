@@ -17,7 +17,7 @@
   License along with This code; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
+//#define ESP_DEBUG_FEATURE DEBUG_OUTPUT_SERIAL0
 #include "../include/esp3d_config.h"
 #include "esp3doutput.h"
 #if COMMUNICATION_PROTOCOL != SOCKET_SERIAL
@@ -39,6 +39,9 @@
 #if COMMUNICATION_PROTOCOL == MKS_SERIAL
 #include "../modules/mks/mks_service.h"
 #endif //COMMUNICATION_PROTOCOL == MKS_SERIAL
+#if defined(GCODE_HOST_FEATURE)
+#include "../modules/gcode_host/gcode_host.h"
+#endif //GCODE_HOST_FEATURE
 
 #if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL || COMMUNICATION_PROTOCOL == SOCKET_SERIAL
 uint8_t ESP3DOutput::_serialoutputflags = DEFAULT_SERIAL_OUTPUT_FLAG;
@@ -252,7 +255,12 @@ bool ESP3DOutput::isOutput(uint8_t flag, bool fromsettings)
 
 size_t ESP3DOutput::dispatch (uint8_t * sbuf, size_t len)
 {
-    //log_esp3d("Dispatch %d chars to client %d", len, _client);
+    log_esp3d("Dispatch %d chars to client %d", len, _client);
+#if defined(GCODE_HOST_FEATURE)
+    if (_client != ESP_STREAM_HOST_CLIENT) {
+        esp3d_gcode_host.push(sbuf, len);
+    }
+#endif //GCODE_HOST_FEATURE
 #if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
     if (_client != ESP_SERIAL_CLIENT) {
 

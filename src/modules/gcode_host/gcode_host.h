@@ -36,9 +36,11 @@ class ESP3DOutput;
 #define ERROR_RESEND            6
 #define ERROR_NUMBER_MISMATCH   7
 #define ERROR_LINE_IGNORED      8
-#define ERROR_FILE              9
+#define ERROR_FILE_SYSTEM       9
 #define ERROR_CHECKSUM          10
-#define ERROR_UNKNOW           11
+#define ERROR_UNKNOW            11
+#define ERROR_FILE_NOT_FOUND    12
+#define ERROR_STREAM_ABORTED    13
 
 #define HOST_NO_STREAM     0
 #define HOST_START_STREAM  1
@@ -58,7 +60,7 @@ class GcodeHost
 public:
     GcodeHost();
     ~GcodeHost();
-    bool begin(bool waitwhenidle = false);
+    bool begin();
     void end();
     void handle();
     bool push(uint8_t * sbuf, size_t len);
@@ -106,13 +108,17 @@ public:
         }
         return _fileName.c_str();
     }
-
-    bool processFile(const char * filename, level_authenticate_type auth_type, ESP3DOutput * output);
-    bool processLine(const char * line, level_authenticate_type auth_type, ESP3DOutput * output);
-    bool processScript(const char * line);
+    bool processScript(const char * line, level_authenticate_type auth_type = LEVEL_ADMIN, ESP3DOutput * output=nullptr);
+    bool processFile(const char * filename, level_authenticate_type auth_type= LEVEL_ADMIN, ESP3DOutput * output=nullptr);
     bool abort();
     bool pause();
     bool resume();
+    void startStream();
+    void readNextCommand();
+    void endStream();
+    void processCommand();
+    bool isCommand();
+    bool isAckNeeded();
 
 private:
     uint8_t _buffer [ESP_HOST_BUFFER_SIZE+1];
@@ -128,9 +134,12 @@ private:
     String _fileName;
     String _script;
     uint8_t _fsType;
-    String _currentLine;
+    String _currentCommand;
     String _response;
-    ESP3DOutput  _output;
+    ESP3DOutput _outputStream;
+    level_authenticate_type _auth_type;
+    uint64_t _startTimeOut;
+    bool _needRelease ;
 };
 
 extern GcodeHost esp3d_gcode_host;

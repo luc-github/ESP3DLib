@@ -17,7 +17,7 @@
   License along with This code; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
+//#define ESP_DEBUG_FEATURE DEBUG_OUTPUT_SERIAL0
 #include "../../include/esp3d_config.h"
 #if defined(GCODE_HOST_FEATURE)
 #include "gcode_host.h"
@@ -26,9 +26,11 @@
 #include "../../core/esp3doutput.h"
 #if defined(FILESYSTEM_FEATURE)
 #include "../filesystem/esp_filesystem.h"
+ESP_File FSfileHandle;
 #endif //FILESYSTEM_FEATURE
 #if defined(SD_DEVICE)
 #include "../filesystem/esp_sd.h"
+ESP_SDFile SDfileHandle;
 #endif //FILESYSTEM_FEATURE
 
 #define TYPE_SCRIPT_STREAM 0
@@ -64,31 +66,39 @@ void GcodeHost::end()
     _step = HOST_NO_STREAM;
     _currentPosition = 0;
     _bufferSize = 0;
-    _output.client(ESP_STREAM_HOST_OUTPUT);
+    _outputStream.client(ESP_STREAM_HOST_CLIENT);
     _totalSize = 0;
     _processedSize = 0;
 }
 
 bool GcodeHost::push(uint8_t * sbuf, size_t len)
 {
+    log_esp3d("Push got %d bytes", len);
     if (_step == HOST_NO_STREAM) {
         return false;
     }
+    String tmp;
+    tmp.reserve(len+1);
+    tmp.concat((char*)sbuf, len);
+    log_esp3d("%s", (const char *)tmp.c_str());
+    tmp = "";
     for (size_t i = 0; i < len; i++) {
         //it is a line process it
         if (sbuf[i]=='\n' || sbuf[i]=='\r') {
+            tmp.concat((char*)_buffer, _bufferSize);
             flush();
         } else {
             //fill buffer until it is full
             if (_bufferSize < ESP_HOST_BUFFER_SIZE) {
                 _buffer[_bufferSize++] = sbuf[i];
+                tmp="";
+                tmp.concat((char*)_buffer, _bufferSize);
             } else {
                 //buffer is full flush it
                 flush();
                 _buffer[_bufferSize++] = sbuf[i];
             }
             _buffer[_bufferSize] =0;
-            _bufferSize++;
         }
     }
     flush();
@@ -103,7 +113,6 @@ void GcodeHost::flush()
     //then clean buffer accordingly
 
     //in case response has not been processed
-
     if(_bufferSize==0) {
         return;
     }
@@ -113,53 +122,247 @@ void GcodeHost::flush()
     _response = (const char*)_buffer;
     _response.toLowerCase();
     if (_response.indexOf("ok") != -1) {
-        _step = HOST_WAIT4_ACK;
+        //check if we have proper ok response
+        //like if numbering is enabled
+        if(_step == HOST_WAIT4_ACK) {
+            _step=HOST_READ_LINE;
+        } else {
+            log_esp3d("Got OK but out of the query");
+        }
     } else {
         if (_response.indexOf("error") != -1) {
+            log_esp3d("Got error");
             _step = HOST_ERROR_STREAM;
         }
     }
+    //What is have processing to do
+    //what if have resend
     _bufferSize = 0;
+}
+
+void GcodeHost::startStream()
+{
+    if (_fsType ==TYPE_SCRIPT_STREAM) {
+        _totalSize = _script.length();
+        log_esp3d("Script %s opened, size is %d", _script.c_str(), _totalSize);
+    }
+#if defined(FILESYSTEM_FEATURE)
+    if (_fsType ==TYPE_FS_STREAM) {
+        if (ESP_FileSystem::exists(_fileName.c_str())) {
+            FSfileHandle = ESP_FileSystem::open(_fileName.c_str());
+        }
+        if (FSfileHandle.isOpen()) {
+            _totalSize = FSfileHandle.size();
+            log_esp3d("File %s opened, size is %d", _fileName.c_str(), _totalSize);
+        } else {
+            _error = ERROR_FILE_NOT_FOUND;
+            _step = HOST_ERROR_STREAM;
+            log_esp3d("File not found: %s", _fileName.c_str());
+            return;
+        }
+    }
+#endif //FILESYSTEM_FEATURE
+#if defined(SD_DEVICE)
+    if (_fsType ==TYPE_SD_STREAM) {
+        if (!ESP_SD::accessFS()) {
+            _error = ERROR_FILE_NOT_FOUND;
+            _step = HOST_ERROR_STREAM;
+            _needRelease = false;
+            log_esp3d("File not found: %s", _fileName.c_str());
+            return;
+        }
+        _needRelease = true;
+        if (ESP_SD::getState(true) == ESP_SDCARD_NOT_PRESENT) {
+            _error = ERROR_FILE_NOT_FOUND;
+            _step = HOST_ERROR_STREAM;
+            log_esp3d("File not found: %s", _fileName.c_str());
+            return;
+        }
+        ESP_SD::setState(ESP_SDCARD_BUSY );
+
+        if (ESP_SD::exists(_fileName.c_str())) {
+            SDfileHandle = ESP_SD::open(_fileName.c_str());
+        }
+        if (SDfileHandle.isOpen()) {
+            _totalSize = SDfileHandle.size();
+            log_esp3d("File %s opened, size is %d", _fileName.c_str(), _totalSize);
+        } else {
+            _error = ERROR_FILE_NOT_FOUND;
+            _step = HOST_ERROR_STREAM;
+            log_esp3d("File not found: %s", _fileName.c_str());
+            return;
+        }
+    }
+#endif //SD_DEVICE
+    _currentPosition = 0;
+    _response = "";
+    _currentPosition = 0;
+    _error = ERROR_NO_ERROR;
+    _step = HOST_READ_LINE;
+    _nextStep = HOST_READ_LINE;
+    _processedSize = 0;
+}
+
+void GcodeHost::endStream()
+{
+    log_esp3d("Ending Stream");
+#if defined(FILESYSTEM_FEATURE)
+    if (_fsType ==TYPE_FS_STREAM) {
+        if (FSfileHandle.isOpen()) {
+            FSfileHandle.close();
+        }
+    }
+#endif //FILESYSTEM_FEATURE
+#if defined(SD_DEVICE)
+    if (_fsType ==TYPE_SD_STREAM) {
+        if (SDfileHandle.isOpen()) {
+            SDfileHandle.close();
+        }
+        if(_needRelease) {
+            ESP_SD::releaseFS();
+        }
+    }
+#endif //SD_DEVICE
+    _step = HOST_NO_STREAM;
+}
+
+void GcodeHost::readNextCommand()
+{
+    _currentCommand = "";
+    _step = HOST_PROCESS_LINE;
+    if (_fsType ==TYPE_SCRIPT_STREAM) {
+        log_esp3d("Reading next command from script");
+        if (_currentPosition < _script.length()) {
+            if (_script.indexOf(';', _currentPosition) != -1) {
+                _currentCommand = _script.substring(_currentPosition, _script.indexOf(';', _currentPosition));
+                _currentPosition = _script.indexOf(';', _currentPosition) + 1;
+            } else {
+                _currentCommand = _script.substring(_currentPosition);
+                _currentPosition = _script.length();
+            }
+            _processedSize = _currentPosition;
+            log_esp3d("Command is %s", _currentCommand.c_str());
+        } else {
+            _step = HOST_STOP_STREAM;
+        }
+    }
+#if defined(FILESYSTEM_FEATURE)
+    if (_fsType ==TYPE_FS_STREAM) {
+        bool processing = true;
+        while (processing) {
+            //to handle file without endline
+            int c = FSfileHandle.read();
+            if (c == -1) {
+                processing = false;
+            } else {
+                _processedSize++;
+                _currentPosition++;
+                if (!(((char)c =='\n') || ((char)c =='\r'))) {
+                    _currentCommand+=(char)c;
+                } else {
+                    processing = false;
+                }
+            }
+        }
+        if (_currentCommand.length() == 0) {
+            _step = HOST_STOP_STREAM;
+        }
+    }
+#endif //FILESYSTEM_FEATURE
+#if defined(SD_DEVICE)
+    if (_fsType ==TYPE_SD_STREAM) {
+        bool processing = true;
+        while (processing) {
+            //to handle file without endline
+            int c = SDfileHandle.read();
+            if (c == -1) {
+                processing = false;
+            } else {
+                _processedSize++;
+                _currentPosition++;
+                if (!(((char)c =='\n') || ((char)c =='\r'))) {
+                    _currentCommand+=(char)c;
+                } else {
+                    processing = false;
+                }
+            }
+        }
+        if (_currentCommand.length() == 0) {
+            _step = HOST_STOP_STREAM;
+        }
+    }
+#endif //SD_DEVICE
+}
+
+bool GcodeHost::isCommand()
+{
+    //clean the command
+    if (_currentCommand.indexOf(';') != -1) {
+        _currentCommand = _currentCommand.substring(0, _currentCommand.indexOf(';'));
+    }
+    _currentCommand.trim();
+    if (_currentCommand.length() == 0 || _currentCommand.startsWith(";")) {
+        return false;
+    }
+    return true;
+}
+bool GcodeHost::isAckNeeded()
+{
+    //TODO: what command do not need for ack ?
+    return true;
+}
+void GcodeHost::processCommand()
+{
+    if (!isCommand()) {
+        log_esp3d("Command %s is not valid", _currentCommand.c_str());
+        _step = HOST_READ_LINE;
+    } else {
+        log_esp3d("Command %s is valid", _currentCommand.c_str());
+        String cmd = _currentCommand + "\n";
+        esp3d_commands.process((uint8_t *)cmd.c_str(), cmd.length(),&_outputStream, _auth_type) ;
+        if (esp3d_commands.is_esp_command((uint8_t *)_currentCommand.c_str(), _currentCommand.length())) {
+            //we display error in output but it is not a blocking error
+            log_esp3d("Command is ESP command");
+            _step = HOST_READ_LINE;
+        } else {
+            _startTimeOut =millis();
+            log_esp3d("Command is GCODE command");
+            if (isAckNeeded()) {
+                _step = HOST_WAIT4_ACK;
+                log_esp3d("Command wait for ack");
+            } else {
+                _step = HOST_READ_LINE;
+            }
+        }
+
+    }
 }
 
 void GcodeHost::handle()
 {
     static uint32_t startTimout = 0;
+
     if (_step == HOST_NO_STREAM) {
         return;
     }
     switch(_step) {
     case HOST_START_STREAM:
-        //TODO open file or process array of commands
-        _step = HOST_READ_LINE;
-        _currentPosition = 0;
+        startStream();
         break;
     case HOST_READ_LINE:
-        //TODO read line from file or array of commands
         if (_nextStep==HOST_PAUSE_STREAM) {
             _step = HOST_PAUSE_STREAM;
             _nextStep = HOST_READ_LINE;
         } else {
-            //TODO read command and put it to line to process
-            _step = HOST_PROCESS_LINE;
+            readNextCommand();
         }
         break;
     case HOST_PROCESS_LINE:
-        //TODO process line
-        //Send command to serial or execute it on ESP3D or send to main FW (Marlin/GRBL_ESP32)
-        startTimout =millis();
-        _step = HOST_WAIT4_ACK;
+        processCommand();
         break;
     case HOST_WAIT4_ACK:
-        //TODO wait for ack
-        //is _response expected ?
-        //check timeout also
-        _response = "";
-        if (_needCommandNumber) {
-
-        }
-        _step = HOST_READ_LINE;
-        if (millis() - startTimout > ESP_HOST_TIMEOUT) {
+        if (millis() - _startTimeOut > ESP_HOST_TIMEOUT) {
+            log_esp3d("Timeout waiting for ack");
             _step = HOST_ERROR_STREAM;
         }
         break;
@@ -167,19 +370,25 @@ void GcodeHost::handle()
         //TODO pause stream
         break;
     case HOST_RESUME_STREAM:
-        //TODO resume stream
+        //Any extra action to resume stream?
+        _step = HOST_READ_LINE;
         break;
-    case HOST_ABORT_STREAM:
     case HOST_STOP_STREAM:
-        //TODO stop stream
+        endStream();
         break;
-    case HOST_ERROR_STREAM:
-        //TODO stream error
-        //Process error then stop stream
-        _response = "";
-        _error = ERROR_UNKNOW; //TODO:put right error
+    case HOST_ERROR_STREAM: {
+        ESP3DOutput output(ESP_ALL_CLIENTS);
+        String Error;
+        if (_error == ERROR_NO_ERROR) {
+            //TODO check _response to put right error
+            _error = ERROR_UNKNOW;
+        }
+        log_esp3d("Error %d", _error);
+        Error = "Stream failed: " + String(_error);
+        output.printERROR(Error.c_str());
         _step = HOST_STOP_STREAM;
-        break;
+    }
+    break;
     default: //Not handled step
         log_esp3d("Not handled step %d", _step);
         break;
@@ -191,7 +400,11 @@ bool  GcodeHost::abort()
     if (_step == HOST_NO_STREAM) {
         return false;
     }
-    _step = HOST_ABORT_STREAM;
+    log_esp3d("Aborting script");
+    //TODO: what to do in addition ?
+    _error=ERROR_STREAM_ABORTED;
+    //we do not use step to do faster abort
+    endStream();
     return true;
 }
 
@@ -232,7 +445,6 @@ String GcodeHost::CheckSumCommand(const char* command, uint32_t commandnb)
     return commandchecksum;
 }
 
-
 bool GcodeHost::resetCommandNumbering()
 {
     String resetcmd = "M110 N0";
@@ -242,72 +454,9 @@ bool GcodeHost::resetCommandNumbering()
         resetcmd = "M110 N0";
     }
     _commandNumber = 1;
-    return _output.printLN(resetcmd.c_str());
+    //need to use process to send command
+    return _outputStream.printLN(resetcmd.c_str());
 }
-
-/*
-bool GcodeHost::sendCommand(const char* command, bool checksum, bool wait4ack, const char * ack)
-{
-    log_esp3d("Send command: %s", command);
-    String s;
-    if(checksum) {
-        s = CheckSumCommand(command, _commandNumber);
-    } else {
-        s = command;
-    }
-    for(uint8_t try_nb = 0; try_nb < MAX_TRY_2_SEND; try_nb ++) {
-        _error = ERROR_NO_ERROR;
-        purge();
-        if ((_error != ERROR_NO_ERROR) && wait4ack) {
-            return false;
-        } else {
-            //if no need to wait for ack the purge has no real impact but clear buffer
-            _error = ERROR_NO_ERROR;
-        }
-        uint32_t start = millis();
-        //to give a chance to not overload buffer
-        bool done = false;
-        while (((millis() - start) < DEFAULT_TIMOUT) && !done) {
-            if ((size_t)serial_service.availableForWrite() > s.length()) {
-                if (strlen(command) == serial_service.write((const uint8_t*)s.c_str(), s.length())) {
-                    if (serial_service.write('\n')==1) {
-                        if(!wait4ack) {
-                            log_esp3d("No need ack");
-                            return true;
-                        }
-                        //process answer
-                        if (wait_for_ack(DEFAULT_TIMOUT, ack)) {
-                            log_esp3d("Command got ack");
-                            return true;
-                        } else {
-                            //what is the error ?
-                            log_esp3d("Error: %d", _error);
-                            //no need to retry for this one
-                            if ((_error == ERROR_MEMORY_PROBLEM) || (_error == ERROR_TIME_OUT)) {
-                                return false;
-                            }
-                            //need to resend command
-                            if (_error == ERROR_RESEND) {
-                                done = true;
-                            }
-                            //the printer ask for another command line so exit
-                            if ((_error == ERROR_NUMBER_MISMATCH) || (_error == ERROR_LINE_IGNORED)) {
-                                return false;
-                            }
-                        }
-                    }
-                }
-            }
-            Hal::wait(0);
-        }
-    }
-    if (_error == ERROR_NO_ERROR) {
-        _error = ERROR_CANNOT_SEND_DATA;
-        log_esp3d("Error: %d", _error);
-    }
-    return false;
-}*/
-
 
 uint32_t GcodeHost::getCommandNumber(String & response)
 {
@@ -331,107 +480,28 @@ uint32_t GcodeHost::getCommandNumber(String & response)
     return l;
 }
 
-/*bool GcodeHost::processFSFile(const char * filename, level_authenticate_type auth_type, ESP3DOutput * output)
+bool GcodeHost::processScript(const char * line, level_authenticate_type auth_type, ESP3DOutput * output)
 {
-    bool res = true;
-    log_esp3d("Processing FS : %s", filename);
-    if (!ESP_FileSystem::exists(filename)) {
-        log_esp3d("Cannot find file");
+    _script = line;
+    _script.trim();
+    log_esp3d("Processing script: %s", _script.c_str());
+    if (_script.length() == 0) {
+        log_esp3d("No script to process");
         return false;
     }
-    ESP_File f = ESP_FileSystem::open(filename);
-    if (!f.isOpen()) {
-        log_esp3d("Cannot open file");
+    if (_step != HOST_NO_STREAM) {
+        log_esp3d("Streaming already in progress");
         return false;
     }
-    size_t filesize  = f.size();
-    int8_t ch;
-    String cmd = "";
-    for (size_t c = 0; c< filesize ; c++) {
-        ch = f.read();
-        if (ch == -1) {
-            log_esp3d("Error reading file");
-            f.close();
-            return false;
-        }
-        if ((ch == 13)||(ch == 10) || (c==(filesize-1))) {
-            //for end of file without \n neither \r
-            if (!((ch == 13)||(ch == 10)) && (c==(filesize-1))) {
-                cmd+=(char)ch;
-            }
-            cmd.trim();
-            if(cmd.length() > 0) {
-                //ignore  comments
-                if (cmd[0]!=';') {
-                    //it is internal or not ?
-                    if(esp3d_commands.is_esp_command((uint8_t *)cmd.c_str(), cmd.length())) {
-                        esp3d_commands.process((uint8_t *)cmd.c_str(), cmd.length(), output, auth_type);
-                    } else {
-                        if (!sendCommand(cmd.c_str(),false, true)) {
-                            log_esp3d("Error sending command");
-                            //To stop instead of continue may need some trigger
-                            res = false;
-                        }
-                    }
-                }
-                cmd="";
-            }
-
-        } else {
-            cmd+=(char)ch;
-        }
-    }
-    f.close();
-    return res;
-}*/
-
-bool GcodeHost::processScript(const char * line)
-{
-    //TODO
-    //check line is a script
-    //if yes  process it
-    //and send true
-    //if not send false
-    return false;
-}
-
-//split line of command separated by '\n'
-bool GcodeHost::processLine(const char * line, level_authenticate_type auth_type, ESP3DOutput * output)
-{
-    bool res = true;
-    /*  String s = "";
-      for (uint p = 0; p < strlen(line); p++) {
-          if ((line[p]==10) || (line[p]==13) || (p == (strlen(line)-1))) {
-              if (!((line[p]==10) || (line[p]==13)) && (p == (strlen(line)-1))) {
-                  s+=line[p];
-              }
-              s.trim();
-              if (s.length()>0) {
-                  //ignore  comments
-                  if (s[0]!=';') {
-                      //it is internal or not ?
-                      if(esp3d_commands.is_esp_command((uint8_t *)s.c_str(), s.length())) {
-                          esp3d_commands.process((uint8_t *)s.c_str(), s.length(), output, auth_type);
-                      } else {
-                          //no check sum no ack
-                          if (!sendCommand(s.c_str(),false, false)) {
-                              log_esp3d("Error sending command");
-                              //To stop instead of continue may need some trigger
-                              res = false;
-                          }
-                      }
-                  }
-              }
-              s = "";
-          } else {
-              s+=line[p];
-          }
-      }*/
-    return res;
+    _fsType = TYPE_SCRIPT_STREAM;
+    _step = HOST_START_STREAM;
+    _auth_type = auth_type;
+    return true;
 }
 
 bool GcodeHost::processFile(const char * filename, level_authenticate_type auth_type, ESP3DOutput * output)
 {
+    bool target_found = false;
     _fileName = filename;
     _fileName.trim();
     log_esp3d("Processing file: %s", filename);
@@ -439,32 +509,44 @@ bool GcodeHost::processFile(const char * filename, level_authenticate_type auth_
         log_esp3d("No file to process");
         return false;
     }
-    if (_fileName[0]!='/') {
-        _fileName = "/" + _fileName;
+    if (_step != HOST_NO_STREAM) {
+        log_esp3d("Streaming already in progress");
+        return false;
     }
     //TODO UD = USB DISK
 #if defined(SD_DEVICE)
     if (_fileName.startsWith(ESP_SD_FS_HEADER)) {
+        log_esp3d("Processing SD file");
+        target_found = true;
         _fileName= _fileName.substring(strlen(ESP_SD_FS_HEADER),_fileName.length());
         _fsType = TYPE_SD_STREAM;
-        _step = HOST_START_STREAM;
-        return true;
     }
 #endif //SD_DEVICE
 #if defined(FILESYSTEM_FEATURE)
-    if (_fileName.startsWith(ESP_FLASH_FS_HEADER)) {
+    if (!target_found && _fileName.startsWith(ESP_FLASH_FS_HEADER)) {
+        target_found = true;
         _fileName= _fileName.substring(strlen(ESP_FLASH_FS_HEADER),_fileName.length());
+        log_esp3d("Processing /FS file %s", _fileName.c_str());
         _fsType = TYPE_FS_STREAM;
-        _step = HOST_START_STREAM;
-        return true;
     }
     //if no header it is also an FS file
-    _fsType = TYPE_FS_STREAM;
-    _step = HOST_START_STREAM;
-    return true;
+    if (!target_found &&_fileName[0]=='/') {
+        log_esp3d("Processing FS file %s", _fileName.c_str());
+        _fsType = TYPE_FS_STREAM;
+        target_found = true;
+    }
 #endif //FILESYSTEM_FEATURE
-    _fileName = "";
-    return false;
+    //it is not a file so it is a script
+    if (!target_found ) {
+        target_found = true;
+        _fsType = TYPE_SCRIPT_STREAM;
+        _script=_fileName;
+        log_esp3d("Processing Script file %s", _script.c_str());
+        _fileName = "";
+    }
+    _step = HOST_START_STREAM;
+    _auth_type = auth_type;
+    return true;
 }
 
 #endif //GCODE_HOST_FEATURE

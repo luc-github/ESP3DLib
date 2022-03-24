@@ -223,7 +223,7 @@
  * Benchmark report
  *
  * **********************************/
-#define ESP_BENCHMARK_FEATURE
+//#define ESP_BENCHMARK_FEATURE
 
 /************************************
  *

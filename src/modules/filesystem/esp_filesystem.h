@@ -60,6 +60,7 @@ private:
     String _name;
     size_t _size;
     time_t _lastwrite;
+    uint64_t _timeout;
 };
 
 class ESP_FileSystem

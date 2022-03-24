@@ -17,6 +17,7 @@
  License along with This code; if not, write to the Free Software
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+//#define ESP_DEBUG_FEATURE DEBUG_OUTPUT_SERIAL0
 #include "../../include/esp3d_config.h"
 #if  defined(GCODE_HOST_FEATURE)
 #include "../commands.h"
@@ -74,6 +75,8 @@ bool Commands::ESP701(const char* cmd_params, level_authenticate_type auth_type,
             }
 
         } else {
+            String resp;
+            bool noError = true;
             switch (esp3d_gcode_host.getStatus()) {
             case HOST_START_STREAM:
             case HOST_READ_LINE:
@@ -81,7 +84,12 @@ bool Commands::ESP701(const char* cmd_params, level_authenticate_type auth_type,
             case HOST_WAIT4_ACK:
                 //TODO add % of progress and filename if any
                 //totalSize / processedSize / fileName
-                response = format_response(COMMANDID, json, true, "processing");
+                if (json) {
+                    resp = "{\"status\":\"processing\",\"total\":\"" + String(esp3d_gcode_host.totalSize()) + "\",\"processed\":\"" + String(esp3d_gcode_host.processedSize()) + "\"}";
+                } else {
+                    resp = "processing";
+                }
+                response = format_response(COMMANDID, json, true, resp.c_str());
                 break;
             case HOST_PAUSE_STREAM:
                 response = format_response(COMMANDID, json, true, "pause stream");
@@ -89,8 +97,23 @@ bool Commands::ESP701(const char* cmd_params, level_authenticate_type auth_type,
             case HOST_RESUME_STREAM:
                 response = format_response(COMMANDID, json, true, "resume stream");
                 break;
+            case  HOST_NO_STREAM:
+                log_esp3d("No stream %d", esp3d_gcode_host.getErrorNum());
+                if (esp3d_gcode_host.getErrorNum()!=ERROR_NO_ERROR) {
+                    noError = false;
+                    if(json) {
+                        resp= "{\"state\":\"no stream\",\"code\":\"" + String(esp3d_gcode_host.getErrorNum()) + "\"}";
+                    } else {
+                        resp = "no stream, last error " + String(esp3d_gcode_host.getErrorNum());
+                    }
+                } else {
+                    resp = "no stream";
+                }
+                response = format_response(COMMANDID, json, noError, resp.c_str());
+                break;
             default:
-                response = format_response(COMMANDID, json, true, "no stream");
+                response = format_response(COMMANDID, json, false, String(esp3d_gcode_host.getStatus()).c_str());
+                noError = false;
                 break;
             }
         }

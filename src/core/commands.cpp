@@ -657,7 +657,7 @@ bool Commands::execute_internal_command (int cmd, const char* cmd_params, level_
     case 700:
         response = ESP700(cmd_params, auth_type, output);
         break;
-    //Query and Control ESP700 stream
+    //Get Status and Control ESP700 stream
     //[ESP701]action=<PAUSE/RESUME/ABORT>
     case 701:
         response = ESP701(cmd_params, auth_type, output);
