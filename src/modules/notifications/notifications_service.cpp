@@ -54,6 +54,9 @@ extern "C" {
 #include "libb64/cdecode.h"
 }
 #endif //ARDUINO_ARCH_ESP32
+#if defined (HTTP_FEATURE) || defined(WS_DATA_FEATURE)
+#include "../websocket/websocket_server.h"
+#endif //HTTP_FEATURE || WS_DATA_FEATURE
 
 #include <base64.h>
 
@@ -166,6 +169,12 @@ bool NotificationsService::sendMSG(const char * title, const char * message)
         return false;
     }
     if (!((strlen(title) == 0) && (strlen(message) == 0))) {
+        //push to webui by default
+#if defined (HTTP_FEATURE) || defined(WS_DATA_FEATURE)
+        String msg = "NOTIFICATION:";
+        msg += message;
+        websocket_terminal_server.pushMSG(msg.c_str());
+#endif //HTTP_FEATURE || WS_DATA_FEATURE
         switch(_notificationType) {
         case ESP_PUSHOVER_NOTIFICATION:
             return sendPushoverMSG(title,message);
