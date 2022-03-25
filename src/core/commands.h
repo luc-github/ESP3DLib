@@ -29,7 +29,7 @@ class Commands
 public:
     Commands();
     ~Commands();
-    void process(uint8_t * sbuf, size_t len, ESP3DOutput * output, level_authenticate_type auth = LEVEL_GUEST, ESP3DOutput * outputonly = nullptr);
+    void process(uint8_t * sbuf, size_t len, ESP3DOutput * output, level_authenticate_type auth = LEVEL_GUEST, ESP3DOutput * outputonly = nullptr, uint8_t outputignore = 0);
     bool is_esp_command(uint8_t * sbuf, size_t len);
     bool execute_internal_command(int cmd, const char* cmd_params, level_authenticate_type auth_level, ESP3DOutput * output);
     int get_space_pos(const char * string, uint from = 0);

@@ -61,7 +61,7 @@ bool Commands::ESP200(const char* cmd_params, level_authenticate_type auth_type,
         } else {
             int8_t state = ESP_SD::getState(true);
             if (state == ESP_SDCARD_IDLE) {
-                response = format_response(COMMANDID, json, true, " SD card ok");
+                response = format_response(COMMANDID, json, true, "SD card ok");
                 if (refreshSD) {
                     ESP_SD::refreshStats(true);
                 }

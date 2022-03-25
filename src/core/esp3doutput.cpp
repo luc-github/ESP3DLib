@@ -255,54 +255,62 @@ bool ESP3DOutput::isOutput(uint8_t flag, bool fromsettings)
 
 size_t ESP3DOutput::dispatch (const uint8_t * sbuf, size_t len, uint8_t ignoreClient)
 {
-    log_esp3d("Dispatch %d chars to client %d", len, _client);
+    log_esp3d("Dispatch %d chars from client %d and ignore %d", len, _client, ignoreClient);
 #if defined(GCODE_HOST_FEATURE)
-    if (!(_client == ESP_STREAM_HOST_CLIENT || _client==ignoreClient)) {
+    if (!(_client == ESP_STREAM_HOST_CLIENT || ESP_STREAM_HOST_CLIENT==ignoreClient)) {
+        log_esp3d("Dispatch  to gcode host");
         esp3d_gcode_host.push(sbuf, len);
     }
 #endif //GCODE_HOST_FEATURE
 #if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
-    if (!(_client == ESP_SERIAL_CLIENT || _client==ignoreClient)) {
+    if (!(_client == ESP_SERIAL_CLIENT || ESP_SERIAL_CLIENT==ignoreClient)) {
         if (isOutput(ESP_SERIAL_CLIENT)) {
 #if COMMUNICATION_PROTOCOL == MKS_SERIAL
+            log_esp3d("Dispatch  to gcode frame");
             MKSService::sendGcodeFrame((const char *)sbuf);
 #else
+            log_esp3d("Dispatch  to serial service");
             serial_service.write(sbuf, len);
 #endif //COMMUNICATION_PROTOCOL == MKS_SERIAL
         }
     }
 #endif //COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
 #if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
-    if (!(_client == ESP_SOCKET_SERIAL_CLIENT || _client==ignoreClient)) {
+    if (!(_client == ESP_SOCKET_SERIAL_CLIENT || ESP_SOCKET_SERIAL_CLIENT==ignoreClient)) {
+        log_esp3d("Dispatch to serial socket client %d is %d,  or is %d", _client, ESP_SOCKET_SERIAL_CLIENT, ignoreClient);
         Serial2Socket.push(sbuf, len);
     }
-    if (!(_client == ESP_ECHO_SERIAL_CLIENT || _client==ignoreClient)) {
+    if (!(_client == ESP_ECHO_SERIAL_CLIENT || ESP_ECHO_SERIAL_CLIENT==ignoreClient)) {
+        log_esp3d("Dispatch to echo serial");
         MYSERIAL1.write(sbuf, len);
     }
 #endif //COMMUNICATION_PROTOCOL == SOCKET_SERIAL 
 #if defined (HTTP_FEATURE) //no need to block it never
-    if (!((_client == ESP_WEBSOCKET_TERMINAL_CLIENT) || (_client == ESP_HTTP_CLIENT)|| (_client==ignoreClient))) {
+    if (!((_client == ESP_WEBSOCKET_TERMINAL_CLIENT) || (_client == ESP_HTTP_CLIENT)|| (ESP_WEBSOCKET_TERMINAL_CLIENT==ignoreClient) || (ESP_HTTP_CLIENT==ignoreClient))) {
         if (websocket_terminal_server) {
+            log_esp3d("Dispatch websocket terminal");
             websocket_terminal_server.write(sbuf, len);
         }
     }
 #endif //HTTP_FEATURE    
 #if defined (BLUETOOTH_FEATURE)
-    if (_!(client == ESP_BT_CLIENT  || _client==ignoreClient)) {
+    if (_!(client == ESP_BT_CLIENT  || ESP_BT_CLIENT==ignoreClient)) {
         if (isOutput(ESP_BT_CLIENT) && bt_service.started()) {
+            log_esp3d("Dispatch to bt");
             bt_service.write(sbuf, len);
         }
     }
 #endif //BLUETOOTH_FEATURE 
 #if defined (TELNET_FEATURE)
-    if (!(_client == ESP_TELNET_CLIENT || _client==ignoreClient)) {
+    if (!(_client == ESP_TELNET_CLIENT || ESP_TELNET_CLIENT==ignoreClient)) {
         if (isOutput(ESP_TELNET_CLIENT) && telnet_server.started()) {
+            log_esp3d("Dispatch  to telnet");
             telnet_server.write(sbuf, len);
         }
     }
 #endif //TELNET_FEATURE 
 #if defined (WS_DATA_FEATURE)
-    if (!(_client == ESP_WEBSOCKET_CLIENT || _client==ignoreClient)) {
+    if (!(_client == ESP_WEBSOCKET_CLIENT || ESP_WEBSOCKET_CLIENT==ignoreClient)) {
         if (isOutput(ESP_WEBSOCKET_CLIENT) && websocket_data_server.started()) {
             log_esp3d("Dispatch to websocket data server");
             websocket_data_server.write(sbuf, len);
@@ -430,14 +438,14 @@ size_t ESP3DOutput::printMSGLine(const char * s)
         break;
     case MARLIN_EMBEDDED:
     case MARLIN:
-        if ((_client == ESP_ECHO_SERIAL_CLIENT) && (strcmp(s, "ok") == 0)) {
+        if (((_client == ESP_ECHO_SERIAL_CLIENT) ||(_client == ESP_STREAM_HOST_CLIENT)) && (strcmp(s, "ok") == 0)) {
             return 0;
         }
 
         if (_client == ESP_ECHO_SERIAL_CLIENT) {
-            display = "echo: ";
+            display = "echo:";
         } else {
-            display = ";echo: ";
+            display = ";echo:";
         }
 
         display += s;
@@ -505,7 +513,7 @@ size_t ESP3DOutput::printMSG(const char * s, bool withNL)
         break;
     case MARLIN_EMBEDDED:
     case MARLIN:
-        if ((_client == ESP_ECHO_SERIAL_CLIENT) && (strcmp(s, "ok") == 0)) {
+        if (((_client == ESP_ECHO_SERIAL_CLIENT) ||(_client == ESP_STREAM_HOST_CLIENT)) && (strcmp(s, "ok") == 0)) {
             return 0;
         }
         if (_client == ESP_REMOTE_SCREEN_CLIENT) {
@@ -516,9 +524,9 @@ size_t ESP3DOutput::printMSG(const char * s, bool withNL)
             log_esp3d("Screen should display %s%s", display.c_str(),s);
         } else {
             if (_client == ESP_ECHO_SERIAL_CLIENT) {
-                display = "echo: ";
+                display = "echo:";
             } else {
-                display = ";echo: ";
+                display = ";echo:";
             }
         }
         display += s;
@@ -730,7 +738,8 @@ size_t ESP3DOutput::write(const uint8_t *buffer, size_t size)
 #if defined(GCODE_HOST_FEATURE)
     case  ESP_STREAM_HOST_CLIENT: {
 #if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
-        dispatch(buffer, size);
+        log_esp3d("ESP_STREAM_HOST_CLIENT do a dispatch to all clients but socket serial");
+        dispatch(buffer, size,ESP_SOCKET_SERIAL_CLIENT);
 #endif //COMMUNICATION_PROTOCOL == SOCKET_SERIAL
     }
     return size;

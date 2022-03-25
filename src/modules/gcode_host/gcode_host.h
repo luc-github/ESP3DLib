@@ -53,6 +53,10 @@ class ESP3DOutput;
 #define HOST_ERROR_STREAM  8
 #define HOST_ABORT_STREAM  9
 
+#define TYPE_SCRIPT_STREAM 0
+#define TYPE_FS_STREAM     1
+#define TYPE_SD_STREAM     2
+
 #define  ESP_HOST_BUFFER_SIZE 255
 
 class GcodeHost
@@ -100,7 +104,10 @@ public:
     {
         return _processedSize;
     }
-
+    uint8_t getFSType()
+    {
+        return _fsType;
+    }
     const char * fileName()
     {
         if (_fileName.length() == 0) {

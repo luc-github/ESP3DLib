@@ -17,6 +17,7 @@
   License along with This code; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+//#define ESP_DEBUG_FEATURE DEBUG_OUTPUT_SERIAL0
 #include "../include/esp3d_config.h"
 #include "esp3d.h"
 #include "commands.h"
@@ -33,13 +34,15 @@ Commands::~Commands()
 }
 
 //dispatch the command
-void Commands::process(uint8_t * sbuf, size_t len, ESP3DOutput * output, level_authenticate_type auth, ESP3DOutput * outputonly )
+void Commands::process(uint8_t * sbuf, size_t len, ESP3DOutput * output, level_authenticate_type auth, ESP3DOutput * outputonly, uint8_t outputignore )
 {
+    log_esp3d("Client is %d, has only %d, has ignore %d", output?output->client():0, outputonly?outputonly->client():0, outputignore);
     if(is_esp_command(sbuf,len)) {
         size_t slen = len;
         String tmpbuf = (const char*)sbuf;
-        if (tmpbuf.startsWith("echo: ")) {
+        if (tmpbuf.startsWith("echo:")) {
             tmpbuf.replace("echo: ", "");
+            tmpbuf.replace("echo:", "");
             slen = tmpbuf.length();
         }
 
@@ -48,7 +51,8 @@ void Commands::process(uint8_t * sbuf, size_t len, ESP3DOutput * output, level_a
         cmd[1] = tmpbuf[5] == ']'?0:tmpbuf[5];
         cmd[2] = tmpbuf[6] == ']'?0:tmpbuf[6];
         cmd[3] = 0x0;
-        log_esp3d("It is ESP command");
+        log_esp3d("It is ESP command %s",cmd);
+        log_esp3d("Respond to client  %d",(outputonly == nullptr)?output->client():outputonly->client());
         execute_internal_command (String((const char*)cmd).toInt(), (slen > (strlen((const char *)cmd)+5))?(const char*)&tmpbuf[strlen((const char *)cmd)+5]:"", auth, (outputonly == nullptr)?output:outputonly);
     } else {
         //Dispatch to all clients but current or to define output
@@ -61,8 +65,10 @@ void Commands::process(uint8_t * sbuf, size_t len, ESP3DOutput * output, level_a
             }
         }
         if (outputonly == nullptr) {
-            output->dispatch(sbuf, len);
+            log_esp3d("Dispatch from %d, but %d", output->client(), outputignore);
+            output->dispatch(sbuf, len, outputignore);
         } else {
+            log_esp3d("Dispatch from %d to only  %d", output->client(), outputonly->client());
             outputonly->write(sbuf, len);
         }
     }

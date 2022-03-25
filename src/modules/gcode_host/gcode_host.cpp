@@ -33,10 +33,6 @@ ESP_File FSfileHandle;
 ESP_SDFile SDfileHandle;
 #endif //FILESYSTEM_FEATURE
 
-#define TYPE_SCRIPT_STREAM 0
-#define TYPE_FS_STREAM     1
-#define TYPE_SD_STREAM     2
-
 #define ESP_HOST_TIMEOUT 16000
 #define MAX_TRY_2_SEND 5
 
@@ -311,13 +307,16 @@ void GcodeHost::processCommand()
         //TODO need to change if ESP3D
 #if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
         ESP3DOutput output(ESP_SOCKET_SERIAL_CLIENT);
+
 #endif//COMMUNICATION_PROTOCOL
-        esp3d_commands.process((uint8_t *)cmd.c_str(), cmd.length(),&_outputStream, _auth_type,isESPcmd?nullptr: &output) ;
+        ESP3DOutput outputhost(ESP_STREAM_HOST_CLIENT);
         if (isESPcmd) {
+            esp3d_commands.process((uint8_t *)cmd.c_str(), cmd.length(),&outputhost, _auth_type) ;
             //we display error in output but it is not a blocking error
             log_esp3d("Command is ESP command");
             _step = HOST_READ_LINE;
         } else {
+            esp3d_commands.process((uint8_t *)cmd.c_str(), cmd.length(),&_outputStream, _auth_type,&output,_outputStream.client()==ESP_ECHO_SERIAL_CLIENT?ESP_SOCKET_SERIAL_CLIENT:0 ) ;
             _startTimeOut =millis();
             log_esp3d("Command is GCODE command");
             if (isAckNeeded()) {
@@ -497,6 +496,8 @@ bool GcodeHost::processScript(const char * line, level_authenticate_type auth_ty
 bool GcodeHost::processFile(const char * filename, level_authenticate_type auth_type, ESP3DOutput * output)
 {
     bool target_found = false;
+    log_esp3d("Processing file client is  %d", output->client());
+    _outputStream.client(output->client());
     _fileName = filename;
     _fileName.trim();
     log_esp3d("Processing file: %s", filename);

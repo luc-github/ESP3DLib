@@ -85,7 +85,11 @@ bool Commands::ESP701(const char* cmd_params, level_authenticate_type auth_type,
                 //TODO add % of progress and filename if any
                 //totalSize / processedSize / fileName
                 if (json) {
-                    resp = "{\"status\":\"processing\",\"total\":\"" + String(esp3d_gcode_host.totalSize()) + "\",\"processed\":\"" + String(esp3d_gcode_host.processedSize()) + "\"}";
+                    resp = "{\"status\":\"processing\",\"total\":\"" + String(esp3d_gcode_host.totalSize()) + "\",\"processed\":\"" + String(esp3d_gcode_host.processedSize()) + "\",\"type\":\"" + String(esp3d_gcode_host.getFSType());
+                    if(esp3d_gcode_host.getFSType() !=TYPE_SCRIPT_STREAM) {
+                        resp+="\",\"name\":\""+String(esp3d_gcode_host.fileName());
+                    }
+                    resp+="\"}";
                 } else {
                     resp = "processing";
                 }

@@ -17,6 +17,7 @@
  License along with This code; if not, write to the Free Software
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+//#define ESP_DEBUG_FEATURE DEBUG_OUTPUT_SERIAL0
 #include "../../include/esp3d_config.h"
 #if defined( WIFI_FEATURE) || defined (ETH_FEATURE)
 #include "../commands.h"
@@ -29,6 +30,7 @@
 //[ESP111] [json=no]
 bool Commands::ESP111(const char* cmd_params, level_authenticate_type auth_type, ESP3DOutput * output)
 {
+    log_esp3d("Client is %d", output?output->client():0);
     (void)auth_type;
     bool noError = true;
     bool json = has_tag (cmd_params, "json");
