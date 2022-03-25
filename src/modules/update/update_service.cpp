@@ -334,7 +334,7 @@ bool processingFileFunction (const char * section, const char * key, const char 
                 b=v;
             }
         }
-        //Notification type None / PushOver / Line / Email / Telegram
+        //Notification type None / PushOver / Line / Email / Telegram / IFTTT
         if (!done) {
             if (strcasecmp("NOTIF_TYPE",key)==0) {
                 T='B';
@@ -350,6 +350,8 @@ bool processingFileFunction (const char * section, const char * key, const char 
                     b=ESP_EMAIL_NOTIFICATION;
                 } else if (strcasecmp("Telegram",value)==0) {
                     b=ESP_TELEGRAM_NOTIFICATION;
+                } else if (strcasecmp("IFTTT",value)==0) {
+                    b=ESP_IFTTT_NOTIFICATION;
                 } else {
                     P=-1;    //invalide value
                 }

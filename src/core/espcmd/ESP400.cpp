@@ -452,6 +452,8 @@ bool Commands::ESP400(const char* cmd_params, level_authenticate_type auth_type,
             output->print (ESP_LINE_NOTIFICATION);
             output->print ("\"},{\"telegram\":\"");
             output->print (ESP_TELEGRAM_NOTIFICATION);
+            output->print ("\"},{\"IFTTT\":\"");
+            output->print (ESP_IFTTT_NOTIFICATION);
             output->print ("\"}]}");
             //Token 1
             output->print (",{\"F\":\"service/notification\",\"P\":\"");

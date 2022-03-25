@@ -26,7 +26,7 @@
 #include "../../modules/notifications/notifications_service.h"
 #define COMMANDID   610
 //Set/Get Notification settings
-//[ESP610]type=<NONE/PUSHOVER/EMAIL/LINE> T1=<token1> T2=<token2> TS=<Settings> json=<no> [pwd=<admin password>]
+//[ESP610]type=<NONE/PUSHOVER/EMAIL/LINE/IFTTT> T1=<token1> T2=<token2> TS=<Settings> json=<no> [pwd=<admin password>]
 //Get will give type and settings only not the protected T1/T2
 bool Commands::ESP610(const char* cmd_params, level_authenticate_type auth_type, ESP3DOutput * output)
 {
@@ -69,6 +69,9 @@ bool Commands::ESP610(const char* cmd_params, level_authenticate_type auth_type,
             case ESP_TELEGRAM_NOTIFICATION:
                 tmp += "TELEGRAM";
                 break;
+            case ESP_IFTTT_NOTIFICATION:
+                tmp += "IFTTT";
+                break;
             default:
                 tmp+= "NONE";
             }
@@ -108,8 +111,10 @@ bool Commands::ESP610(const char* cmd_params, level_authenticate_type auth_type,
                     Ntype = ESP_LINE_NOTIFICATION;
                 } else if (parameter == "TELEGRAM") {
                     Ntype = ESP_TELEGRAM_NOTIFICATION;
+                } else if (parameter == "IFTTT") {
+                    Ntype = ESP_IFTTT_NOTIFICATION;
                 } else {
-                    response = format_response(COMMANDID, json, false, "Only NONE, PUSHOVER, EMAIL, LINE are supported");
+                    response = format_response(COMMANDID, json, false, "Only NONE, PUSHOVER, EMAIL, LINE, IFTTT are supported");
                     noError = false;
                 }
                 if (noError) {
