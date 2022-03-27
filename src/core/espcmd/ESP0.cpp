@@ -147,7 +147,6 @@ const char * help[]= {"[ESP] (id) - display this help",
 #if COMMUNICATION_PROTOCOL != SOCKET_SERIAL
                       "[ESP900](ENABLE/DISABLE) - display/set serial state",
 #endif //COMMUNICATION_PROTOCOL != SOCKET_SERIAL
-                      "[ESP901](ENABLE/DISABLE) - display/set verbose boot",
 #ifdef BUZZER_DEVICE
                       "[ESP910](ENABLE/DISABLE) - display/set buzzer state",
 #endif //BUZZER_DEVICE
@@ -277,7 +276,6 @@ const uint cmdlist[]= {0,
 #if COMMUNICATION_PROTOCOL != SOCKET_SERIAL
                        900,
 #endif //COMMUNICATION_PROTOCOL != SOCKET_SERIAL
-                       901,
 #ifdef BUZZER_DEVICE
                        910,
 

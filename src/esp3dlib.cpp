@@ -17,6 +17,7 @@
     Main author: luc lebosse
 
 */
+#define ESP_DEBUG_FEATURE DEBUG_OUTPUT_SERIAL0
 #include "include/esp3d_config.h"
 
 #if defined(ESP3DLIB_ENV)
@@ -59,23 +60,13 @@ Esp3DLib::Esp3DLib()
 //Begin which setup everything
 void Esp3DLib::init()
 {
-    xTaskCreatePinnedToCore(
-        ESP3DLibTaskfn, /* Task function. */
-        "ESP3DLib Task", /* name of task. */
-        8192, /* Stack size of task */
-        NULL, /* parameter of the task */
-        ESP3DLIB_RUNNING_PRIORITY, /* priority of the task */
-        &(Hal::xHandle), /* Task handle to keep track of created task */
-        ESP3DLIB_RUNNING_CORE    /* Core to run the task */
-    );
-#ifdef DISABLE_WDT_ESP3DLIB_TASK
-    esp_task_wdt_delete(Hal::xHandle);
-#endif //DISABLE_WDT_ESP3DLIB_TASK 
+
+
 }
 //Parse command
 bool Esp3DLib::parse(char * cmd)
 {
-    if (esp3d_commands.is_esp_command((uint8_t *)cmd, strlen(cmd))) {
+    if (myesp3d.started() && esp3d_commands.is_esp_command((uint8_t *)cmd, strlen(cmd))) {
         //command come from other serial port
         ESP3DOutput  output(ESP_ECHO_SERIAL_CLIENT);
         esp3d_commands.process((uint8_t *)cmd, strlen(cmd),& output, LEVEL_ADMIN);
@@ -87,6 +78,25 @@ bool Esp3DLib::parse(char * cmd)
 //Idletask when setup is done
 void Esp3DLib::idletask()
 {
+    static uint8_t count=0;
+    if (count < 5) {
+        count++;
+        if (count==4) {
+            //Create esp3d task
+            xTaskCreatePinnedToCore(
+                ESP3DLibTaskfn, /* Task function. */
+                "ESP3DLib Task", /* name of task. */
+                8192, /* Stack size of task */
+                NULL, /* parameter of the task */
+                ESP3DLIB_RUNNING_PRIORITY, /* priority of the task */
+                &(Hal::xHandle), /* Task handle to keep track of created task */
+                ESP3DLIB_RUNNING_CORE    /* Core to run the task */
+            );
+#ifdef DISABLE_WDT_ESP3DLIB_TASK
+            esp_task_wdt_delete(Hal::xHandle);
+#endif //DISABLE_WDT_ESP3DLIB_TASK 
+        }
+    }
     Hal::wait (0);  // Yield to other tasks
 }
 #endif //ESP3DLIB_ENV

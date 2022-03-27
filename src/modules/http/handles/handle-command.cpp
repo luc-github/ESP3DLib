@@ -47,7 +47,17 @@ void HTTP_Server::handle_web_command ()
             cmd+="\n";    //need to validate command
         }
         log_esp3d("Web Command: %s",cmd.c_str());
-        esp3d_commands.process((uint8_t*)cmd.c_str(), cmd.length(), &output, auth_level);
+        if (esp3d_commands.is_esp_command((uint8_t *)cmd.c_str(), cmd.length())) {
+            esp3d_commands.process((uint8_t*)cmd.c_str(), cmd.length(), &output, auth_level);
+        } else {
+#if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+            ESP3DOutput outputOnly(ESP_SOCKET_SERIAL_CLIENT);
+#endif//COMMUNICATION_PROTOCOL
+#if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
+            ESP3DOutput outputOnly(ESP_SERIAL_CLIENT);
+#endif //COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+            esp3d_commands.process((uint8_t*)cmd.c_str(), cmd.length(), &output, auth_level,&outputOnly);
+        }
     } else if (_webserver->hasArg ("ping")) {
         _webserver->send (200);
     } else {

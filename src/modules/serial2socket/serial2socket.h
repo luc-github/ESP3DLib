@@ -26,7 +26,7 @@
 #define S2S_TXBUFFERSIZE 1200
 #define S2S_RXBUFFERSIZE 128
 #define S2S_FLUSHTIMEOUT 500
-class Serial_2_Socket: public Print
+class Serial_2_Socket: public Stream
 {
 public:
     Serial_2_Socket();
@@ -57,6 +57,7 @@ public:
     long baudRate();
     void begin(long speed);
     void end();
+    void enable(bool enable=true);
     bool started();
     int available();
     int peek(void);

@@ -155,7 +155,6 @@ public:
 #if COMMUNICATION_PROTOCOL != SOCKET_SERIAL
     bool ESP900(const char* cmd_params, level_authenticate_type auth_level, ESP3DOutput * output);
 #endif //COMMUNICATION_PROTOCOL != SOCKET_SERIAL
-    bool ESP901(const char* cmd_params, level_authenticate_type auth_level, ESP3DOutput * output);
     bool ESP920(const char* cmd_params, level_authenticate_type auth_level, ESP3DOutput * output);
 #ifdef BUZZER_DEVICE
     bool ESP910(const char* cmd_params, level_authenticate_type auth_level, ESP3DOutput * output);

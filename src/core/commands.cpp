@@ -56,7 +56,8 @@ void Commands::process(uint8_t * sbuf, size_t len, ESP3DOutput * output, level_a
         execute_internal_command (String((const char*)cmd).toInt(), (slen > (strlen((const char *)cmd)+5))?(const char*)&tmpbuf[strlen((const char *)cmd)+5]:"", auth, (outputonly == nullptr)?output:outputonly);
     } else {
         //Dispatch to all clients but current or to define output
-        if ((output->client() == ESP_HTTP_CLIENT) && (outputonly == nullptr)) {
+        //the web command will never get answer as answer go to websocket
+        if (output->client() == ESP_HTTP_CLIENT) {
             if (auth != LEVEL_GUEST) {
                 output->printMSG("");
             } else {
@@ -710,11 +711,6 @@ bool Commands::execute_internal_command (int cmd, const char* cmd_params, level_
         response = ESP900(cmd_params, auth_type, output);
         break;
 #endif //COMMUNICATION_PROTOCOL != SOCKET_SERIAL
-    //Get state / Set Enable / Disable Verbose boot
-    //[ESP901]<ENABLE/DISABLE>
-    case 901:
-        response = ESP901(cmd_params, auth_type, output);
-        break;
 #ifdef BUZZER_DEVICE
     //Get state / Set Enable / Disable buzzer
     //[ESP910]<ENABLE/DISABLE>

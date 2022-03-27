@@ -63,7 +63,7 @@ bool Esp3D::restart = false;
 //Contructor
 Esp3D::Esp3D()
 {
-
+    _started = false;
 }
 
 //Destructor
@@ -78,6 +78,9 @@ bool Esp3D::begin()
     BootDelay bd;
     Hal::begin();
     DEBUG_ESP3D_INIT
+#if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+    Serial2Socket.enable();
+#endif // COMMUNICATION_PROTOCOL == SOCKET_SERIAL
     //init output
     ESP3DOutput::isOutput(ESP_ALL_CLIENTS, true);
     bool res = true;
@@ -140,12 +143,16 @@ bool Esp3D::begin()
     esp3d_gcode_host.processFile(ESP_AUTOSTART_SCRIPT_FILE);
 #endif //ESP_AUTOSTART_FEATURE
 #endif //GCODE_HOST_FEATURE
+    _started=true;
     return res;
 }
 
 //Process which handle all input
 void Esp3D::handle()
 {
+    if(!_started) {
+        return;
+    }
     //if need restart
     if (restart) {
         restart_now();
@@ -167,9 +174,15 @@ void Esp3D::handle()
 #endif //GCODE_HOST_FEATURE
 }
 
+bool Esp3D::started()
+{
+    return _started;
+}
+
 //End ESP3D
 bool Esp3D::end()
 {
+    _started = false;
 #if defined(CONNECTED_DEVICES_FEATURE)
     DevicesServices::end();
 #endif //CONNECTED_DEVICES_FEATURE
