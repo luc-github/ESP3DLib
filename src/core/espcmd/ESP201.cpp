@@ -105,12 +105,9 @@ bool Commands::ESP201(const char* cmd_params, level_authenticate_type auth_type,
                         if ( (value >= 0) || (value <= analog_range+1) ) {
                             Hal::analogRange(analog_range);
                             Hal::analogWriteFreq(1000);
-                            if (!analogWrite(pin, value)) {
-                                response = format_response(COMMANDID, json, false, "Invalid value");
-                                noError = false;
-                            } else {
-                                response = format_response(COMMANDID, json, true, "ok");
-                            }
+                            analogWrite(pin, value);
+                            response = format_response(COMMANDID, json, false, "Invalid value");
+                            noError = false;
                         } else {
                             response = format_response(COMMANDID, json, false, "Invalid parameter");
                             noError = false;

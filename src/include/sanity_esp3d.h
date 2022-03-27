@@ -22,7 +22,7 @@
 #define _SANITY_ESP3D_H
 
 #include "esp3d_config.h"
-
+#if not defined(ESP_NO_SANITY_CHECK)
 /**************************
  * Settings
  * ***********************/
@@ -160,5 +160,7 @@
 #if defined(SD_UPDATE_FEATURE) && !defined(SD_DEVICE)
 #error SD_UPDATE_FEATURE is not available because SD_DEVICE is not enabled
 #endif
+
+#endif //ESP_NO_SANITY_CHECK
 
 #endif //SANITY_ESP3D_H 

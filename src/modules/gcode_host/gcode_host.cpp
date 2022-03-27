@@ -307,8 +307,10 @@ void GcodeHost::processCommand()
         //TODO need to change if ESP3D
 #if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
         ESP3DOutput output(ESP_SOCKET_SERIAL_CLIENT);
-
 #endif//COMMUNICATION_PROTOCOL
+#if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
+        ESP3DOutput output(ESP_SERIAL_CLIENT);
+#endif //COMMUNICATION_PROTOCOL == SOCKET_SERIAL
         ESP3DOutput outputhost(ESP_STREAM_HOST_CLIENT);
         if (isESPcmd) {
             esp3d_commands.process((uint8_t *)cmd.c_str(), cmd.length(),&outputhost, _auth_type) ;
@@ -316,7 +318,12 @@ void GcodeHost::processCommand()
             log_esp3d("Command is ESP command");
             _step = HOST_READ_LINE;
         } else {
+#if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
             esp3d_commands.process((uint8_t *)cmd.c_str(), cmd.length(),&_outputStream, _auth_type,&output,_outputStream.client()==ESP_ECHO_SERIAL_CLIENT?ESP_SOCKET_SERIAL_CLIENT:0 ) ;
+#endif //COMMUNICATION_PROTOCOL == SOCKET_SERIAL            
+#if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
+            esp3d_commands.process((uint8_t *)cmd.c_str(), cmd.length(),&_outputStream, _auth_type,&output) ;
+#endif //COMMUNICATION_PROTOCOL == SOCKET_SERIAL           
             _startTimeOut =millis();
             log_esp3d("Command is GCODE command");
             if (isAckNeeded()) {
@@ -355,6 +362,7 @@ void GcodeHost::handle()
     case HOST_WAIT4_ACK:
         if (millis() - _startTimeOut > ESP_HOST_TIMEOUT) {
             log_esp3d("Timeout waiting for ack");
+            _error = ERROR_TIME_OUT;
             _step = HOST_ERROR_STREAM;
         }
         break;
@@ -378,6 +386,9 @@ void GcodeHost::handle()
         Error = "error: stream failed: " + String(_error) + "\n";
 #if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
         ESP3DOutput output(ESP_SOCKET_SERIAL_CLIENT);
+#endif//COMMUNICATION_PROTOCOL
+#if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
+        ESP3DOutput output(ESP_SERIAL_CLIENT);
 #endif//COMMUNICATION_PROTOCOL
         output.dispatch((const uint8_t *)Error.c_str(), Error.length());
         _step = HOST_STOP_STREAM;

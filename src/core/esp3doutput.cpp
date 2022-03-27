@@ -741,6 +741,10 @@ size_t ESP3DOutput::write(const uint8_t *buffer, size_t size)
         log_esp3d("ESP_STREAM_HOST_CLIENT do a dispatch to all clients but socket serial");
         dispatch(buffer, size,ESP_SOCKET_SERIAL_CLIENT);
 #endif //COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+#if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
+        log_esp3d("ESP_STREAM_HOST_CLIENT do a dispatch to all clients but serial");
+        dispatch(buffer, size,ESP_SERIAL_CLIENT);
+#endif //COMMUNICATION_PROTOCOL == SOCKET_SERIAL
     }
     return size;
     break;
