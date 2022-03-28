@@ -23,7 +23,8 @@
 #ifndef _NOTIFICATIONS_SERVICE_H
 #define _NOTIFICATIONS_SERVICE_H
 
-class WiFiClientSecure;
+#include <WiFiClientSecure.h>
+
 
 class NotificationsService
 {

@@ -232,6 +232,4 @@ bool Commands::ESP401(const char* cmd_params, level_authenticate_type auth_type,
         output->printERROR(response.c_str(), errorCode);
     }
     return noError;
-
-    return response;
 }

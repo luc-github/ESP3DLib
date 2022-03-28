@@ -129,7 +129,9 @@ void Hal::analogRange(uint32_t range)
         _analogRange = 255;
         break;
     }
-    ::analogReadResolution(resolution);
+#if defined(ARDUINO_ARCH_ESP32)
+    analogReadResolution(resolution);
+#endif //ARDUINO_ARCH_ESP32
 #ifdef ARDUINO_ARCH_ESP8266
     ::analogWriteRange(_analogRange);
 #endif //ARDUINO_ARCH_ESP8266
