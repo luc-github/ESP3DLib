@@ -100,6 +100,12 @@ public:
     static bool isOutput(uint8_t flag, bool fromsettings = false);
     static void toScreen(uint8_t output_type, const char * s);
     static const char * encodeString(const char * s);
+#ifdef HTTP_FEATURE
+    bool footerSent()
+    {
+        return _footerSent;
+    }
+#endif //HTTP_FEATURE
 private:
     uint8_t _client;
 #ifdef HTTP_FEATURE

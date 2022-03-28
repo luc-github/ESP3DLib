@@ -56,8 +56,10 @@ void Commands::process(uint8_t * sbuf, size_t len, ESP3DOutput * output, level_a
         execute_internal_command (String((const char*)cmd).toInt(), (slen > (strlen((const char *)cmd)+5))?(const char*)&tmpbuf[strlen((const char *)cmd)+5]:"", auth, (outputonly == nullptr)?output:outputonly);
     } else {
         //Dispatch to all clients but current or to define output
+#if defined(HTTP_FEATURE)
         //the web command will never get answer as answer go to websocket
-        if (output->client() == ESP_HTTP_CLIENT) {
+        //This is sanity check as the http client should already answered
+        if (output->client() == ESP_HTTP_CLIENT && !output->footerSent()) {
             if (auth != LEVEL_GUEST) {
                 output->printMSG("");
             } else {
@@ -65,6 +67,7 @@ void Commands::process(uint8_t * sbuf, size_t len, ESP3DOutput * output, level_a
                 return;
             }
         }
+#endif //HTTP_FEATURE
         if (outputonly == nullptr) {
             log_esp3d("Dispatch from %d, but %d", output->client(), outputignore);
             output->dispatch(sbuf, len, outputignore);

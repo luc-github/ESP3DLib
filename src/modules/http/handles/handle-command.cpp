@@ -56,6 +56,13 @@ void HTTP_Server::handle_web_command ()
 #if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
             ESP3DOutput outputOnly(ESP_SERIAL_CLIENT);
 #endif //COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+            _webserver->sendHeader("Cache-Control","no-cache");
+#ifdef ESP_ACCESS_CONTROL_ALLOW_ORIGIN
+            _webserver->sendHeader("Access-Control-Allow-Origin", "*");
+#endif //ESP_ACCESS_CONTROL_ALLOw_ORIGIN
+            //the command is not ESP3D so it will be forwarded to the serial port
+            //no need to wait to answer then
+            _webserver->send (200, "text/plain", "ESP3D says: command forwarded");
             esp3d_commands.process((uint8_t*)cmd.c_str(), cmd.length(), &output, auth_level,&outputOnly);
         }
     } else if (_webserver->hasArg ("ping")) {
