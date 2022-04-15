@@ -32,6 +32,10 @@
 #include "../../filesystem/esp_sd.h"
 #endif //SD_DEVICE
 
+#if defined(ESP3DLIB_ENV) && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+#include "../../serial2socket/serial2socket.h"
+#endif // ESP3DLIB_ENV && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+
 //Handle not registred path on FS neither SD ///////////////////////
 void HTTP_Server:: handle_not_found()
 {
@@ -70,9 +74,15 @@ void HTTP_Server:: handle_not_found()
                         _webserver->sendHeader("Content-Encoding", "gzip");
                         path = pathWithGz;
                     }
+#if defined(ESP3DLIB_ENV) && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+                    Serial2Socket.pause();
+#endif // ESP3DLIB_ENV && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
                     if(!StreamSDFile(path.c_str(),contentType.c_str())) {
                         log_esp3d("Stream `%s` failed", path.c_str());
                     }
+#if defined(ESP3DLIB_ENV) && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+                    Serial2Socket.pause(false);
+#endif // ESP3DLIB_ENV && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
                     ESP_SD::releaseFS();
                     return;
                 }

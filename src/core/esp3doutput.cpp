@@ -280,7 +280,7 @@ size_t ESP3DOutput::dispatch (const uint8_t * sbuf, size_t len, uint8_t ignoreCl
         log_esp3d("Dispatch to serial socket client %d is %d,  or is %d", _client, ESP_SOCKET_SERIAL_CLIENT, ignoreClient);
         Serial2Socket.push(sbuf, len);
     }
-    if (!(_client == ESP_ECHO_SERIAL_CLIENT || ESP_ECHO_SERIAL_CLIENT==ignoreClient)) {
+    if (!(_client == ESP_ECHO_SERIAL_CLIENT || ESP_ECHO_SERIAL_CLIENT==ignoreClient ||_client == ESP_SOCKET_SERIAL_CLIENT)) {
         log_esp3d("Dispatch to echo serial");
         MYSERIAL1.write(sbuf, len);
     }

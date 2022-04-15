@@ -212,25 +212,25 @@ adc1_channel_t get_channel(int pin)
         return ADC1_CHANNEL_4;
 #elif CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
     case 1:
-        return ADC_CHANNEL_0;
+        return ADC1_CHANNEL_0;
     case 2:
-        return ADC_CHANNEL_1;
+        return ADC1_CHANNEL_1;
     case 3:
-        return ADC_CHANNEL_2;
+        return ADC1_CHANNEL_2;
     case 4:
-        return ADC_CHANNEL_3;
+        return ADC1_CHANNEL_3;
     case 5:
-        return ADC_CHANNEL_4;
+        return ADC1_CHANNEL_4;
     case 6:
-        return ADC_CHANNEL_5;
+        return ADC1_CHANNEL_5;
     case 7:
-        return ADC_CHANNEL_6;
+        return ADC1_CHANNEL_6;
     case 8:
-        return ADC_CHANNEL_7;
+        return ADC1_CHANNEL_7;
     case 9:
-        return ADC_CHANNEL_8;
+        return ADC1_CHANNEL_8;
     case 10:
-        return ADC_CHANNEL_9;
+        return ADC1_CHANNEL_9;
 #else
 #error "ADC1_CHANNEL not defined for this chip"
 #endif

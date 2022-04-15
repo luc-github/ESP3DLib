@@ -67,9 +67,11 @@ public:
     void handle_flush();
     void handle();
     operator bool() const;
-
+    void pause(bool state=true);
+    bool isPaused();
 private:
     bool _started;
+    bool _paused;
     uint32_t _lastflush;
     uint8_t _TXbuffer[S2S_TXBUFFERSIZE];
     uint16_t _TXbufferSize;

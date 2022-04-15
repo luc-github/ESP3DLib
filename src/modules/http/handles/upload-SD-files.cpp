@@ -32,6 +32,9 @@
 #ifdef ESP_BENCHMARK_FEATURE
 #include "../../../core/benchmark.h"
 #endif //ESP_BENCHMARK_FEATURE
+#if defined(ESP3DLIB_ENV) && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+#include "../../serial2socket/serial2socket.h"
+#endif // ESP3DLIB_ENV && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
 
 //SD files uploader handle
 void HTTP_Server::SDFileupload ()
@@ -52,7 +55,9 @@ void HTTP_Server::SDFileupload ()
         HTTPUpload& upload = _webserver->upload();
         String upload_filename = upload.filename;
         if ((_upload_status != UPLOAD_STATUS_FAILED) || (upload.status == UPLOAD_FILE_START)) {
-
+#if defined(ESP3DLIB_ENV) && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+            Serial2Socket.pause(true);
+#endif // ESP3DLIB_ENV && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
             //Upload start
             if (upload.status == UPLOAD_FILE_START) {
 #ifdef ESP_BENCHMARK_FEATURE
@@ -70,6 +75,9 @@ void HTTP_Server::SDFileupload ()
                     ESP_SD::releaseFS();
                     _upload_status=UPLOAD_STATUS_FAILED;
                     pushError(ESP_ERROR_NO_SD, "Upload rejected");
+#if defined(ESP3DLIB_ENV) && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+                    Serial2Socket.pause(false);
+#endif // ESP3DLIB_ENV && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
                     return;
                 }
                 ESP_SD::setState(ESP_SDCARD_BUSY );
@@ -175,12 +183,18 @@ void HTTP_Server::SDFileupload ()
                 }
                 log_esp3d("Release Sd called");
                 ESP_SD::releaseFS();
+#if defined(ESP3DLIB_ENV) && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+                Serial2Socket.pause(false);
+#endif // ESP3DLIB_ENV && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
                 //Upload cancelled
             } else {
                 if (_upload_status == UPLOAD_STATUS_ONGOING) {
                     _upload_status = UPLOAD_STATUS_FAILED;
                     log_esp3d("Release Sd called");
                     ESP_SD::releaseFS();
+#if defined(ESP3DLIB_ENV) && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+                    Serial2Socket.pause(false);
+#endif // ESP3DLIB_ENV && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
                 }
             }
         }
@@ -198,6 +212,9 @@ void HTTP_Server::SDFileupload ()
         }
         log_esp3d("Release Sd called");
         ESP_SD::releaseFS();
+#if defined(ESP3DLIB_ENV) && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+        Serial2Socket.pause(false);
+#endif // ESP3DLIB_ENV && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
     }
     Hal::wait(5);
 }

@@ -17,7 +17,7 @@
     Main author: luc lebosse
 
 */
-#define ESP_DEBUG_FEATURE DEBUG_OUTPUT_SERIAL0
+//#define ESP_DEBUG_FEATURE DEBUG_OUTPUT_SERIAL0
 #include "include/esp3d_config.h"
 
 #if defined(ESP3DLIB_ENV)

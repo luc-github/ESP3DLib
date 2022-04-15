@@ -29,6 +29,11 @@
 #endif //ARDUINO_ARCH_ESP8266
 #include "../../filesystem/esp_filesystem.h"
 #include "../../authentication/authentication_service.h"
+#if defined(ESP3DLIB_ENV) && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+#include "../../serial2socket/serial2socket.h"
+#endif // ESP3DLIB_ENV && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+
+
 
 #ifdef ESP_BENCHMARK_FEATURE
 #include "../../../core/benchmark.h"
@@ -53,7 +58,9 @@ void HTTP_Server::FSFileupload ()
         HTTPUpload& upload = _webserver->upload();
         String upload_filename = upload.filename;
         if ((_upload_status != UPLOAD_STATUS_FAILED) || (upload.status == UPLOAD_FILE_START)) {
-
+#if defined(ESP3DLIB_ENV) && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+            Serial2Socket.pause();
+#endif // ESP3DLIB_ENV && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
             //Upload start
             if (upload.status == UPLOAD_FILE_START) {
 #ifdef ESP_BENCHMARK_FEATURE
@@ -154,10 +161,14 @@ void HTTP_Server::FSFileupload ()
                     _upload_status=UPLOAD_STATUS_FAILED;
                     pushError(ESP_ERROR_FILE_CLOSE, "File close failed");
                 }
+#if defined(ESP3DLIB_ENV) && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+                Serial2Socket.pause(false);
+#endif // ESP3DLIB_ENV && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
                 //Upload cancelled
             } else {
                 if (_upload_status == UPLOAD_STATUS_ONGOING) {
                     _upload_status = UPLOAD_STATUS_FAILED;
+
                 }
             }
         }
@@ -173,6 +184,9 @@ void HTTP_Server::FSFileupload ()
                 ESP_FileSystem::remove (filename.c_str());
             }
         }
+#if defined(ESP3DLIB_ENV) && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+        Serial2Socket.pause(false);
+#endif // ESP3DLIB_ENV && COMMUNICATION_PROTOCOL == SOCKET_SERIAL
     }
 }
 #endif //HTTP_FEATURE && FILESYSTEM_FEATURE
