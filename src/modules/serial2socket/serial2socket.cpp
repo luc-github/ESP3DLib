@@ -55,6 +55,8 @@ void Serial_2_Socket::pause(bool state)
         _TXbufferSize = 0;
         _RXbufferSize = 0;
         _RXbufferpos = 0;
+    } else {
+        _lastflush = millis();
     }
 }
 
@@ -70,6 +72,7 @@ void Serial_2_Socket::end()
     _RXbufferpos = 0;
     _started = false;
     _paused = false;
+    _lastflush = millis();
 }
 
 long Serial_2_Socket::baudRate()
@@ -98,8 +101,8 @@ int Serial_2_Socket::available()
 
 size_t Serial_2_Socket::write(uint8_t c)
 {
-    if (_paused) {
-        return 0;
+    if (!_started || _paused) {
+        return 1;
     }
     return write(&c,1);
 }
@@ -107,7 +110,8 @@ size_t Serial_2_Socket::write(uint8_t c)
 size_t Serial_2_Socket::write(const uint8_t *buffer, size_t size)
 {
     if(buffer == NULL || size == 0 || !_started || _paused) {
-        return 0;
+        log_esp3d("Serial2Socket: no data, not started or paused");
+        return size;
     }
     if (_TXbufferSize==0) {
         _lastflush = millis();
@@ -121,6 +125,7 @@ size_t Serial_2_Socket::write(const uint8_t *buffer, size_t size)
         _TXbuffer[_TXbufferSize] = buffer[i];
         _TXbufferSize++;
         if (buffer[i] == (const uint8_t)'\n'|| buffer[i] == (const uint8_t)'\r') {
+            log_esp3d("S2S: %s TXSize: %d", (const char *)_TXbuffer, _TXbufferSize);
             flush();
         }
     }
