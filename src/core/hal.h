@@ -56,8 +56,5 @@ private:
     static void wdtFeed();
     static uint32_t _analogRange;
     static uint32_t _analogWriteFreq;
-#if defined(ARDUINO_ARCH_ESP32)
-    static int getAnalogWriteChannel(uint8_t pin);
-#endif //ARDUINO_ARCH_ESP32
 };
 #endif //_ESP3D_HAL_H

@@ -25,13 +25,15 @@
 #endif //ARDUINO_ARCH_ESP8266
 #if defined(ARDUINO_ARCH_ESP32)
 #include <soc/soc.h>
+#if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
+//FIXME : S3 not support it yet
 #include <soc/rtc_wdt.h>
+#endif //CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
 #include <soc/rtc_cntl_reg.h>
 #include <WiFi.h>
 #include <esp_task_wdt.h>
 #include <driver/adc.h>
 TaskHandle_t Hal::xHandle = nullptr;
-void rtc_wdt_feed(void);
 #endif //ARDUINO_ARCH_ESP32
 
 #include "esp3doutput.h"
@@ -50,32 +52,6 @@ void Hal::pinMode(uint8_t pin, uint8_t mode)
 #endif
     ::pinMode(pin, mode);
 }
-
-#if defined(ARDUINO_ARCH_ESP32)
-int Hal::getAnalogWriteChannel(uint8_t pin)
-{
-    switch (pin) {
-#if CONFIG_IDF_TARGET_ESP32
-    case 39:
-        return ADC1_CHANNEL_3;
-    case 36:
-        return ADC1_CHANNEL_0;
-    case 35:
-        return ADC1_CHANNEL_7;
-    case 34:
-        return ADC1_CHANNEL_6;
-    case 33:
-        return ADC1_CHANNEL_5;
-    case 32:
-        return ADC1_CHANNEL_4;
-    default:
-        return -1;
-#else
-#error "ADC1_CHANNEL not defined for this chip"
-#endif
-    }
-}
-#endif //ARDUINO_ARCH_ESP32
 
 int Hal::analogRead(uint8_t pin)
 {
@@ -179,7 +155,10 @@ void Hal::wdtFeed()
         vTaskDelay(5); //delay 1 RTOS tick
     }
 #if !defined(DISABLE_WDT_ESP3DLIB_TASK) && !defined(DISABLE_WDT_CORE_0)
-    rtc_wdt_feed();
+	#if CONFIG_IDF_TARGET_ESP32
+		//FIXME: not implemented
+				rtc_wdt_feed();
+	#endif //CONFIG_IDF_TARGET_ESP32S2
 #endif//!defined(DISABLE_WDT_ESP3DLIB_TASK) && !defined(DISABLE_WDT_CORE_0)
 #ifndef DISABLE_WDT_ESP3DLIB_TASK
     if (xHandle && esp_task_wdt_status(xHandle)==ESP_OK) {
@@ -222,7 +201,12 @@ bool Hal::has_temperature_sensor()
     return false;
 #endif //ARDUINO_ARCH_ESP8266
 #ifdef ARDUINO_ARCH_ESP32
+#if CONFIG_IDF_TARGET_ESP32S3
+	//FIXME: not yet implemented
+	return false;
+#else
     return true;
+#endif //CONFIG_IDF_TARGET_ESP32S3
 #endif //ARDUINO_ARCH_ESP32
 }
 
@@ -231,8 +215,14 @@ float Hal::temperature()
 #ifdef ARDUINO_ARCH_ESP8266
     return 0.0;
 #endif //ARDUINO_ARCH_ESP8266
+
 #ifdef ARDUINO_ARCH_ESP32
+#if CONFIG_IDF_TARGET_ESP32S3
+	//FIXME: not yet implemented
+	return 0.0;
+#else
     return temperatureRead();
+#endif //CONFIG_IDF_TARGET_ESP32S3
 #endif //ARDUINO_ARCH_ESP32
 }
 
