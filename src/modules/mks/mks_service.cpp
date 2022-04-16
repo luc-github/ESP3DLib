@@ -627,8 +627,8 @@ bool MKSService::sendNetworkFrame()
             //Wifi_key Segment
             strcpy((char *)&_frame[dataOffset], s.c_str());
             dataOffset+=s.length();
-        } else if (NetConfig::getMode() == ESP_WIFI_AP || (NetConfig::getMode() == ESP_AP_SETUP) {
-        log_esp3d("AP Mode");
+        } else if (NetConfig::getMode() == ESP_WIFI_AP || (NetConfig::getMode() == ESP_AP_SETUP)) {
+            log_esp3d("AP Mode");
             ///////////////////////////////////
             //IP Segment
             //IP value
