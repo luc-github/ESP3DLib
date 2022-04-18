@@ -21,7 +21,7 @@
 #define ESP3DLIB_ENV
 //Uncomment if you want to compile Marlin and ESP3DLib with Arduino IDE
 //Comment if you want to compile Marlin and ESP3DLib with PlatformIO
-#define COMPILE_WITH_ARDUINO_IDE
+//#define COMPILE_WITH_ARDUINO_IDE
 #if !defined(COMPILE_WITH_ARDUINO_IDE)
 //config reference, do not touch
 #ifndef ESP_XSTR
@@ -177,13 +177,30 @@
 
 //pin if reader has insert detection feature
 //let -1 or comment if none
-#ifdef SD_DETECT_PIN
+#if defined (SD_DETECT_PIN) && (SD_DETECT_PIN > 0)
 #define ESP_SD_DETECT_PIN       SD_DETECT_PIN
 #endif //SD_DETECT_PIN  
+
 //value expected for ESP_SD_DETECT_PIN
 #ifdef SD_DETECT_STATE
 #define ESP_SD_DETECT_VALUE      SD_DETECT_STATE
 #endif
+
+#if defined (SDSS) && (SDSS > 0)
+#define ESP_SD_CS_PIN SDSS
+#endif //ESP_SD_CS_PIN
+
+#if defined(SD_SCK_PIN) && (SD_SCK_PIN > 0)
+#define ESP_SD_SCK_PIN SD_SCK_PIN
+#endif //SD_SCK_PIN
+
+#if defined(SD_MOSI_PIN) && (SD_MOSI_PIN > 0)
+#define ESP_SD_MOSI_PIN SD_MOSI_PIN
+#endif //SD_MOSI_PIN
+
+#if defined(SD_MISO_PIN) && (SD_MISO_PIN > 0)
+#define ESP_SD_MISO_PIN SD_MISO_PIN
+#endif //SD_MISO_PIN
 #endif //SDSUPPORT
 
 //SD_UPDATE_FEATURE: allow to configure settings using SD
