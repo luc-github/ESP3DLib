@@ -248,6 +248,7 @@ bool WiFiConfig::StartAP(bool setupMode)
     int8_t channel = Settings_ESP3D::read_byte (ESP_AP_CHANNEL);
     //IP
     int32_t IP = Settings_ESP3D::read_IP(ESP_AP_IP_VALUE);
+
     IPAddress ip(IP);
     IPAddress gw(0,0,0,0);
     IPAddress mask(DEFAULT_AP_MASK_VALUE);
@@ -265,7 +266,9 @@ bool WiFiConfig::StartAP(bool setupMode)
         output.printMSG(stmp.c_str());
         log_esp3d("%s",stmp.c_str());
         //must be done after starting AP not before
-        Hal::wait(100);
+        //https://github.com/espressif/arduino-esp32/issues/4222
+        //on some phone 100 is ok but on some other it is not enough so 2000 is ok
+        Hal::wait(2000);
         //Set static IP
         log_esp3d("Use: %s / %s / %s", ip.toString().c_str(),ip.toString().c_str(),mask.toString().c_str());
         if (!WiFi.softAPConfig(ip, setupMode?ip:gw, mask)) {
