@@ -37,10 +37,7 @@ typedef struct {
          mounted:1,
          filenameIsDir:1,
          workDirIsRoot:1,
-         abort_sd_printing:1,
-         busy:1
-
-         ;
+         abort_sd_printing:1;
 } card_flags_t;
 
 

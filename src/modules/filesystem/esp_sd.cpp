@@ -62,6 +62,9 @@ bool ESP_SD::_enabled = false;
 
 bool ESP_SD::enableSharedSD()
 {
+    if(_enabled) {
+        return false;
+    }
     _enabled = true;
 #if defined (ESP_FLAG_SHARED_SD_PIN)
     //need to check if SD is in use ?
@@ -72,11 +75,10 @@ bool ESP_SD::enableSharedSD()
 #endif // ESP_FLAG_SHARED_SD_PIN
 #if defined (ESP3DLIB_ENV)
     //check if card is not currently in use
-    if ((card.isMounted() && (IS_SD_PRINTING() ||IS_SD_FETCHING() ||IS_SD_PAUSED() ||  IS_SD_FILE_OPEN()))||card.flag.busy) {
+    if ((card.isMounted() && (IS_SD_PRINTING() ||IS_SD_FETCHING() ||IS_SD_PAUSED() ||  IS_SD_FILE_OPEN()))) {
         _enabled = false;
     } else {
         card.release();
-        card.flag.busy = true;
     }
 #endif // ESP3DLIB_ENV
     return _enabled;
@@ -116,7 +118,6 @@ void  ESP_SD::releaseFS()
 #endif // ESP_FLAG_SHARED_SD_PIN
 #if defined (ESP3DLIB_ENV)
     log_esp3d("Release SD");
-    card.flag.busy = false;
     card.mount();
 #endif // ESP3DLIB_ENV
     _enabled = false;

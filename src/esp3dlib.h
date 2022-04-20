@@ -48,6 +48,10 @@ public:
        * idletask function.
        */
     void idletask();
+    /**
+       * test if SD card is currently used by esp3dlib.
+       */
+    bool isSdUsed();
 };
 
 /**

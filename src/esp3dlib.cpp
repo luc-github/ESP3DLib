@@ -31,6 +31,9 @@
 #include "core/esp3doutput.h"
 #include "core/commands.h"
 #include <soc/rtc_wdt.h>
+#ifdef SDSUPPORT
+#include "modules/filesystem/esp_sd.h"
+#endif //SDSUPPORT
 
 
 Esp3DLib esp3dlib;
@@ -73,6 +76,16 @@ bool Esp3DLib::parse(char * cmd)
         return true;
     }
     return false;
+}
+
+bool Esp3DLib::isSdUsed()
+{
+#ifdef SDSUPPORT
+    return ESP_SD::isEnabled();
+#else
+    return false;
+#endif //SDSUPPORT
+
 }
 
 //Idletask when setup is done
