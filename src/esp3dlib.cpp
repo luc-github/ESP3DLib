@@ -30,7 +30,9 @@
 #include "core/esp3d.h"
 #include "core/esp3doutput.h"
 #include "core/commands.h"
+#if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
 #include <soc/rtc_wdt.h>
+#endif //CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
 #ifdef SDSUPPORT
 #include "modules/filesystem/esp_sd.h"
 #endif //SDSUPPORT
@@ -47,7 +49,9 @@ void ESP3DLibTaskfn( void * parameter )
     //Main loop
     for(;;) {
         myesp3d.handle();
+#if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
         rtc_wdt_feed();
+#endif //#if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
         vTaskDelay(1 / portTICK_RATE_MS);
     }
     vTaskDelete( Hal::xHandle );
