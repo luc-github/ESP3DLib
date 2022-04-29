@@ -521,6 +521,7 @@ size_t ESP3DOutput::printMSG(const char * s, bool withNL)
             display = HAS_SERIAL_DISPLAY;
 #endif //HAS_REMOTE_SCREEN
             display += "M117 ";
+            withNL = true;
             log_esp3d("Screen should display %s%s", display.c_str(),s);
         } else {
             if (_client == ESP_ECHO_SERIAL_CLIENT) {
@@ -536,12 +537,13 @@ size_t ESP3DOutput::printMSG(const char * s, bool withNL)
     default:
         if (_client == ESP_REMOTE_SCREEN_CLIENT) {
             display = "M117 ";
+            withNL = true;
         } else {
             display = ";";
         }
         display += s;
     }
-    if(withNL&& _client != ESP_REMOTE_SCREEN_CLIENT) {
+    if(withNL) {
         return printLN(display.c_str());
     } else {
         return print(display.c_str());

@@ -71,11 +71,12 @@ bool ESP_SD::enableSharedSD()
     //Method : TBD
     //1 - check sd cs state ? what about SDIO then ?
     //2 - check M27 status ?
+    log_esp3d("SD shared enabled PIN %d with %d", ESP_FLAG_SHARED_SD_PIN, ESP_FLAG_SHARED_SD_VALUE);
     digitalWrite(ESP_FLAG_SHARED_SD_PIN, ESP_FLAG_SHARED_SD_VALUE);
 #endif // ESP_FLAG_SHARED_SD_PIN
 #if defined (ESP3DLIB_ENV)
     //check if card is not currently in use
-    if ((card.isMounted() && (IS_SD_PRINTING() ||IS_SD_FETCHING() ||IS_SD_PAUSED() ||  IS_SD_FILE_OPEN()))) {
+    if (card.isMounted() && (IS_SD_PRINTING() ||IS_SD_FETCHING() ||IS_SD_PAUSED() ||  IS_SD_FILE_OPEN())) {
         _enabled = false;
     } else {
         card.release();
@@ -114,6 +115,7 @@ void  ESP_SD::releaseFS()
 {
 #if SD_DEVICE_CONNECTION == ESP_SHARED_SD
 #if defined (ESP_FLAG_SHARED_SD_PIN)
+    log_esp3d("SD shared disabled PIN %d with %d", ESP_FLAG_SHARED_SD_PIN, ESP_FLAG_SHARED_SD_VALUE);
     digitalWrite(ESP_FLAG_SHARED_SD_PIN, !ESP_FLAG_SHARED_SD_VALUE);
 #endif // ESP_FLAG_SHARED_SD_PIN
 #if defined (ESP3DLIB_ENV)

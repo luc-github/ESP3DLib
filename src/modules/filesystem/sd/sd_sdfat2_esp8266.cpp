@@ -17,6 +17,7 @@ sd_sdfat2_esp8266.cpp - ESP3D sd support class
   License along with This code; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+//#define ESP_DEBUG_FEATURE DEBUG_OUTPUT_SERIAL0
 #include "../../../include/esp3d_config.h"
 #if defined (ARDUINO_ARCH_ESP8266) && defined(SD_DEVICE)
 #if (SD_DEVICE == ESP_SDFAT2)

@@ -339,8 +339,6 @@ void GcodeHost::processCommand()
 
 void GcodeHost::handle()
 {
-    static uint32_t startTimout = 0;
-
     if (_step == HOST_NO_STREAM) {
         return;
     }

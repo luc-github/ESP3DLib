@@ -56,7 +56,6 @@ void HTTP_Server::init_handlers()
     //need to be there even no authentication to say to UI no authentication
     _webserver->on("/login", HTTP_ANY, handle_login);
 #ifdef FILESYSTEM_FEATURE
-    //FileSystememptyConstChar
     _webserver->on ("/files", HTTP_ANY, handleFSFileList, FSFileupload);
 #endif //FILESYSTEM_FEATURE
 #if COMMUNICATION_PROTOCOL == MKS_SERIAL

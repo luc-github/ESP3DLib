@@ -109,6 +109,7 @@ void Hal::analogRange(uint32_t range)
     analogReadResolution(resolution);
 #endif //ARDUINO_ARCH_ESP32
 #ifdef ARDUINO_ARCH_ESP8266
+    (void)resolution;
     ::analogWriteRange(_analogRange);
 #endif //ARDUINO_ARCH_ESP8266
 }
@@ -155,10 +156,10 @@ void Hal::wdtFeed()
         vTaskDelay(5); //delay 1 RTOS tick
     }
 #if !defined(DISABLE_WDT_ESP3DLIB_TASK) && !defined(DISABLE_WDT_CORE_0)
-	#if CONFIG_IDF_TARGET_ESP32
-		//FIXME: not implemented
-				rtc_wdt_feed();
-	#endif //CONFIG_IDF_TARGET_ESP32S2
+#if CONFIG_IDF_TARGET_ESP32
+    //FIXME: not implemented
+    rtc_wdt_feed();
+#endif //CONFIG_IDF_TARGET_ESP32S2
 #endif//!defined(DISABLE_WDT_ESP3DLIB_TASK) && !defined(DISABLE_WDT_CORE_0)
 #ifndef DISABLE_WDT_ESP3DLIB_TASK
     if (xHandle && esp_task_wdt_status(xHandle)==ESP_OK) {
@@ -202,8 +203,8 @@ bool Hal::has_temperature_sensor()
 #endif //ARDUINO_ARCH_ESP8266
 #ifdef ARDUINO_ARCH_ESP32
 #if CONFIG_IDF_TARGET_ESP32S3
-	//FIXME: not yet implemented
-	return false;
+    //FIXME: not yet implemented
+    return false;
 #else
     return true;
 #endif //CONFIG_IDF_TARGET_ESP32S3
@@ -218,8 +219,8 @@ float Hal::temperature()
 
 #ifdef ARDUINO_ARCH_ESP32
 #if CONFIG_IDF_TARGET_ESP32S3
-	//FIXME: not yet implemented
-	return 0.0;
+    //FIXME: not yet implemented
+    return 0.0;
 #else
     return temperatureRead();
 #endif //CONFIG_IDF_TARGET_ESP32S3

@@ -140,7 +140,7 @@ void HTTP_Server::SDFileupload ()
 #endif//ESP_BENCHMARK_FEATURE
                     //no error so write post date
                     int writeddatanb=fsUploadFile.write(upload.buf, upload.currentSize);
-                    if(upload.currentSize != writeddatanb) {
+                    if(upload.currentSize != (size_t)writeddatanb) {
                         //we have a problem set flag UPLOAD_STATUS_FAILED
                         log_esp3d("File write failed du to mismatch size %d vs %d", writeddatanb, upload.currentSize);
                         _upload_status=UPLOAD_STATUS_FAILED;

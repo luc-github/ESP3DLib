@@ -598,7 +598,7 @@ bool Commands::ESP400(const char* cmd_params, level_authenticate_type auth_type,
             output->print (Settings_ESP3D::read_byte(ESP_SERIAL_FLAG));
             output->print ("\",\"H\":\"serial\",\"O\":[{\"no\":\"0\"},{\"yes\":\"1\"}]}");
 #endif //COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
-#if !defined(ESP3DLIB_ENV) || (defined(ESP3DLIB_ENV) && (HAS_DISPLAY || defined(HAS_SERIAL_DISPLAY)))
+#if (defined(ESP3DLIB_ENV) && defined(HAS_DISPLAY)) || defined(HAS_SERIAL_DISPLAY)
             //Printer SCREEN
             output->print (",{\"F\":\"system/outputmsg\",\"P\":\"");
             output->print (ESP_REMOTE_SCREEN_FLAG);
