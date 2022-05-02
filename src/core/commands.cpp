@@ -583,6 +583,11 @@ bool Commands::execute_internal_command (int cmd, const char* cmd_params, level_
         break;
 #endif //BUZZER_DEVICE
 #endif //DISPLAY_DEVICE
+    //Show pins
+    //[ESP220][pwd=<user password>]
+    case 220:
+        response = ESP220(cmd_params, auth_type, output);
+        break;
     //Delay command
     //[ESP290]<delay in ms>[pwd=<user password>]
     case 290:

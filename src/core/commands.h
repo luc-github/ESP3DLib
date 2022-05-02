@@ -116,6 +116,7 @@ public:
 #ifdef SENSOR_DEVICE
     bool ESP210(const char* cmd_params, level_authenticate_type auth_level, ESP3DOutput * output);
 #endif //SENSOR_DEVICE
+    bool ESP220(const char* cmd_params, level_authenticate_type auth_level, ESP3DOutput * output);
     bool ESP290(const char* cmd_params, level_authenticate_type auth_level, ESP3DOutput * output);
     bool ESP400(const char* cmd_params, level_authenticate_type auth_level, ESP3DOutput * output);
     bool ESP401(const char* cmd_params, level_authenticate_type auth_level, ESP3DOutput * output);

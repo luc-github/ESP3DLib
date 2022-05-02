@@ -98,6 +98,7 @@ const char * help[]= {"[ESP] (id) - display this help",
                       "[ESP216](SNAP) - Take screen snapshot",
 #endif //DISPLAY_SNAPSHOT_FEATURE
 #endif //DISPLAY_DEVICE
+                      "[ESP220] - Show used pins",
 #ifdef BUZZER_DEVICE
                       "[ESP250]F=(frequency) D=(duration) - play sound on buzzer",
 #endif //BUZZER_DEVICE
@@ -230,6 +231,7 @@ const uint cmdlist[]= {0,
                        216,
 #endif //DISPLAY_SNAPSHOT_FEATURE
 #endif //DISPLAY_DEVICE
+                       220,
 #ifdef BUZZER_DEVICE
                        250,
 #endif //BUZZER_DEVICE
