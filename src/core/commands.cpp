@@ -23,12 +23,16 @@
 #include "commands.h"
 #include "esp3doutput.h"
 #include "settings_esp3d.h"
+#if COMMUNICATION_PROTOCOL == MKS_SERIAL
+#include "../modules/mks/mks_service.h"
+#endif //COMMUNICATION_PROTOCOL == MKS_SERIAL
 
 Commands esp3d_commands;
 
 Commands::Commands()
 {
 }
+
 Commands::~Commands()
 {
 }
@@ -73,7 +77,15 @@ void Commands::process(uint8_t * sbuf, size_t len, ESP3DOutput * output, level_a
             output->dispatch(sbuf, len, outputignore);
         } else {
             log_esp3d("Dispatch from %d to only  %d", output->client(), outputonly->client());
+#if COMMUNICATION_PROTOCOL == MKS_SERIAL
+            if (outputonly->client() == ESP_SERIAL_CLIENT) {
+                MKSService::sendGcodeFrame((const char *)sbuf);
+            } else {
+                outputonly->write(sbuf, len);
+            }
+#else
             outputonly->write(sbuf, len);
+#endif //COMMUNICATION_PROTOCOL == MKS_SERIAL
         }
     }
 }

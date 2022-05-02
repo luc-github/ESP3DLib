@@ -19,9 +19,11 @@
 */
 //this is ESP3DLIB compilation environement
 #define ESP3DLIB_ENV
+
 //Uncomment if you want to compile Marlin and ESP3DLib with Arduino IDE
 //Comment if you want to compile Marlin and ESP3DLib with PlatformIO
 //#define COMPILE_WITH_ARDUINO_IDE
+
 #if !defined(COMPILE_WITH_ARDUINO_IDE)
 //config reference, do not touch
 #ifndef ESP_XSTR
@@ -54,6 +56,11 @@
 //#define DISABLE_SD_UPDATE_FEATURE
 //#define DISABLE_WEB_UPDATE_FEATURE
 //#define AUTHENTICATION_FEATURE
+
+#ifndef SD_DETECT_STATE
+#define SD_DETECT_STATE LOW
+#endif
+
 #define SDSUPPORT
 //#define HAS_DISPLAY
 //#define HAS_SERIAL_DISPLAY "M118 P1 "

@@ -1327,6 +1327,25 @@ bool Commands::ESP420(const char* cmd_params, level_authenticate_type auth_type,
             }
             line="";
 #endif //AUTHENTICATION_FEATURE
+#if defined (HAS_SERIAL_DISPLAY)
+            if (json) {
+                line +=",{\"id\":\"";
+            }
+            line +="M117";
+            if (json) {
+                line +="\",\"value\":\"";
+            } else {
+                line +=": ";
+            }
+            line +="ON";
+            if (json) {
+                line +="\"}";
+                output->print (line.c_str());
+            } else {
+                output->printMSGLine(line.c_str());
+            }
+            line="";
+#endif //HAS_SERIAL_DISPLAY
 #if defined (NOTIFICATION_FEATURE)
             if (json) {
                 line +=",{\"id\":\"";

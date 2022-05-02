@@ -126,6 +126,7 @@ public:
     void processCommand();
     bool isCommand();
     bool isAckNeeded();
+    bool isAck(String & line);
 
 private:
     uint8_t _buffer [ESP_HOST_BUFFER_SIZE+1];

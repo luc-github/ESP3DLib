@@ -39,14 +39,22 @@ bool Commands::ESP111(const char* cmd_params, level_authenticate_type auth_type,
     if (parameter.length() == 0) {
         response = format_response(COMMANDID, json, true, NetConfig::localIP().c_str());
     } else {
-        response = format_response(COMMANDID, json, false, "Unknown parameter");
-        noError = false;
+        parameter = get_param (cmd_params, "OUTPUT=");
+        if (parameter != "PRINTER") {
+            response = format_response(COMMANDID, json, false, "Unknown parameter");
+        }
     }
+
     if (noError) {
+        parameter = get_param (cmd_params, "OUTPUT=");
         if (json) {
             output->printLN (response.c_str() );
         } else {
             output->printMSG (response.c_str() );
+            if (parameter == "PRINTER") {
+                ESP3DOutput printerOutput(ESP_REMOTE_SCREEN_CLIENT);
+                printerOutput.printMSG (NetConfig::localIP().c_str() );
+            }
         }
     } else {
         output->printERROR(response.c_str(), 200);

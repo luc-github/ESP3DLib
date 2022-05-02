@@ -143,6 +143,10 @@ void HTTP_Server::handleSDFileList ()
                 }
             }
         }
+        //force refresh
+        if (_webserver->arg ("action") == "list") {
+            ESP_SD::refreshStats(true);
+        }
     }
     String buffer2send ;
     buffer2send.reserve(1200);

@@ -69,10 +69,10 @@ void GcodeHost::end()
 
 bool GcodeHost::push(const uint8_t * sbuf, size_t len)
 {
-    log_esp3d("Push got %d bytes", len);
     if (_step == HOST_NO_STREAM) {
         return false;
     }
+    log_esp3d("Push got %d bytes", len);
     for (size_t i = 0; i < len; i++) {
         //it is a line process it
         if (sbuf[i]=='\n' || sbuf[i]=='\r') {
@@ -94,6 +94,21 @@ bool GcodeHost::push(const uint8_t * sbuf, size_t len)
     return true;
 }
 
+bool GcodeHost::isAck(String & line)
+{
+    if (line.indexOf("ok") != -1) {
+        log_esp3d("got ok");
+        return true;
+    }
+    if (Settings_ESP3D::GetFirmwareTarget()==SMOOTHIEWARE) {
+        if (line.indexOf("smoothie out") != -1) {
+            log_esp3d("got smoothie out");
+            return true;
+        }
+    }
+    return false;
+}
+
 void GcodeHost::flush()
 {
     //analyze buffer and do action if needed
@@ -105,7 +120,7 @@ void GcodeHost::flush()
     _response = (const char*)_buffer;
     log_esp3d("Stream got the response: %s", _response.c_str());
     _response.toLowerCase();
-    if (_response.indexOf("ok") != -1) {
+    if (isAck(_response)) {
         //check if we have proper ok response
         //like if numbering is enabled
         if(_step == HOST_WAIT4_ACK) {
@@ -128,7 +143,7 @@ void GcodeHost::startStream()
 {
     if (_fsType ==TYPE_SCRIPT_STREAM) {
         _totalSize = _script.length();
-        log_esp3d("Script %s opened, size is %d", _script.c_str(), _totalSize);
+        log_esp3d("Script line %s opened, size is %d", _script.c_str(), _totalSize);
     }
 #if defined(FILESYSTEM_FEATURE)
     if (_fsType ==TYPE_FS_STREAM) {
@@ -315,13 +330,14 @@ void GcodeHost::processCommand()
         if (isESPcmd) {
             esp3d_commands.process((uint8_t *)cmd.c_str(), cmd.length(),&outputhost, _auth_type) ;
             //we display error in output but it is not a blocking error
-            log_esp3d("Command is ESP command");
+            log_esp3d("Command is ESP command: %s, client is %d", cmd.c_str(), );
             _step = HOST_READ_LINE;
         } else {
 #if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
             esp3d_commands.process((uint8_t *)cmd.c_str(), cmd.length(),&_outputStream, _auth_type,&output,_outputStream.client()==ESP_ECHO_SERIAL_CLIENT?ESP_SOCKET_SERIAL_CLIENT:0 ) ;
 #endif //COMMUNICATION_PROTOCOL == SOCKET_SERIAL            
 #if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
+            log_esp3d("Command is not ESP command:%s, client is %d and only is %d",cmd.c_str(), (&_outputStream?_outputStream.client():0),(&output?output.client():0));
             esp3d_commands.process((uint8_t *)cmd.c_str(), cmd.length(),&_outputStream, _auth_type,&output) ;
 #endif //COMMUNICATION_PROTOCOL == SOCKET_SERIAL           
             _startTimeOut =millis();
@@ -333,7 +349,6 @@ void GcodeHost::processCommand()
                 _step = HOST_READ_LINE;
             }
         }
-
     }
 }
 
@@ -419,6 +434,7 @@ bool GcodeHost::pause()
     _nextStep = HOST_PAUSE_STREAM;
     return true;
 }
+
 bool GcodeHost::resume()
 {
     if (_step != HOST_PAUSE_STREAM) {
@@ -505,9 +521,17 @@ bool GcodeHost::processScript(const char * line, level_authenticate_type auth_ty
 bool GcodeHost::processFile(const char * filename, level_authenticate_type auth_type, ESP3DOutput * output)
 {
     bool target_found = false;
-    log_esp3d("Processing file client is  %d", output->client());
-    _outputStream.client(output->client());
-    _fileName = filename;
+#if COMMUNICATION_PROTOCOL == SOCKET_SERIAL
+    log_esp3d("Processing file client is  %d", output?output->client():ESP_SOCKET_SERIAL_CLIENT);
+    _outputStream.client(output?output->client():ESP_SOCKET_SERIAL_CLIENT);
+#endif//COMMUNICATION_PROTOCOL
+#if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
+    log_esp3d("Processing file client is  %d", output?output->client():ESP_SERIAL_CLIENT);
+    _outputStream.client(output?output->client():ESP_SERIAL_CLIENT);
+#endif//COMMUNICATION_PROTOCOL
+    //sanity check
+    _fileName = filename[0]!='/'?"/":"";
+    _fileName +=filename;
     _fileName.trim();
     log_esp3d("Processing file: %s", filename);
     if (_fileName.length() == 0) {
@@ -535,7 +559,7 @@ bool GcodeHost::processFile(const char * filename, level_authenticate_type auth_
         _fsType = TYPE_FS_STREAM;
     }
     //if no header it is also an FS file
-    if (!target_found &&_fileName[0]=='/') {
+    if (!target_found) {
         log_esp3d("Processing FS file %s", _fileName.c_str());
         _fsType = TYPE_FS_STREAM;
         target_found = true;
@@ -545,7 +569,8 @@ bool GcodeHost::processFile(const char * filename, level_authenticate_type auth_
     if (!target_found ) {
         target_found = true;
         _fsType = TYPE_SCRIPT_STREAM;
-        _script=_fileName;
+        //remove the /
+        _script=&_fileName[1];
         log_esp3d("Processing Script file %s", _script.c_str());
         _fileName = "";
     }

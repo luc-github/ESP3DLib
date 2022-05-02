@@ -103,6 +103,7 @@ bool  ESP_SD::accessFS()
         log_esp3d("SD Busy");
         return false;
     }
+#if SD_DEVICE_CONNECTION == ESP_SHARED_SD
     if  (ESP_SD::enableSharedSD()) {
         log_esp3d("Access SD");
         return true;
@@ -110,6 +111,10 @@ bool  ESP_SD::accessFS()
         log_esp3d("Enable shared SD failed");
         return false;
     }
+#else
+    log_esp3d("Access SD");
+    return true;
+#endif // SD_DEVICE_CONNECTION == ESP_SHARED_SD
 }
 void  ESP_SD::releaseFS()
 {
