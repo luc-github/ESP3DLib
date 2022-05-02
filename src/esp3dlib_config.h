@@ -186,6 +186,8 @@
 //let -1 or comment if none
 #if defined (SD_DETECT_PIN) && (SD_DETECT_PIN > 0)
 #define ESP_SD_DETECT_PIN       SD_DETECT_PIN
+#else
+#define ESP_SD_DETECT_VALUE  LOW
 #endif //SD_DETECT_PIN  
 
 //value expected for ESP_SD_DETECT_PIN
