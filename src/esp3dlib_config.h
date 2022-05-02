@@ -193,8 +193,8 @@
 #define ESP_SD_DETECT_VALUE      SD_DETECT_STATE
 #endif
 
-#if defined (SDSS) && (SDSS > 0)
-#define ESP_SD_CS_PIN SDSS
+#if defined (SD_SS_PIN) && (SD_SS_PIN > 0)
+#define ESP_SD_CS_PIN SD_SS_PIN
 #endif //ESP_SD_CS_PIN
 
 #if defined(SD_SCK_PIN) && (SD_SCK_PIN > 0)
