@@ -84,7 +84,7 @@ bool Esp3DLib::parse(char * cmd)
 
 bool Esp3DLib::isSdUsed()
 {
-#ifdef SDSUPPORT
+#if defined( SDSUPPORT) &&  SD_DEVICE_CONNECTION  == ESP_SHARED_SD
     return ESP_SD::isEnabled();
 #else
     return false;
