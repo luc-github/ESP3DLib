@@ -187,7 +187,7 @@
 
 //pin if reader has insert detection feature
 //let -1 or comment if none
-#if defined (SD_DETECT_PIN) && (SD_DETECT_PIN > 0)
+#if defined (SD_DETECT_PIN) && (SD_DETECT_PIN >= 0)
 #define ESP_SD_DETECT_PIN       SD_DETECT_PIN
 #endif //SD_DETECT_PIN  
 
@@ -196,19 +196,19 @@
 #define ESP_SD_DETECT_VALUE      SD_DETECT_STATE
 #endif
 
-#if defined (SD_SS_PIN) && (SD_SS_PIN > 0)
-#define ESP_SD_CS_PIN SD_SS_PIN
-#endif //ESP_SD_CS_PIN
+#if defined (SDSS) && (SDSS >= 0)
+#define ESP_SD_CS_PIN SDSS
+#endif //SDSS
 
-#if defined(SD_SCK_PIN) && (SD_SCK_PIN > 0)
+#if defined(SD_SCK_PIN) && (SD_SCK_PIN >= 0)
 #define ESP_SD_SCK_PIN SD_SCK_PIN
 #endif //SD_SCK_PIN
 
-#if defined(SD_MOSI_PIN) && (SD_MOSI_PIN > 0)
+#if defined(SD_MOSI_PIN) && (SD_MOSI_PIN >= 0)
 #define ESP_SD_MOSI_PIN SD_MOSI_PIN
 #endif //SD_MOSI_PIN
 
-#if defined(SD_MISO_PIN) && (SD_MISO_PIN > 0)
+#if defined(SD_MISO_PIN) && (SD_MISO_PIN >= 0)
 #define ESP_SD_MISO_PIN SD_MISO_PIN
 #endif //SD_MISO_PIN
 #endif //SDSUPPORT
