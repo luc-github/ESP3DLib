@@ -33,7 +33,10 @@
 #define MARLIN_HAL_PATH(PATH) HAL_PATH( ../../../../../Marlin/src/HAL, PATH)
 #define MARLIN_PATH(PATH) ESP_XSTR(../../../../../Marlin/src/PATH)
 #include MARLIN_PATH(inc/MarlinConfigPre.h)
+#include MARLIN_PATH(pins/pins.h)
 #include MARLIN_PATH(inc/Version.h)
+//#include MARLIN_PATH(HAL/ESP32S3/spi_pins.h)
+
 #undef DISABLED
 #undef _BV
 #else
