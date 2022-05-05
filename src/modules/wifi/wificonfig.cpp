@@ -252,6 +252,14 @@ bool WiFiConfig::StartAP(bool setupMode)
     IPAddress ip(IP);
     IPAddress gw(0,0,0,0);
     IPAddress mask(DEFAULT_AP_MASK_VALUE);
+#if defined (ARDUINO_ARCH_ESP8266)
+    log_esp3d("Use: %s / %s / %s", ip.toString().c_str(),ip.toString().c_str(),mask.toString().c_str());
+    if (!WiFi.softAPConfig(ip, setupMode?ip:gw, mask)) {
+        output.printERROR("Set IP to AP failed");
+    } else {
+        output.printMSG(ip.toString().c_str());
+    }
+#endif //ARDUINO_ARCH_ESP8266
     //Start AP
     if(WiFi.softAP(SSID.c_str(), (password.length() > 0)?password.c_str():nullptr, channel)) {
         String stmp = "AP SSID: '" + SSID;
@@ -265,6 +273,7 @@ bool WiFiConfig::StartAP(bool setupMode)
         }
         output.printMSG(stmp.c_str());
         log_esp3d("%s",stmp.c_str());
+#if defined (ARDUINO_ARCH_ESP32)
         //must be done after starting AP not before
         //https://github.com/espressif/arduino-esp32/issues/4222
         //on some phone 100 is ok but on some other it is not enough so 2000 is ok
@@ -276,7 +285,6 @@ bool WiFiConfig::StartAP(bool setupMode)
         } else {
             output.printMSG(ip.toString().c_str());
         }
-#if defined (ARDUINO_ARCH_ESP32)
         WiFi.setSleep(false);
         WiFi.softAPsetHostname(NetConfig::hostname(true));
 #endif //ARDUINO_ARCH_ESP32
