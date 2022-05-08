@@ -229,6 +229,17 @@
 //Also used by ESP700
 #define GCODE_HOST_FEATURE
 
+//Allows to mount /FS and /SD under / for FTP server /WebDav
+#define GLOBAL_FILESYSTEM_FEATURE
+
+//WEBDAV_FEATURE : enable WebDav feature
+//FS_ROOT        mount all FS
+//FS_FLASH       mount Flash FS
+//FS_SD          mount SD FS
+//FS_USBDISK     mount USB disk FS
+
+#define WEBDAV_FEATURE  FS_ROOT
+
 /************************************
  *
  * DEBUG
