@@ -17,6 +17,7 @@
   License along with This code; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+//#define ESP_DEBUG_FEATURE DEBUG_OUTPUT_SERIAL0
 #include "../../include/esp3d_config.h"
 #if defined(GLOBAL_FILESYSTEM_FEATURE)
 #include "esp_globalFS.h"
@@ -349,19 +350,24 @@ void ESP_GBFS::closeAll()
 ESP_GBFile ESP_GBFS::open(const char* path, uint8_t mode)
 {
     ESP_GBFile f;
+    log_esp3d("open %s", path);
 #if defined (FILESYSTEM_FEATURE) || defined(SD_DEVICE)
     uint8_t t = getFSType(path);
+    log_esp3d("type %d", t);
     if ((t == FS_ROOT) &&  (mode == ESP_FILE_READ)) {
         f = ESP_GBFile(FS_ROOT,"/" );
+        log_esp3d("root");
         getNextFS(true);
     }
 #if defined (FILESYSTEM_FEATURE)
     if (t == FS_FLASH) {
+        log_esp3d("open flash : %s", getRealPath(path));
         f = ESP_FileSystem::open(getRealPath(path), mode);
     }
 #endif //FILESYSTEM_FEATURE
 #if defined (SD_DEVICE)
     if (t == FS_SD) {
+        log_esp3d("open SD : %s", getRealPath(path));
         f = ESP_SD::open(getRealPath(path), mode);
     }
 #endif //SD_DEVICE

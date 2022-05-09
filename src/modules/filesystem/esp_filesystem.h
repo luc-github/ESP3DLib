@@ -68,8 +68,8 @@ class ESP_FileSystem
 public:
     static String & formatBytes (uint64_t bytes);
     static bool begin();
-    static bool  accessFS();
-    static void  releaseFS();
+    static bool  accessFS(uint8_t FS = FS_FLASH);
+    static void  releaseFS(uint8_t FS = FS_FLASH);
     static void end();
     static size_t totalBytes();
     static size_t usedBytes();
@@ -89,6 +89,7 @@ public:
     {
         return _started;
     }
+    static uint8_t getFSType(const char * path=nullptr);
 private:
     static bool _started;
 };

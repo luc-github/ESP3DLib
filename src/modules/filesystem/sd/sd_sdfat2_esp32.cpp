@@ -301,13 +301,16 @@ bool ESP_SD::format(ESP3DOutput * output)
 
 ESP_SDFile ESP_SD::open(const char* path, uint8_t mode)
 {
+    log_esp3d("open %s, %d", path, mode);
     //do some check
     if(((strcmp(path,"/") == 0) && ((mode == ESP_FILE_WRITE) || (mode == ESP_FILE_APPEND))) || (strlen(path) == 0)) {
         _sizechanged = true;
+        log_esp3d("reject  %s", path);
         return ESP_SDFile();
     }
     // path must start by '/'
     if (path[0] != '/') {
+        log_esp3d("%s is invalid path", path);
         return ESP_SDFile();
     }
     if (mode != ESP_FILE_READ) {
@@ -320,8 +323,14 @@ ESP_SDFile ESP_SD::open(const char* path, uint8_t mode)
         }
     }
     File tmp = SD.open(path, (mode == ESP_FILE_READ)?FILE_READ:(mode == ESP_FILE_WRITE)?FILE_WRITE:FILE_WRITE);
-    ESP_SDFile esptmp(&tmp, tmp.isDir(),(mode == ESP_FILE_READ)?false:true, path);
-    return esptmp;
+    if(tmp) {
+        ESP_SDFile esptmp(&tmp,strcmp(path,"/") == 0?true: tmp.isDir(),(mode == ESP_FILE_READ)?false:true, path);
+        log_esp3d("%s is a %s",strcmp(path,"/") == 0?true: tmp.isDir()?"Dir":"File");
+        return esptmp;
+    } else {
+        log_esp3d("open %s failed", path);
+        return  ESP_SDFile();
+    }
 }
 
 bool ESP_SD::exists(const char* path)

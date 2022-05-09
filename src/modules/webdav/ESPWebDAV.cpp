@@ -1411,13 +1411,14 @@ bool ESPWebDAVCore::parseRequest(const String& givenMethod,
     stripSlashes(uri);
     client = givenClient;
     contentTypeFn = givenContentTypeFn;
+    uint8_t fsType =  WebDavFS::getFSType(uri.c_str());
 
     log_esp3d("############################################");
     log_esp3d(">>>>>>>>>> RECV");
 
     log_esp3d("method: %s",method.c_str());
     log_esp3d(" url: %s",uri.c_str());
-
+    log_esp3d(" FS: %d",fsType);
     // parse and finish all headers
     String headerName;
     String headerValue;
@@ -1441,54 +1442,69 @@ bool ESPWebDAVCore::parseRequest(const String& givenMethod,
     overwrite.clear();
     ifHeader.clear();
     lockTokenHeader.clear();
-
-    while (1) {
-        String req = client->readStringUntil('\r');
-        client->readStringUntil('\n');
-        if (req == "")
-            // no more headers
-        {
-            break;
+    bool fsAvailable = true;
+    if (WebDavFS::accessFS(fsType)) {
+#if WEBDAV_FEATURE == FS_SD
+        //if not global FS and FS is SD, need to manually check/set the SD card state
+        if( WebDavFS::getState(true) == ESP_SDCARD_NOT_PRESENT) {
+            fsAvailable = false;
+        } else {
+            ESP_SD::setState(ESP_SDCARD_BUSY );
         }
+#endif // WEBDAV_FEATURE == FS_SD
+        if (fsAvailable) {
+            while (1) {
+                String req = client->readStringUntil('\r');
+                client->readStringUntil('\n');
+                if (req == "")
+                    // no more headers
+                {
+                    break;
+                }
 
-        int headerDiv = req.indexOf(':');
-        if (headerDiv == -1) {
-            break;
+                int headerDiv = req.indexOf(':');
+                if (headerDiv == -1) {
+                    break;
+                }
+
+                headerName = req.substring(0, headerDiv);
+                headerValue = req.substring(headerDiv + 2);
+                log_esp3d("\t%s: %s", headerName.c_str(), headerValue.c_str());
+
+                if (headerName.equalsIgnoreCase("Host")) {
+                    hostHeader = headerValue;
+                } else if (headerName.equalsIgnoreCase("Depth")) {
+                    depthHeader = headerValue;
+                } else if (headerName.equalsIgnoreCase("Content-Length")) {
+                    contentLengthHeader = headerValue.toInt();
+                } else if (headerName.equalsIgnoreCase("Destination")) {
+                    destinationHeader = headerValue;
+                } else if (headerName.equalsIgnoreCase("Range")) {
+                    processRange(headerValue);
+                } else if (headerName.equalsIgnoreCase("Overwrite")) {
+                    overwrite = headerValue;
+                } else if (headerName.equalsIgnoreCase("If")) {
+                    ifHeader = headerValue;
+                } else if (headerName.equalsIgnoreCase("Lock-Token")) {
+                    lockTokenHeader = headerValue;
+                }
+            }
+            log_esp3d("<<<<<<<<<< RECV");
+            handleRequest();
+        } else {
+            handleIssue(404, "Not found");
         }
-
-        headerName = req.substring(0, headerDiv);
-        headerValue = req.substring(headerDiv + 2);
-        log_esp3d("\t%s: %s", headerName.c_str(), headerValue.c_str());
-
-        if (headerName.equalsIgnoreCase("Host")) {
-            hostHeader = headerValue;
-        } else if (headerName.equalsIgnoreCase("Depth")) {
-            depthHeader = headerValue;
-        } else if (headerName.equalsIgnoreCase("Content-Length")) {
-            contentLengthHeader = headerValue.toInt();
-        } else if (headerName.equalsIgnoreCase("Destination")) {
-            destinationHeader = headerValue;
-        } else if (headerName.equalsIgnoreCase("Range")) {
-            processRange(headerValue);
-        } else if (headerName.equalsIgnoreCase("Overwrite")) {
-            overwrite = headerValue;
-        } else if (headerName.equalsIgnoreCase("If")) {
-            ifHeader = headerValue;
-        } else if (headerName.equalsIgnoreCase("Lock-Token")) {
-            lockTokenHeader = headerValue;
-        }
+        WebDavFS::releaseFS(fsType);
+    } else {
+        handleIssue(404, "Not found");
     }
-    log_esp3d("<<<<<<<<<< RECV");
 
-    bool ret = true;
-    /*ret =*/ handleRequest();
-
-    // finalize the response
+// finalize the response
     if (_chunked) {
         sendContent("");
     }
 
-    return ret;
+    return true;
 }
 
 

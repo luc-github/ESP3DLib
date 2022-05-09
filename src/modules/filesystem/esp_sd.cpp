@@ -96,8 +96,15 @@ uint8_t ESP_SD::setState(uint8_t flag)
     return _state;
 }
 
-bool  ESP_SD::accessFS()
+uint8_t ESP_SD::getFSType(const char * path)
 {
+    (void)path;
+    return FS_SD;
+}
+
+bool  ESP_SD::accessFS(uint8_t FS)
+{
+    (void)FS;
     //if card is busy do not let another task access SD and so prevent a release
     if (_state == ESP_SDCARD_BUSY) {
         log_esp3d("SD Busy");
@@ -116,8 +123,9 @@ bool  ESP_SD::accessFS()
     return true;
 #endif // SD_DEVICE_CONNECTION == ESP_SHARED_SD
 }
-void  ESP_SD::releaseFS()
+void  ESP_SD::releaseFS(uint8_t FS)
 {
+    (void)FS;
 #if SD_DEVICE_CONNECTION == ESP_SHARED_SD
 #if defined (ESP_FLAG_SHARED_SD_PIN)
     log_esp3d("SD shared disabled PIN %d with %d", ESP_FLAG_SHARED_SD_PIN, ESP_FLAG_SHARED_SD_VALUE);
