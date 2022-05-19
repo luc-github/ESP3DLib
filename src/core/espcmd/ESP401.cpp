@@ -86,7 +86,8 @@ bool Commands::ESP401(const char* cmd_params, level_authenticate_type auth_type,
                 //Byte value
                 if (styp == "B") {
                     if (!Settings_ESP3D::write_byte (spos.toInt(), sval.toInt())) {
-                        response = false;
+                        response = "Set failed";
+                        noError = false;
                     } else {
                         //dynamique refresh is better than restart the boards
                         switch(spos.toInt()) {
