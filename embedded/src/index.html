@@ -35,6 +35,8 @@
         <div class="controlBar">
           <input
             class="formControl"
+            spellcheck="false" 
+            autocorrect="off" 
             autocomplete="off"
             type="text"
             value=""
@@ -100,16 +102,18 @@
         <div class="modal-body">
           <div class="controlBar">
             <div class="label">User:</div>
-            <input type="text" id="loginInput" />
+            <input type="text" id="loginInput" spellcheck="false" autocorrect="off" autocomplete="off" />
           </div>
           <hr />
           <div class="controlBar">
             <div class="label">Password:</div>
-            <input type="password" id="passwordInput" />
+            <input type="password" id="passwordInput" spellcheck="false" autocorrect="off" autocomplete="off"/>
           </div>
         </div>
+        <div id="loginMsg" class="hide text-error-login">Invalid user or password</div>
         <div class="modal-footer">
-          <button type="button" class="btn" id="loginbutton">Login</button>
+          <button type="button" class="btn m-1" id="disconnectbutton">Disconnect</button>
+          <button type="button" class="btn m-1" id="loginbutton">Login</button>
         </div>
       </div>
     </div>
