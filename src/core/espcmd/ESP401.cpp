@@ -47,18 +47,18 @@ bool Commands::ESP401(const char* cmd_params, level_authenticate_type auth_type,
 {
     bool noError = true;
     bool json = has_tag (cmd_params, "json");
+    String spos= "";
     String response;
     String parameter;
     int errorCode = 200; //unless it is a server error use 200 as default and set error in json instead
 #ifdef AUTHENTICATION_FEATURE
     if (auth_type != LEVEL_ADMIN) {
-        response = = "Wrong authentication level";
+        response = "Wrong authentication level";
         noError = false;
         errorCode = 401;
     }
 #else
     (void)auth_type;
-    String spos= "";
 #endif //AUTHENTICATION_FEATURE
     if (noError) {
         //check validity of parameters
@@ -86,8 +86,7 @@ bool Commands::ESP401(const char* cmd_params, level_authenticate_type auth_type,
                 //Byte value
                 if (styp == "B") {
                     if (!Settings_ESP3D::write_byte (spos.toInt(), sval.toInt())) {
-                        response = "Set failed";
-                        noError = false;
+                        response = false;
                     } else {
                         //dynamique refresh is better than restart the boards
                         switch(spos.toInt()) {

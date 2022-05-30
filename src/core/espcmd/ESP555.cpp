@@ -38,7 +38,7 @@ bool Commands::ESP555(const char* cmd_params, level_authenticate_type auth_type,
         if (parameter.length() != 0) {
             if (Settings_ESP3D::isLocalPasswordValid (parameter.c_str() ) ) {
                 if (!Settings_ESP3D::write_string (ESP_USER_PWD, parameter.c_str())) {
-                    esponse = format_response(COMMANDID, json, false, "Set failed");
+                    response = format_response(COMMANDID, json, false, "Set failed");
                     noError = false;
                 } else {
                     response = format_response(COMMANDID, json, true, "ok");
