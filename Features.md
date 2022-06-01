@@ -1,4 +1,4 @@
-# V2 Features
+# V3 Features
 
 * Embedded maintenance page (terminal / local FS update / Firmware update)
 * WebUI support

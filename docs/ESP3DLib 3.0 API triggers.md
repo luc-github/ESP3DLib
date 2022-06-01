@@ -1,4 +1,4 @@
-ESP3DLib 2.0 triggers
+ESP3DLib 3.0 triggers
 in configuration_adv.h
 1 - madatory define 
  #define ESP3D_WIFISUPPORT   // ESP3D Library WiFi management (https://github.com/luc-github/ESP3DLib)
