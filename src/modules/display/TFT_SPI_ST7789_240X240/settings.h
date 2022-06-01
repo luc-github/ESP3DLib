@@ -1,5 +1,5 @@
 /*
-  OLED_SSD1306.h - ESP3D display data file
+  settings.h - ESP3D display data file
 
   Copyright (c) 2014 Luc Lebosse. All rights reserved.
 
@@ -17,52 +17,53 @@
   License along with This code; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include "esp3d_logo.h"
+
 //Screen size
-#define SCREEN_WIDTH    128
-#define SCREEN_HEIGHT   64
+#define SCREEN_WIDTH    240
+#define SCREEN_HEIGHT   240
+
 //Colors
-#define TFT_BLACK   BLACK
-#define TFT_WHITE   WHITE
-#define SPLASH_FG   TFT_BLACK
-#define SPLASH_BG   TFT_WHITE
-#define SCREEN_BG   TFT_BLACK
-#define PROGRESS_FG TFT_WHITE
-#define SIGNAL_FG   TFT_WHITE
-#define SSID_FG TFT_WHITE
-#define IP_FG   TFT_WHITE
-#define STATUS_FG   TFT_WHITE
+#define COLOR_BLACK   TFT_BLACK
+#define COLOR_WHITE   TFT_WHITE
+#define SPLASH_FG   COLOR_WHITE
+#define SPLASH_BG   COLOR_BLACK
+#define SCREEN_BG   COLOR_BLACK
+#define PROGRESS_FG TFT_BLUE
+#define SIGNAL_FG   TFT_CYAN
+#define SSID_FG TFT_ORANGE
+#define IP_FG   COLOR_WHITE
+#define STATUS_FG   TFT_YELLOW
 
 //Fonts
 #define FONTSIGNAL  2
 #define FONTSSID     2
-#define FONTIP   3
+#define FONTIP   4
 #define FONTSTATUS   2
 
 //Positions
-#define SIGNAL_X 128-27
+#define SIGNAL_X SCREEN_WIDTH-34
 #define SIGNAL_Y 0
 #define SIGNAL_W 46
-#define SIGNAL_H 10
+#define SIGNAL_H 14
 
-#define SIGNAL_ICON_X 128-43
+#define SIGNAL_ICON_X SCREEN_WIDTH-60
 #define SIGNAL_ICON_Y 2
-#define SIGNAL_ICON_W 15
+#define SIGNAL_ICON_W 23
 #define SIGNAL_ICON_H 10
-#define SIGNAL_ICON_W_BAR 3
-#define SIGNAL_ICON_SPACER_X 1
+#define SIGNAL_ICON_W_BAR 4
+#define SIGNAL_ICON_SPACER_X 2
 
 #define SSID_AREA_X 0
 #define SSID_AREA_Y 0
 #define SSID_AREA_W 85
-#define SSID_AREA_H 12
+#define SSID_AREA_H 14
 
 #define IP_AREA_X 0
-#define IP_AREA_Y 16
-#define IP_AREA_W 128
-#define IP_AREA_H 16
+#define IP_AREA_Y (SCREEN_HEIGHT/2) - 8
+#define IP_AREA_W SCREEN_WIDTH
+#define IP_AREA_H 20
 
 #define STATUS_AREA_X 0
-#define STATUS_AREA_Y 48
-#define STATUS_AREA_W 128
+#define STATUS_AREA_Y SCREEN_HEIGHT-16
+#define STATUS_AREA_W SCREEN_WIDTH
 #define STATUS_AREA_H 16

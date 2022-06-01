@@ -54,7 +54,9 @@ extern "C" {
 #if defined (HTTP_FEATURE) || defined(WS_DATA_FEATURE)
 #include "../websocket/websocket_server.h"
 #endif //HTTP_FEATURE || WS_DATA_FEATURE
-
+#if defined (DISPLAY_DEVICE)
+#include "../display/display.h"
+#endif //DISPLAY_DEVICE
 #include <base64.h>
 
 #define PUSHOVERTIMEOUT 5000
@@ -188,9 +190,13 @@ bool NotificationsService::sendMSG(const char * title, const char * message)
         //push to webui by default
 #if defined (HTTP_FEATURE) || defined(WS_DATA_FEATURE)
         String msg = "NOTIFICATION:";
+
         msg += message;
         websocket_terminal_server.pushMSG(msg.c_str());
 #endif //HTTP_FEATURE || WS_DATA_FEATURE
+#ifdef DISPLAY_DEVICE
+        esp3d_display.setStatus(message);
+#endif //DISPLAY_DEVICE
         switch(_notificationType) {
         case ESP_PUSHOVER_NOTIFICATION:
             return sendPushoverMSG(title,message);
@@ -211,7 +217,7 @@ bool NotificationsService::sendMSG(const char * title, const char * message)
             break;
         }
     }
-    return false;
+    return true;
 }
 //Messages are currently limited to 1024 4-byte UTF-8 characters
 //but we do not do any check
@@ -555,6 +561,7 @@ bool NotificationsService::begin()
     _notificationType = Settings_ESP3D::read_byte(ESP_NOTIFICATION_TYPE);
     switch(_notificationType) {
     case 0: //no notification = no error but no start
+        _started=true;
         return true;
     case ESP_PUSHOVER_NOTIFICATION:
         _token1 = Settings_ESP3D::read_string(ESP_NOTIFICATION_TOKEN1);

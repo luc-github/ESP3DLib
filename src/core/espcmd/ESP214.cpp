@@ -45,7 +45,7 @@ bool Commands::ESP214(const char* cmd_params, level_authenticate_type auth_type,
 #endif //AUTHENTICATION_FEATURE
     if (noError) {
         parameter = clean_param(get_param (cmd_params, ""));
-        esp3d_display.SetStatus(parameter.c_str());
+        esp3d_display.setStatus(parameter.c_str());
         response = format_response(COMMANDID, json, true, "ok");
     }
     if (noError) {

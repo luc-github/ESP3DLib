@@ -122,7 +122,7 @@ bool Esp3D::begin()
     }
 #endif //FILESYSTEM_FEATURE
 #ifdef DISPLAY_DEVICE
-    esp3d_display.show_screenID(MAIN_SCREEN);
+    esp3d_display.showScreenID(MAIN_SCREEN);
     log_esp3d("Main screen");
 #endif //DISPLAY_DEVICE
     //Setup Network

@@ -124,12 +124,12 @@ void ESP3DOutput::toScreen(uint8_t output_type, const char * s)
     switch (output_type) {
     case ESP_OUTPUT_IP_ADDRESS:
 #ifdef DISPLAY_DEVICE
-        esp3d_display.display_IP(true);
+        esp3d_display.updateIP();
 #endif //DISPLAY_DEVICE
         break;
     case ESP_OUTPUT_STATUS:
 #ifdef DISPLAY_DEVICE
-        esp3d_display.SetStatus(s);
+        esp3d_display.setStatus(s);
 #endif //DISPLAY_DEVICE
         break;
     case ESP_OUTPUT_PROGRESS:
@@ -141,9 +141,8 @@ void ESP3DOutput::toScreen(uint8_t output_type, const char * s)
 #ifdef DISPLAY_DEVICE
         switch(atoi(s)) {
         case ESP_STATE_DISCONNECTED:
-            esp3d_display.SetStatus(F("Disconnected"));
+            esp3d_display.setStatus("Disconnected");
             break;
-            esp3d_display.SetStatus("Disconnected");
         default :
             break;
         }
@@ -713,7 +712,7 @@ size_t ESP3DOutput::write(const uint8_t *buffer, size_t size)
 #endif //HTTP_FEATURE
 #if defined (DISPLAY_DEVICE)
     case ESP_SCREEN_CLIENT:
-        esp3d_display.SetStatus((const char *)buffer);
+        esp3d_display.setStatus((const char *)buffer);
         return size;
 #endif //DISPLAY_DEVICE
 #if defined (BLUETOOTH_FEATURE)

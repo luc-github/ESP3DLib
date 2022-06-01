@@ -55,13 +55,13 @@ bool Commands::ESP170(const char* cmd_params, level_authenticate_type auth_type,
         } else {
             parameter = clean_param(get_param (cmd_params, ""));
             //get
-            if (parameter.length() == 0)) {
+            if (parameter.length() == 0) {
                 sensor_t * s = esp_camera_sensor_get();
                 if (s == nullptr) {
                     response = format_response(COMMANDID, json, false, "No camera initialized");
                     noError = false;
                 } else {
-                    String line = ""
+                    String line = "";
                     if (json) {
                         output->print ("{\"cmd\":\"170\",\"status\":\"ok\",\"data\":\"[");
                     }
@@ -235,7 +235,7 @@ bool Commands::ESP170(const char* cmd_params, level_authenticate_type auth_type,
                     line="";
                     //ae_level
                     if (json) {
-                        line +="{\"id\":\"ae_level\",\"value\":\"");
+                        line +="{\"id\":\"ae_level\",\"value\":\"";
                     } else {
                         line +="ae_level:";
                     }
@@ -434,7 +434,7 @@ bool Commands::ESP170(const char* cmd_params, level_authenticate_type auth_type,
                     if (json) {
                         output->printLN ("]}");
                     }
-                    return true
+                    return true;
                 }
             } else { //set
 #ifdef AUTHENTICATION_FEATURE

@@ -1,5 +1,5 @@
 /*
-  OLED_SSD1306.h - ESP3D display data file
+  display.cpp -  display functions class
 
   Copyright (c) 2014 Luc Lebosse. All rights reserved.
 
@@ -17,6 +17,8 @@
   License along with This code; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-//Screen size
-#define SCREEN_WIDTH    128
-#define SCREEN_HEIGHT   64
+
+#include "../../include/esp3d_config.h"
+#if defined (DISPLAY_DEVICE)
+//TBD
+#endif //DISPLAY_DEVICE

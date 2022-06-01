@@ -96,15 +96,19 @@ bool WiFiConfig::isPasswordValid (const char * password)
  * Get WiFi signal strength
  */
 
-int32_t WiFiConfig::getSignal (int32_t RSSI)
+int32_t WiFiConfig::getSignal (int32_t RSSI, bool filter)
 {
-    if (RSSI < MIN_RSSI) {
+    if (RSSI < MIN_RSSI && filter) {
+        return 0;
+    }
+    if (RSSI <= -100 && !filter) {
         return 0;
     }
     if (RSSI >= -50) {
         return 100;
     }
     return (2 * (RSSI + 100) );
+
 }
 
 /*

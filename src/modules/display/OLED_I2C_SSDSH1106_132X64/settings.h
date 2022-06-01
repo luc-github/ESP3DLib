@@ -1,5 +1,5 @@
 /*
-  OLED_SSDSH1106.h - ESP3D display data file
+  settings.h - ESP3D display data file
 
   Copyright (c) 2014 Luc Lebosse. All rights reserved.
 
@@ -17,21 +17,21 @@
   License along with This code; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include "esp3d_logo.h"
+
 //Screen size
 #define SCREEN_WIDTH    132
 #define SCREEN_HEIGHT   64
 //Colors
-#define TFT_BLACK   BLACK
-#define TFT_WHITE   WHITE
-#define SPLASH_FG   TFT_BLACK
-#define SPLASH_BG   TFT_WHITE
-#define SCREEN_BG   TFT_BLACK
-#define PROGRESS_FG TFT_WHITE
-#define SIGNAL_FG   TFT_WHITE
-#define SSID_FG TFT_WHITE
-#define IP_FG   TFT_WHITE
-#define STATUS_FG   TFT_WHITE
+#define COLOR_BLACK   BLACK
+#define COLOR_WHITE   WHITE
+#define SPLASH_FG   COLOR_BLACK
+#define SPLASH_BG   COLOR_WHITE
+#define SCREEN_BG   COLOR_BLACK
+#define PROGRESS_FG COLOR_WHITE
+#define SIGNAL_FG   COLOR_WHITE
+#define SSID_FG COLOR_WHITE
+#define IP_FG   COLOR_WHITE
+#define STATUS_FG   COLOR_WHITE
 
 //Fonts
 #define FONTSIGNAL 2

@@ -236,7 +236,43 @@ bool Commands::ESP220(const char* cmd_params, level_authenticate_type auth_type,
             line="";
 #endif //SENSOR_DEVICE
 #ifdef DISPLAY_DEVICE
-            //TODO: add display pin
+#if (DISPLAY_DEVICE == OLED_I2C_SSD1306) || (DISPLAY_DEVICE == OLED_I2C_SSDSH1106)
+            hasPin = true;
+            if (json) {
+                line += "{\"id\":\"";
+            }
+            line +="SDA";
+            if (json) {
+                line +="\",\"value\":\"";
+            } else {
+                line +=": ";
+            }
+            line +=String(ESP_SDA_PIN);
+            if (json) {
+                line +="\"}";
+                output->print (line.c_str());
+            } else {
+                output->printMSGLine(line.c_str());
+            }
+            line="";
+            if (json) {
+                line += "{\"id\":\"";
+            }
+            line +="SCL";
+            if (json) {
+                line +="\",\"value\":\"";
+            } else {
+                line +=": ";
+            }
+            line +=String(ESP_SCL_PIN);
+            if (json) {
+                line +="\"}";
+                output->print (line.c_str());
+            } else {
+                output->printMSGLine(line.c_str());
+            }
+            line="";
+#endif //(DISPLAY_DEVICE == OLED_I2C_SSD1306) || (DISPLAY_DEVICE == OLED_I2C_SSDSH1106)
 #endif //DISPLAY_DEVICE
             if (!hasPin) {
                 if (json) {
