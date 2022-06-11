@@ -293,7 +293,7 @@ size_t ESP3DOutput::dispatch (const uint8_t * sbuf, size_t len, uint8_t ignoreCl
     }
 #endif //HTTP_FEATURE    
 #if defined (BLUETOOTH_FEATURE)
-    if (_!(client == ESP_BT_CLIENT  || ESP_BT_CLIENT==ignoreClient)) {
+    if (!(_client == ESP_BT_CLIENT  || ESP_BT_CLIENT==ignoreClient)) {
         if (isOutput(ESP_BT_CLIENT) && bt_service.started()) {
             log_esp3d("Dispatch to bt");
             bt_service.write(sbuf, len);
@@ -558,7 +558,6 @@ size_t ESP3DOutput::printERROR(const char * s, int code_error)
     if (_client == ESP_SCREEN_CLIENT) {
         return print(s);
     }
-    _code = code_error;
     if (_client == ESP_HTTP_CLIENT) {
 #ifdef HTTP_FEATURE
         (void)code_error;
@@ -571,7 +570,7 @@ size_t ESP3DOutput::printERROR(const char * s, int code_error)
                     display ="";
                 }
                 display += s;
-                _webserver->send (_code, "text/plain", display.c_str());
+                _webserver->send (code_error, "text/plain", display.c_str());
                 _headerSent = true;
                 _footerSent = true;
                 return display.length();
