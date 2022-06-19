@@ -19,7 +19,7 @@
 */
 
 #include "../../include/esp3d_config.h"
-#ifdef RECOVERY_FEATURE
+#if defined(RECOVERY_FEATURE)
 #include "recovery_service.h"
 #include "../../core/settings_esp3d.h"
 #include "../../core/esp3doutput.h"
