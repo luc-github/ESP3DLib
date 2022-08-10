@@ -28,8 +28,12 @@
 #else
 #undef DISABLED
 #undef _BV
+#  if __has_include ("../esp3dlib_config.h")
 #include "../esp3dlib_config.h"
 #include "./Marlin/FlushableHardwareSerial.h"
+#else
+#error "No configuration file found"
+#endif
 #endif
 #endif
 
@@ -38,6 +42,17 @@
 #include "../core/hal.h"
 #include "../core/debug_esp3d.h"
 #include "../include/version.h"
+
+#if defined(ARDUINO_ARCH_ESP8266)
+/************************************
+ *
+ * SSL Client
+ *
+ * **********************************/
+//Using BearSSL need to decrease size of packet to not be OOM on ESP8266
+#define BEARSSL_MFLN_SIZE   512
+#define BEARSSL_MFLN_SIZE_FALLBACK  4096
+#endif // ARDUINO_ARCH_ESP8266
 
 /************************************
  *

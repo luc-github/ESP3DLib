@@ -176,9 +176,6 @@
 //ESP_SDFAT2                  4
 #define SD_DEVICE    ESP_SDFAT2
 
-//SDIO mode
-#define SD_ONE_BIT_MODE true
-
 //SD Device Connection type (default is ESP_NO_SD if not defined)
 //ESP_NO_SD
 //ESP_DIRECT_SD
@@ -211,13 +208,15 @@
 #if defined(SD_MISO_PIN) && (SD_MISO_PIN >= 0)
 #define ESP_SD_MISO_PIN SD_MISO_PIN
 #endif //SD_MISO_PIN
-#endif //SDSUPPORT
 
 //SD_UPDATE_FEATURE: allow to configure settings using SD
 //Rely on Configuration_adv.h
 #ifndef DISABLE_SD_UPDATE_FEATURE
-//#define SD_UPDATE_FEATURE
+#define SD_UPDATE_FEATURE
 #endif //DISABLE_SD_UPDATE_FEATURE
+#endif //SDSUPPORT
+
+
 
 //NOTIFICATION_FEATURE : allow to push notifications
 //Rely on Configuration_adv.h
@@ -236,9 +235,11 @@
 //FS_ROOT        mount all FS
 //FS_FLASH       mount Flash FS
 //FS_SD          mount SD FS
-//FS_USBDISK     mount USB disk FS
-
+#ifndef DISABLE_WEBDAV_FEATURE
+#ifndef WEBDAV_FEATURE
 #define WEBDAV_FEATURE  FS_ROOT
+#endif //WEBDAV_FEATURE
+#endif //DISABLE_WEBDAV_FEATURE
 
 /************************************
  *
@@ -310,3 +311,7 @@
 #define ESP_NOTIFICATION_TITLE "ESP3D Notification"
 #endif //NOTIFICATION_TITLE
 #endif //NOTIFICATION_FEATURE
+
+#if defined (SD_TIMESTAMP_FEATURE) || defined (FILESYSTEM_TIMESTAMP_FEATURE)
+#define TIMESTAMP_FEATURE
+#endif //SD_TIMESTAMP_FEATURE || FILESYSTEM_TIMESTAMP_FEATURE 

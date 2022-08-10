@@ -1,4 +1,4 @@
-# ESP3DLib 3.0 for Marlin
+# ESP3DLib 3.0 for Marlin [<img src="https://img.shields.io/liberapay/patrons/ESP3D.svg?logo=liberapay">](https://liberapay.com/ESP3D)
 
 <img src="https://github.com/luc-github/ESP3DLib/blob/master/images/ESP3D_social_mini.png">
 Library for ESP32 boards using Marlin 2.x : 
@@ -12,7 +12,7 @@ The web interface files has it's own repository [ESP3D-WEBUI](https://github.com
 
 [Latest development version ![Development Version](https://img.shields.io/badge/3.0-yellow?style=plastic) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3DLib/3.0?style=plastic)](https://github.com/luc-github/ESP3DLib/tree/3.0) [![Travis (.org) branch](https://img.shields.io/travis/luc-github/ESP3DLib/devt?style=plastic)](https://travis-ci.org/luc-github/ESP3DLib) [![Release Version](https://img.shields.io/github/v/release/luc-github/ESP3D-WEBUI?color=green&include_prereleases&label=WebUI&style=plastic)](https://github.com/luc-github/ESP3D-WEBUI/tree/3.0) [![Marlin](https://img.shields.io/github/release/MarlinFirmware/Marlin.svg?style=plastic&label=Marlin)](https://github.com/MarlinFirmware/Marlin)    
 
-To use this version you need an updated version of Marlin which is https://github.com/luc-github/Marlin
+To use ESP3Lib V3 you need an updated version of Marlin which is here: https://github.com/luc-github/Marlin, necessary will be pushed when library V3 is considered as stable enough.   
 
 <h4>:warning: This is not for ESP8266 boards neither standalone ESP3D installation</h4>   
 
@@ -21,11 +21,23 @@ for them go [here](https://github.com/luc-github/ESP3D)
 [All releases](https://github.com/luc-github/ESP3DLib/releases)
 
 
+## Sponsors 
+[<img width="200px" src="https://raw.githubusercontent.com/luc-github/ESP3DLib/master/images/sponsors-supporters/MKS/mksmakerbase.jpg" title="MKS Makerbase">](https://github.com/makerbase-mks)&nbsp;&nbsp;
 
+## Supporters
 
-## Donate
-Every support is welcome: [<img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG_global.gif" border="0" alt="PayPal – The safer, easier way to pay online.">](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=Y8FFE7NA4LJWQ)    
-Especially if need to buy new modules for testing.
+## Become a sponsor or a supporter
+ * A sponsor is a recurent donator    
+If your tier is `10 US$/month` or more, to thank you for your support, your logo / avatar will be added to the readme page with eventually with a link to your site.    
+ * A supporter is per time donator 
+ If your donation is over `120 US$` per year, to thank you for your support, your logo / avatar will be added to the readme page with eventually with a link to your site.  
+
+ Every support is welcome, indeed helping users / developing new features need time and devices, donations contribute a lot to make things happen, thank you.
+
+* liberapay <a href="https://liberapay.com/ESP3D/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a> 
+* Paypal [<img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG_global.gif" border="0" alt="PayPal – The safer, easier way to pay online.">](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FQL59C749A78L)
+* ko-fi [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/G2G0C0QT7)
+
 
 ## Features
 * Complete configuration by web browser (Station or Access point) or by Serial commands
@@ -41,61 +53,8 @@ Especially if need to buy new modules for testing.
 As side project of ESP3D, it follows ESP3D features: https://github.com/luc-github/ESP3DLib/blob/3.0/Features.md
 
 ## How to enable ?
-In Marlin configuration files :  
-[Configuration.h](https://github.com/MarlinFirmware/Marlin/blob/bugfix-2.0.x/Marlin/Configuration.h) 
 
-Select an ESP32 based board.   
-
-Uncomment the second serial port to allow esp3d to get all printer feedback 
-```
-/**
- * Select a secondary serial port on the board to use for communication with the host.
- * :[-1, 0, 1, 2, 3, 4, 5, 6, 7]
- */
-#define SERIAL_PORT_2 -1
-```
-
-[Configuration_adv.h](https://github.com/MarlinFirmware/Marlin/blob/bugfix-2.0.x/Marlin/Configuration_adv.h)  
-
-enable `#define ESP3D_WIFISUPPORT   // ESP3D Library WiFi management (https://github.com/luc-github/ESP3DLib)`    
-
-Define to which access point your board need to connect to:
-```
-  #define WIFI_SSID "Wifi SSID"
-  #define WIFI_PWD  "Wifi Password"
-```
-if not defined or you left like this the board will act as an Access Point instead.
-
-and finally
-```
-#define WEBSUPPORT          // Start a webserver (which may include auto-discovery)
-#define OTASUPPORT          // Support over-the-air firmware updates
-#define WIFI_CUSTOM_COMMAND // Accept feature config commands (e.g., WiFi ESP3D) from the host
-```
-
-
-For advanced configuration add in same section:
-
-to enable this feature which is disabled by default:
-```
-//AUTHENTICATION_FEATURE: protect pages by login password.
-#define AUTHENTICATION_FEATURE
-```
-
-to disable any of these features which are enabled by default:
-
-```
-//MDNS_FEATURE: this feature allow  type the name defined
-//in web browser by default: http:\\marlinesp.local and connect
-#define DISABLE_MDNS_FEATURE
-
-//SSDD_FEATURE: this feature is a discovery protocol, supported on Windows out of the box
-//Rely on Configuration_adv.h
-#define DISABLE_SSDP_FEATURE
-
-//CAPTIVE_PORTAL_FEATURE: In SoftAP redirect all unknow call to main page
-#define DISABLE_CAPTIVE_PORTAL_FEATURE
-```  
+Check the document : https://github.com/luc-github/ESP3DLib/blob/3.0/Configuration.md
 
 
 
@@ -104,13 +63,13 @@ Default Settings if not modified in Configuration_adv.h:
 AP:MARLIN_ESP    
 PW:12345678   
 Authentification: WPA     
-Mode: g (n is not supported by AP, just by STA)    
+Mode: g (n is not supported by AP, but by STA)    
 channel: 1         
 IP: 192.168.0.1   
 Mask: 255.255.255.0   
 GW:192.168.0.1    
 Web port:80 
-the websocket is web port + 1 => 80+1 : 81  
+the webUI websocket is web port + 1 => 80+1 : 81  
 User: admin   
 Password: admin   
 User:user   
@@ -133,4 +92,5 @@ you can also check [discussions panel](https://github.com/luc-github/ESP3DLib/di
 
 
 ## TODO/On going  :   
---Import all ESP3D 2.1/3.0 features
+- Test test test....
+- Update Marlin to support it officially the V3 using latest ESP32 arduino / platformIO core version
