@@ -8,15 +8,11 @@ Library for ESP32 boards using Marlin 2.x :
 [MRR_ESPE](https://github.com/maplerainresearch/MRR_ESPE),
 [ESP32 Controller](https://github.com/simon-jouet/ESP32Controller)
 
-The web interface files has it's own repository [ESP3D-WEBUI](https://github.com/luc-github/ESP3D-WEBUI/tree/2.1).
+[Current version: ![Current Version](https://img.shields.io/badge/ESPDLib-1.0-green?style=plastic) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3DLib/master?style=plastic)](https://github.com/luc-github/ESP3DLib/tree/master) [![Release Version](https://img.shields.io/github/v/release/luc-github/ESP3D-WEBUI?color=green&label=WebUI&style=plastic)](https://github.com/luc-github/ESP3D-WEBUI/tree/2.1/languages) [![Marlin](https://img.shields.io/github/release/MarlinFirmware/Marlin.svg?style=plastic&label=Marlin)](https://github.com/MarlinFirmware/Marlin)  
 
-[Latest development version ![Development Version](https://img.shields.io/badge/Devt-v1.x-yellow?style=plastic) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3DLib/devt?style=plastic)](https://github.com/luc-github/ESP3DLib/tree/devt) [![Travis (.org) branch](https://img.shields.io/travis/luc-github/ESP3DLib/devt?style=plastic)](https://travis-ci.org/luc-github/ESP3DLib) [![Release Version](https://img.shields.io/github/v/release/luc-github/ESP3D-WEBUI?color=green&include_prereleases&label=WebUI&style=plastic)](https://github.com/luc-github/ESP3D-WEBUI/tree/2.1) [![Marlin](https://img.shields.io/github/release/MarlinFirmware/Marlin.svg?style=plastic&label=Marlin)](https://github.com/MarlinFirmware/Marlin)    
+[Development version: ![Development Version](https://img.shields.io/badge/ESPDLib-3.0-yellow?style=plastic) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3DLib/3.0?style=plastic)](https://github.com/luc-github/ESP3DLib/tree/3.0)  [![Release Version](https://img.shields.io/github/v/release/luc-github/ESP3D-WEBUI?color=green&include_prereleases&label=WebUI&style=plastic)](https://github.com/luc-github/ESP3D-WEBUI/tree/3.0) [![Project Page ESP3D 3.0](https://img.shields.io/badge/Project%20page-ESP3D%203.0-blue?style=plastic)](https://github.com/users/luc-github/projects/1/views/1) [![Marlin](https://img.shields.io/badge/Marlin-2.0.9.3(luc)-yellow?style=plastic)](https://github.com/luc-github/Marlin/tree/ESP3DLibV3.0)
 
-[Project board](https://github.com/users/luc-github/projects/1/views/1)
-
-To use development version just add `#devt` at the end of ESP3DLib git address in your platformio.ini
-
-`ESP3DLib=https://github.com/luc-github/ESP3DLib.git#devt`   
+:warning:Currently the development version need special version of Marlin which may not sync with latest version of Marlin yet : https://github.com/luc-github/Marlin/tree/ESP3DLibV3.0
 
 <h4>:warning: This is not for ESP8266 boards neither standalone ESP3D installation</h4>   
 
