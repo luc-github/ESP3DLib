@@ -30,15 +30,16 @@
 #define ESP_XSTR_(M) #M
 #define ESP_XSTR(M) ESP_XSTR_(M)
 #endif
-#define MARLIN_HAL_PATH(PATH) HAL_PATH( ../../../../../Marlin/src/HAL, PATH)
 #define MARLIN_PATH(PATH) ESP_XSTR(../../../../../Marlin/src/PATH)
-#include MARLIN_PATH(inc/MarlinConfigPre.h)
-#include MARLIN_PATH(pins/pins.h)
-#include MARLIN_PATH(inc/Version.h)
-//#include MARLIN_PATH(HAL/ESP32S3/spi_pins.h)
+#include MARLIN_PATH(inc/MarlinConfig.h)
 
 #undef DISABLED
 #undef _BV
+#undef SPI_FULL_SPEED
+#undef SPI_HALF_SPEED
+#undef SPI_QUARTER_SPEED
+#undef SPI_EIGHTH_SPEED
+#undef SPI_SIXTEENTH_SPEED
 #else
 #define OTASUPPORT
 #define WEBSUPPORT
