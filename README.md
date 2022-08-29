@@ -3,10 +3,13 @@
 <img src="https://github.com/luc-github/ESP3DLib/blob/master/images/ESP3D_social_mini.png">
 Library for ESP32 boards using Marlin 2.x : 
 
+[ESP32 Controller](https://github.com/simon-jouet/ESP32Controller),
 [FYSETC-E4](https://github.com/FYSETC/FYSETC-E4),
 [MRR_ESPA](https://github.com/maplerainresearch/MRR_ESPA), 
 [MRR_ESPE](https://github.com/maplerainresearch/MRR_ESPE),
-[ESP32 Controller](https://github.com/simon-jouet/ESP32Controller)
+[Panda Zhu](https://github.com/markniu/PandaZHU),
+[MKS Tinybee](https://github.com/makerbase-mks/MKS-TinyBee)
+
 
 [Current version: ![Current Version](https://img.shields.io/badge/ESPDLib-1.0-green?style=plastic) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3DLib/master?style=plastic)](https://github.com/luc-github/ESP3DLib/tree/master) [![Release Version](https://img.shields.io/github/v/release/luc-github/ESP3D-WEBUI?color=green&label=WebUI&style=plastic)](https://github.com/luc-github/ESP3D-WEBUI/tree/2.1/languages) [![Marlin](https://img.shields.io/github/release/MarlinFirmware/Marlin.svg?style=plastic&label=Marlin)](https://github.com/MarlinFirmware/Marlin)  
 
