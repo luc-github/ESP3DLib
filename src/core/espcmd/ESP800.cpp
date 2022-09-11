@@ -46,7 +46,7 @@
 //get fw version firmare target and fw version
 //eventually set time with pc time
 //output is JSON or plain text according parameter
-//[ESP800]json=<no><time=YYYY-MM-DD-HH-MM-SS>
+//[ESP800]json=<no><time=YYYY-MM-DDTHH:mm:ss> <version=3.0.0-a11> <setup=0/1>
 bool Commands::ESP800(const char* cmd_params, level_authenticate_type auth_type, ESP3DOutput * output)
 {
     bool noError = true;
@@ -240,20 +240,6 @@ bool Commands::ESP800(const char* cmd_params, level_authenticate_type auth_type,
             line+= "Web Socket IP:";
         }
         line+=NetConfig::localIP().c_str();
-        if (json) {
-            line +="\"";
-            output->print (line.c_str());
-        } else {
-            output->printMSGLine(line.c_str());
-        }
-        line="";
-        //WebSocket subprotocol
-        if (json) {
-            line+=",\"WebSocketSubProtocol\":\"";
-        } else {
-            line+= "Web Socket SubProtocol:";
-        }
-        line+= websocket_terminal_server.getProtocol();
         if (json) {
             line +="\"";
             output->print (line.c_str());
