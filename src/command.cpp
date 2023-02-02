@@ -1262,7 +1262,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
                 espresponse->print ("%");
                 espresponse->print ("\n");
                 uint8_t PhyMode;
-                esp_wifi_get_protocol (ESP_IF_WIFI_STA, &PhyMode);
+                esp_wifi_get_protocol (WIFI_IF_STA, &PhyMode);
                 espresponse->print ("Phy Mode: ");
                 if (PhyMode == (WIFI_PROTOCOL_11B | WIFI_PROTOCOL_11G | WIFI_PROTOCOL_11N)) {
                     espresponse->print ("11n");
@@ -1310,7 +1310,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
             espresponse->print (")");
             espresponse->print ("\n");
             wifi_config_t conf;
-            esp_wifi_get_config (ESP_IF_WIFI_AP, &conf);
+            esp_wifi_get_config (WIFI_IF_STA, &conf);
             espresponse->print ("SSID: ");
             espresponse->print ((const char*) conf.ap.ssid);
             espresponse->print ("\n");
