@@ -106,7 +106,19 @@
 #define STATIC_MODE   1
 
 //defaults values
+#ifndef DEFAULT_HOSTNAME
+#ifdef WIFI_HOSTNAME
+// Marlin firmware specific.
+#define DEFAULT_HOSTNAME WIFI_HOSTNAME
+#endif
+#ifdef DEFAULT_WIFI_HOSTNAME
+// Marlin firmware specific.
+#define DEFAULT_HOSTNAME DEFAULT_WIFI_HOSTNAME
+#endif
+#ifndef DEFAULT_HOSTNAME
 #define DEFAULT_HOSTNAME "marlinesp"
+#endif
+#endif
 #ifndef WIFI_SSID
 #define DEFAULT_STA_SSID "MARLIN_ESP"
 #define DEFAULT_RADIO_MODE ESP_WIFI_AP
