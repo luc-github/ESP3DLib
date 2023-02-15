@@ -153,7 +153,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
             Preferences prefs;
             prefs.begin(NAMESPACE, true);
             String defV = DEFAULT_STA_SSID;
-            espresponse->println(prefs.getString(STA_SSID_ENTRY, defV).c_str());
+            espresponse->println(prefs.getString(STA_SSID_ENTRY, defV));
             prefs.end();
         } else { //set
 #ifdef ENABLE_AUTHENTICATION
@@ -306,7 +306,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
             defV = DEFAULT_STA_MK;
             int32_t MK = prefs.getInt(STA_MK_ENTRY, WiFiConfig::IP_int_from_string(defV));
             defV = "IP:" + WiFiConfig::IP_string_from_int(IP) + ", GW:" + WiFiConfig::IP_string_from_int(GW) + ", MSK:" + WiFiConfig::IP_string_from_int(MK);
-            espresponse->println(defV.c_str());
+            espresponse->println(defV);
             prefs.end();
         } else { //set
 #ifdef ENABLE_AUTHENTICATION
@@ -380,7 +380,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
             Preferences prefs;
             prefs.begin(NAMESPACE, true);
             String defV = DEFAULT_AP_SSID;
-            espresponse->println(prefs.getString(AP_SSID_ENTRY, defV).c_str());
+            espresponse->println(prefs.getString(AP_SSID_ENTRY, defV));
             prefs.end();
         } else { //set
 #ifdef ENABLE_AUTHENTICATION
@@ -391,7 +391,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
                 return false;
             }
 #endif
-            if (!WiFiConfig::isSSIDValid (parameter.c_str() ) ) {
+            if (!WiFiConfig::isSSIDValid (parameter.c_str()) ) {
                 if(espresponse) {
                     espresponse->println ("Error: Incorrect SSID!");
                 }
@@ -423,7 +423,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
         }
 #endif
         parameter = get_param (cmd_params, "", true);
-        if (!WiFiConfig::isPasswordValid (parameter.c_str() ) ) {
+        if (!WiFiConfig::isPasswordValid (parameter.c_str()) ) {
             if(espresponse) {
                 espresponse->println ("Error: Incorrect password!");
             }
@@ -466,7 +466,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
             //IP
             String defV = DEFAULT_AP_IP;
             int32_t IP = prefs.getInt(AP_IP_ENTRY, WiFiConfig::IP_int_from_string(defV));
-            espresponse->println(WiFiConfig::IP_string_from_int(IP).c_str());
+            espresponse->println(WiFiConfig::IP_string_from_int(IP));
             prefs.end();
         } else { //set
 #ifdef ENABLE_AUTHENTICATION
@@ -518,7 +518,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
             Preferences prefs;
             prefs.begin(NAMESPACE, true);
             int8_t channel = prefs.getChar(AP_CHANNEL_ENTRY, DEFAULT_AP_CHANNEL);
-            espresponse->println(String(channel).c_str());
+            espresponse->println(String(channel));
             prefs.end();
         } else { //set
 #ifdef ENABLE_AUTHENTICATION
@@ -631,7 +631,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
             return false;
         }
         String currentIP =  WiFiConfig::currentIP();
-        espresponse->println (currentIP.c_str());
+        espresponse->println (currentIP);
     }
     break;
 
@@ -655,7 +655,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
             Preferences prefs;
             prefs.begin(NAMESPACE, true);
             String defV = DEFAULT_HOSTNAME;
-            espresponse->println(prefs.getString(HOSTNAME_ENTRY, defV).c_str());
+            espresponse->println(prefs.getString(HOSTNAME_ENTRY, defV));
             prefs.end();
         } else { //set host name
 #ifdef ENABLE_AUTHENTICATION
@@ -762,7 +762,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
             Preferences prefs;
             prefs.begin(NAMESPACE, true);
             int port = prefs.getUShort(HTTP_PORT_ENTRY, DEFAULT_WEBSERVER_PORT);
-            espresponse->println(String(port).c_str());
+            espresponse->println(String(port));
             prefs.end();
         } else { //set
 #ifdef ENABLE_AUTHENTICATION
@@ -815,7 +815,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
             resp="No SD card";
         }
 #endif
-        espresponse->println (resp.c_str());
+        espresponse->println (resp);
     }
     break;
     //Get full ESP3D settings
@@ -841,11 +841,11 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
         espresponse->print ("{\"F\":\"network\",\"P\":\"");
         espresponse->print (HOSTNAME_ENTRY);
         espresponse->print ("\",\"T\":\"S\",\"V\":\"");
-        espresponse->print (v.c_str());
+        espresponse->print (v);
         espresponse->print ("\",\"H\":\"Hostname\" ,\"S\":\"");
-        espresponse->print (String(MAX_HOSTNAME_LENGTH).c_str());
+        espresponse->print (String(MAX_HOSTNAME_LENGTH));
         espresponse->print ("\", \"M\":\"");
-        espresponse->print (String(MIN_HOSTNAME_LENGTH).c_str());
+        espresponse->print (String(MIN_HOSTNAME_LENGTH));
         espresponse->print ("\"}");
         espresponse->print (",");
 
@@ -854,7 +854,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
         espresponse->print (HTTP_ENABLE_ENTRY);
         espresponse->print ("\",\"T\":\"B\",\"V\":\"");
         vi = prefs.getChar(HTTP_ENABLE_ENTRY, 1);
-        espresponse->print (String(vi).c_str());
+        espresponse->print (String(vi));
         espresponse->print ("\",\"H\":\"HTTP protocol\",\"O\":[{\"Enabled\":\"1\"},{\"Disabled\":\"0\"}]}");
         espresponse->print (",");
 
@@ -862,11 +862,11 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
         espresponse->print ("{\"F\":\"network\",\"P\":\"");
         espresponse->print (HTTP_PORT_ENTRY);
         espresponse->print ("\",\"T\":\"I\",\"V\":\"");
-        espresponse->print (String(prefs.getUShort(HTTP_PORT_ENTRY, DEFAULT_WEBSERVER_PORT)).c_str());
+        espresponse->print (String(prefs.getUShort(HTTP_PORT_ENTRY, DEFAULT_WEBSERVER_PORT)));
         espresponse->print ("\",\"H\":\"HTTP Port\",\"S\":\"");
-        espresponse->print (String(MAX_HTTP_PORT).c_str());
+        espresponse->print (String(MAX_HTTP_PORT));
         espresponse->print ("\",\"M\":\"");
-        espresponse->print (String(MIN_HTTP_PORT).c_str());
+        espresponse->print (String(MIN_HTTP_PORT));
         espresponse->print ("\"}");
         espresponse->print (",");
 
@@ -897,7 +897,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
         espresponse->print (ESP_RADIO_MODE);
         espresponse->print ("\",\"T\":\"B\",\"V\":\"");
         vi = prefs.getChar(ESP_RADIO_MODE, DEFAULT_RADIO_MODE);
-        espresponse->print (String(vi).c_str());
+        espresponse->print (String(vi));
         espresponse->print ("\",\"H\":\"Wifi mode\",\"O\":[{\"STA\":\"1\"},{\"AP\":\"2\"},{\"None\":\"0\"}]}");
         espresponse->print (",");
 
@@ -906,11 +906,11 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
         espresponse->print (STA_SSID_ENTRY);
         espresponse->print ("\",\"T\":\"S\",\"V\":\"");
         defV = DEFAULT_STA_SSID;
-        espresponse->print (prefs.getString(STA_SSID_ENTRY, defV).c_str());
+        espresponse->print (prefs.getString(STA_SSID_ENTRY, defV));
         espresponse->print ("\",\"S\":\"");
-        espresponse->print (String(MAX_SSID_LENGTH).c_str());
+        espresponse->print (String(MAX_SSID_LENGTH));
         espresponse->print ("\",\"H\":\"Station SSID\",\"M\":\"");
-        espresponse->print (String(MIN_SSID_LENGTH).c_str());
+        espresponse->print (String(MIN_SSID_LENGTH));
         espresponse->print ("\"}");
         espresponse->print (",");
 
@@ -920,9 +920,9 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
         espresponse->print ("\",\"T\":\"S\",\"V\":\"");
         espresponse->print (HIDDEN_PASSWORD);
         espresponse->print ("\",\"S\":\"");
-        espresponse->print (String(MAX_PASSWORD_LENGTH).c_str());
+        espresponse->print (String(MAX_PASSWORD_LENGTH));
         espresponse->print ("\",\"H\":\"Station Password\",\"M\":\"");
-        espresponse->print (String(MIN_PASSWORD_LENGTH).c_str());
+        espresponse->print (String(MIN_PASSWORD_LENGTH));
         espresponse->print ("\"}");
         espresponse->print (",");
 
@@ -930,7 +930,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
         espresponse->print ("{\"F\":\"network\",\"P\":\"");
         espresponse->print (STA_IP_MODE_ENTRY);
         espresponse->print ("\",\"T\":\"B\",\"V\":\"");
-        espresponse->print (String(prefs.getChar(STA_IP_MODE_ENTRY, DEFAULT_STA_IP_MODE)).c_str());
+        espresponse->print (String(prefs.getChar(STA_IP_MODE_ENTRY, DEFAULT_STA_IP_MODE)));
         espresponse->print ("\",\"H\":\"Station IP Mode\",\"O\":[{\"DHCP\":\"0\"},{\"Static\":\"1\"}]}");
         espresponse->print (",");
 
@@ -938,7 +938,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
         espresponse->print ("{\"F\":\"network\",\"P\":\"");
         espresponse->print (STA_IP_ENTRY);
         espresponse->print ("\",\"T\":\"A\",\"V\":\"");
-        espresponse->print (WiFiConfig::IP_string_from_int(prefs.getInt(STA_IP_ENTRY, 0)).c_str());
+        espresponse->print (WiFiConfig::IP_string_from_int(prefs.getInt(STA_IP_ENTRY, 0)));
         espresponse->print ("\",\"H\":\"Station Static IP\"}");
         espresponse->print (",");
 
@@ -946,7 +946,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
         espresponse->print ("{\"F\":\"network\",\"P\":\"");
         espresponse->print (STA_GW_ENTRY);
         espresponse->print ("\",\"T\":\"A\",\"V\":\"");
-        espresponse->print (WiFiConfig::IP_string_from_int(prefs.getInt(STA_GW_ENTRY, 0)).c_str());
+        espresponse->print (WiFiConfig::IP_string_from_int(prefs.getInt(STA_GW_ENTRY, 0)));
         espresponse->print ("\",\"H\":\"Station Static Gateway\"}");
         espresponse->print (",");
 
@@ -954,7 +954,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
         espresponse->print ("{\"F\":\"network\",\"P\":\"");
         espresponse->print (STA_MK_ENTRY);
         espresponse->print ("\",\"T\":\"A\",\"V\":\"");
-        espresponse->print (WiFiConfig::IP_string_from_int(prefs.getInt(STA_MK_ENTRY, 0)).c_str());
+        espresponse->print (WiFiConfig::IP_string_from_int(prefs.getInt(STA_MK_ENTRY, 0)));
         espresponse->print ("\",\"H\":\"Station Static Mask\"}");
         espresponse->print (",");
 
@@ -963,11 +963,11 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
         espresponse->print (AP_SSID_ENTRY);
         espresponse->print ("\",\"T\":\"S\",\"V\":\"");
         defV = DEFAULT_AP_SSID;
-        espresponse->print (prefs.getString(AP_SSID_ENTRY, defV).c_str());
+        espresponse->print (prefs.getString(AP_SSID_ENTRY, defV));
         espresponse->print ("\",\"S\":\"");
-        espresponse->print (String(MAX_SSID_LENGTH).c_str());
+        espresponse->print (String(MAX_SSID_LENGTH));
         espresponse->print ("\",\"H\":\"AP SSID\",\"M\":\"");
-        espresponse->print (String(MIN_SSID_LENGTH).c_str());
+        espresponse->print (String(MIN_SSID_LENGTH));
         espresponse->print ("\"}");
         espresponse->print (",");
 
@@ -977,9 +977,9 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
         espresponse->print ("\",\"T\":\"S\",\"V\":\"");
         espresponse->print (HIDDEN_PASSWORD);
         espresponse->print ("\",\"S\":\"");
-        espresponse->print (String(MAX_PASSWORD_LENGTH).c_str());
+        espresponse->print (String(MAX_PASSWORD_LENGTH));
         espresponse->print ("\",\"H\":\"AP Password\",\"M\":\"");
-        espresponse->print (String(MIN_PASSWORD_LENGTH).c_str());
+        espresponse->print (String(MIN_PASSWORD_LENGTH));
         espresponse->print ("\"}");
         espresponse->print (",");
 
@@ -996,13 +996,13 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
         espresponse->print ("{\"F\":\"network\",\"P\":\"");
         espresponse->print (AP_CHANNEL_ENTRY);
         espresponse->print ("\",\"T\":\"B\",\"V\":\"");
-        espresponse->print (String(prefs.getChar(AP_CHANNEL_ENTRY, DEFAULT_AP_CHANNEL)).c_str());
+        espresponse->print (String(prefs.getChar(AP_CHANNEL_ENTRY, DEFAULT_AP_CHANNEL)));
         espresponse->print ("\",\"H\":\"AP Channel\",\"O\":[");
         for (int i = MIN_CHANNEL; i <= MAX_CHANNEL ; i++) {
             espresponse->print ("{\"");
-            espresponse->print (String(i).c_str());
+            espresponse->print (String(i));
             espresponse->print ("\":\"");
-            espresponse->print (String(i).c_str());
+            espresponse->print (String(i));
             espresponse->print ("\"}");
             if (i < MAX_CHANNEL) {
                 espresponse->print (",");
@@ -1154,9 +1154,9 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
                     espresponse->print (",");
                 }
                 espresponse->print ("{\"SSID\":\"");
-                espresponse->print (WiFi.SSID (i).c_str());
+                espresponse->print (WiFi.SSID (i));
                 espresponse->print ("\",\"SIGNAL\":\"");
-                espresponse->print (String(WiFiConfig::getSignal (WiFi.RSSI (i) )).c_str());
+                espresponse->print (String(WiFiConfig::getSignal (WiFi.RSSI (i) )));
                 espresponse->print ("\",\"IS_PROTECTED\":\"");
 
                 if (WiFi.encryptionType (i) == WIFI_AUTH_OPEN) {
@@ -1189,24 +1189,24 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
         Preferences prefs;
         prefs.begin(NAMESPACE, true);
         espresponse->print ("Chip ID: ");
-        espresponse->print (String ( (uint16_t) (ESP.getEfuseMac() >> 32) ).c_str());
+        espresponse->print (String ( (uint16_t) (ESP.getEfuseMac() >> 32) ));
         espresponse->print ("\n");
         espresponse->print ("CPU Frequency: ");
-        espresponse->print (String (ESP.getCpuFreqMHz() ).c_str());
+        espresponse->print (String (ESP.getCpuFreqMHz() ));
         espresponse->print ("Mhz");
         espresponse->print ("\n");
         espresponse->print ("CPU Temperature: ");
-        espresponse->print (String (temperatureRead(), 1).c_str());
+        espresponse->print (String (temperatureRead(), 1));
         espresponse->print ("C");
         espresponse->print ("\n");
         espresponse->print ("Free memory: ");
-        espresponse->print (ESPResponseStream::formatBytes (ESP.getFreeHeap()).c_str());
+        espresponse->print (ESPResponseStream::formatBytes (ESP.getFreeHeap()));
         espresponse->print ("\n");
         espresponse->print ("SDK: ");
         espresponse->print (ESP.getSdkVersion());
         espresponse->print ("\n");
         espresponse->print ("Flash Size: ");
-        espresponse->print (ESPResponseStream::formatBytes (ESP.getFlashChipSize()).c_str());
+        espresponse->print (ESPResponseStream::formatBytes (ESP.getFlashChipSize()));
         espresponse->print ("\n");
         espresponse->print ("Available Size for update: ");
         size_t  flashsize = 0;
@@ -1220,13 +1220,13 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
                 }
             }
         }
-        espresponse->print (ESPResponseStream::formatBytes (flashsize).c_str());
+        espresponse->print (ESPResponseStream::formatBytes (flashsize));
         espresponse->print ("\n");
         espresponse->print ("Available Size for SPIFFS: ");
-        espresponse->print (ESPResponseStream::formatBytes (SPIFFS.totalBytes()).c_str());
+        espresponse->print (ESPResponseStream::formatBytes (SPIFFS.totalBytes()));
         espresponse->print ("\n");
         espresponse->print ("Baud rate: ");
-        espresponse->print (String(ESPResponseStream::baudRate()).c_str());
+        espresponse->print (String(ESPResponseStream::baudRate()));
         espresponse->print ("\n");
         espresponse->print ("Sleep mode: ");
         if (WiFi.getSleep()) {
@@ -1236,29 +1236,29 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
         }
         espresponse->print ("\n");
         espresponse->print ("Web port: ");
-        espresponse->print (String( prefs.getUShort(HTTP_PORT_ENTRY, DEFAULT_WEBSERVER_PORT)).c_str());
+        espresponse->print (String( prefs.getUShort(HTTP_PORT_ENTRY, DEFAULT_WEBSERVER_PORT)));
         espresponse->print ("\n");
         /*espresponse->print ("Data port: ");
-        //if (_data_port!=0)espresponse->print (String(_data_port).c_str());
+        //if (_data_port!=0)espresponse->print (String(_data_port));
         //else
         espresponse->print ("Disabled");
         espresponse->print ("\n");*/
         espresponse->print ("Hostname: ");
         String defV = DEFAULT_HOSTNAME;
-        espresponse->print ( prefs.getString(HOSTNAME_ENTRY, defV).c_str());
+        espresponse->print ( prefs.getString(HOSTNAME_ENTRY, defV));
         espresponse->print ("\n");
         espresponse->print ("Active Mode: ");
         if (WiFi.getMode() == WIFI_STA) {
             espresponse->print ("STA (");
-            espresponse->print ( WiFi.macAddress().c_str());
+            espresponse->print ( WiFi.macAddress());
             espresponse->print (")");
             espresponse->print ("\n");
             espresponse->print ("Connected to: ");
             if (WiFi.isConnected()) { //in theory no need but ...
-                espresponse->print (WiFi.SSID().c_str());
+                espresponse->print (WiFi.SSID());
                 espresponse->print ("\n");
                 espresponse->print ("Signal: ");
-                espresponse->print ( String(WiFiConfig::getSignal (WiFi.RSSI())).c_str());
+                espresponse->print ( String(WiFiConfig::getSignal (WiFi.RSSI())));
                 espresponse->print ("%");
                 espresponse->print ("\n");
                 uint8_t PhyMode;
@@ -1275,7 +1275,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
                 }
                 espresponse->print ("\n");
                 espresponse->print ("Channel: ");
-                espresponse->print (String (WiFi.channel()).c_str());
+                espresponse->print (String (WiFi.channel()));
                 espresponse->print ("\n");
                 espresponse->print ("IP Mode: ");
                 tcpip_adapter_dhcp_status_t dhcp_status;
@@ -1287,26 +1287,26 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
                 }
                 espresponse->print ("\n");
                 espresponse->print ("IP: ");
-                espresponse->print (WiFi.localIP().toString().c_str());
+                espresponse->print (WiFi.localIP().toString());
                 espresponse->print ("\n");
                 espresponse->print ("Gateway: ");
-                espresponse->print (WiFi.gatewayIP().toString().c_str());
+                espresponse->print (WiFi.gatewayIP().toString());
                 espresponse->print ("\n");
                 espresponse->print ("Mask: ");
-                espresponse->print (WiFi.subnetMask().toString().c_str());
+                espresponse->print (WiFi.subnetMask().toString());
                 espresponse->print ("\n");
                 espresponse->print ("DNS: ");
-                espresponse->print (WiFi.dnsIP().toString().c_str());
+                espresponse->print (WiFi.dnsIP().toString());
                 espresponse->print ("\n");
             } //this is web command so connection => no command
             espresponse->print ("Disabled Mode: ");
             espresponse->print ("AP (");
-            espresponse->print (WiFi.softAPmacAddress().c_str());
+            espresponse->print (WiFi.softAPmacAddress());
             espresponse->print (")");
             espresponse->print ("\n");
         } else if (WiFi.getMode() == WIFI_AP) {
             espresponse->print ("AP (");
-            espresponse->print (WiFi.softAPmacAddress().c_str());
+            espresponse->print (WiFi.softAPmacAddress());
             espresponse->print (")");
             espresponse->print ("\n");
             wifi_config_t conf;
@@ -1331,7 +1331,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
             }
             espresponse->print ("\n");
             espresponse->print ("Max Connections: ");
-            espresponse->print (String(conf.ap.max_connection).c_str());
+            espresponse->print (String(conf.ap.max_connection));
             espresponse->print ("\n");
             espresponse->print ("DHCP Server: ");
             tcpip_adapter_dhcp_status_t dhcp_status;
@@ -1343,43 +1343,43 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
             }
             espresponse->print ("\n");
             espresponse->print ("IP: ");
-            espresponse->print (WiFi.softAPIP().toString().c_str());
+            espresponse->print (WiFi.softAPIP().toString());
             espresponse->print ("\n");
             tcpip_adapter_ip_info_t ip_AP;
             tcpip_adapter_get_ip_info (TCPIP_ADAPTER_IF_AP, &ip_AP);
             espresponse->print ("Gateway: ");
-            espresponse->print (IPAddress (ip_AP.gw.addr).toString().c_str());
+            espresponse->print (IPAddress (ip_AP.gw.addr).toString());
             espresponse->print ("\n");
             espresponse->print ("Mask: ");
-            espresponse->print (IPAddress (ip_AP.netmask.addr).toString().c_str());
+            espresponse->print (IPAddress (ip_AP.netmask.addr).toString());
             espresponse->print ("\n");
             espresponse->print ("Connected clients: ");
             wifi_sta_list_t station;
             tcpip_adapter_sta_list_t tcpip_sta_list;
             esp_wifi_ap_get_sta_list (&station);
             tcpip_adapter_get_sta_list (&station, &tcpip_sta_list);
-            espresponse->print (String(station.num).c_str());
+            espresponse->print (String(station.num));
             espresponse->print ("\n");
             for (int i = 0; i < station.num; i++) {
                 espresponse->print (ESPResponseStream::mac2str(tcpip_sta_list.sta[i].mac));
                 espresponse->print (" ");
-                espresponse->print ( IPAddress (tcpip_sta_list.sta[i].ip.addr).toString().c_str());
+                espresponse->print ( IPAddress (tcpip_sta_list.sta[i].ip.addr).toString());
                 espresponse->print ("\n");
             }
             espresponse->print ("Disabled Mode: ");
             espresponse->print ("STA (");
-            espresponse->print (WiFi.macAddress().c_str());
+            espresponse->print (WiFi.macAddress());
             espresponse->print (")");
             espresponse->print ("\n");
         } else if (WiFi.getMode() == WIFI_AP_STA) { //we should not be in this state but just in case ....
             espresponse->print ("Mixed");
             espresponse->print ("\n");
             espresponse->print ("STA (");
-            espresponse->print (WiFi.macAddress().c_str());
+            espresponse->print (WiFi.macAddress());
             espresponse->print (")");
             espresponse->print ("\n");
             espresponse->print ("AP (");
-            espresponse->print (WiFi.softAPmacAddress().c_str());
+            espresponse->print (WiFi.softAPmacAddress());
             espresponse->print (")");
             espresponse->print ("\n");
 

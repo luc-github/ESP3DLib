@@ -50,7 +50,9 @@ class ESPResponseStream
 {
 public:
     void print(const char *data);
+    inline void print(const String& data) { print( data.c_str() ); }
     void println(const char *data);
+    inline void println(const String& data) { print( data.c_str() ); }
     void flush();
     tpipe pipe()
     {
@@ -76,5 +78,6 @@ class Esp3DCom
 {
 public:
     static void echo(const char * data);
+    static inline void echo(const String& data) { echo(data.c_str()); }
 };
 #endif //ESPCOM_H

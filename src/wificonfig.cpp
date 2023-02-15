@@ -180,7 +180,7 @@ void WiFiConfig::WiFiEvent(WiFiEvent_t event)
     switch (event) {
     case SYSTEM_EVENT_STA_GOT_IP:
         Esp3DCom::echo ("Connected");
-        Esp3DCom::echo(WiFi.localIP().toString().c_str());
+        Esp3DCom::echo(WiFi.localIP().toString());
         break;
     case SYSTEM_EVENT_STA_DISCONNECTED:
         Esp3DCom::echo("WiFi not connected");
@@ -357,7 +357,7 @@ bool WiFiConfig::StartAP()
         Esp3DLibConfig::wait (100);
         //Set static IP
         WiFi.softAPConfig(ip, gw, mask);
-        Esp3DCom::echo(WiFi.softAPIP().toString().c_str());
+        Esp3DCom::echo(WiFi.softAPIP().toString());
         return true;
     } else {
         Esp3DCom::echo("Starting AP failed");
