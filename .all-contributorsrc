@@ -55,6 +55,15 @@
         "bug",
         "platform"
       ]
+    },
+    {
+      "login": "markniu",
+      "name": "Mark",
+      "avatar_url": "https://avatars.githubusercontent.com/u/13879340?v=4",
+      "profile": "https://github.com/markniu",
+      "contributions": [
+        "platform"
+      ]
     }
   ],
   "contributorsPerLine": 7,
