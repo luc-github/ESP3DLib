@@ -1,6 +1,6 @@
 # ESP3DLib 1.0 Marlin version [<img src="https://img.shields.io/liberapay/patrons/ESP3D.svg?logo=liberapay">](https://liberapay.com/ESP3D)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <img src="https://github.com/luc-github/ESP3DLib/blob/master/images/ESP3D_social_mini.png">
@@ -168,6 +168,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://discord.gg/yNwksQvZmQ"><img src="https://avatars.githubusercontent.com/u/12979070?v=4?s=100" width="100px;" alt="makerbase"/><br /><sub><b>makerbase</b></sub></a><br /><a href="#financial-makerbase-mks" title="Financial">💵</a> <a href="https://github.com/luc-github/ESP3DLib/issues?q=author%3Amakerbase-mks" title="Bug reports">🐛</a> <a href="#platform-makerbase-mks" title="Packaging/porting to new platform">📦</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/vivian-ng"><img src="https://avatars.githubusercontent.com/u/24537694?v=4?s=100" width="100px;" alt="vivian-ng"/><br /><sub><b>vivian-ng</b></sub></a><br /><a href="https://github.com/luc-github/ESP3DLib/commits?author=vivian-ng" title="Code">💻</a> <a href="https://github.com/luc-github/ESP3DLib/issues?q=author%3Avivian-ng" title="Bug reports">🐛</a> <a href="#platform-vivian-ng" title="Packaging/porting to new platform">📦</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/markniu"><img src="https://avatars.githubusercontent.com/u/13879340?v=4?s=100" width="100px;" alt="Mark"/><br /><sub><b>Mark</b></sub></a><br /><a href="#platform-markniu" title="Packaging/porting to new platform">📦</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://www.fysetc.com"><img src="https://avatars.githubusercontent.com/u/36067086?v=4?s=100" width="100px;" alt="FYSETC.COM"/><br /><sub><b>FYSETC.COM</b></sub></a><br /><a href="#financial-FYSETC" title="Financial">💵</a> <a href="https://github.com/luc-github/ESP3DLib/issues?q=author%3AFYSETC" title="Bug reports">🐛</a> <a href="#platform-FYSETC" title="Packaging/porting to new platform">📦</a></td>
     </tr>
   </tbody>
 </table>
