@@ -28,6 +28,7 @@ for them go [here](https://github.com/luc-github/ESP3D)
 
 ## Sponsors 
 [<img width="200px" src="https://raw.githubusercontent.com/luc-github/ESP3DLib/master/images/sponsors-supporters/MKS/mksmakerbase.jpg" title="MKS Makerbase">](https://github.com/makerbase-mks)&nbsp;&nbsp;
+[<img width="140px" src="https://raw.githubusercontent.com/luc-github/ESP3DLib/master/images/sponsors-supporters/patrickS.png" title="Patrick S.">](https://github.com/PendulumPit)&nbsp;&nbsp;
 
 ## Supporters
 
