@@ -1,6 +1,6 @@
 # ESP3DLib 1.0 Marlin version [<img src="https://img.shields.io/liberapay/patrons/ESP3D.svg?logo=liberapay">](https://liberapay.com/ESP3D)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <img src="https://github.com/luc-github/ESP3DLib/blob/master/images/ESP3D_social_mini.png">
@@ -165,6 +165,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ellensp"><img src="https://avatars.githubusercontent.com/u/530024?v=4?s=100" width="100px;" alt="ellensp"/><br /><sub><b>ellensp</b></sub></a><br /><a href="https://github.com/luc-github/ESP3DLib/issues?q=author%3Aellensp" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/eduard-sukharev"><img src="https://avatars.githubusercontent.com/u/3235378?v=4?s=100" width="100px;" alt="Eduard Sukharev"/><br /><sub><b>Eduard Sukharev</b></sub></a><br /><a href="https://github.com/luc-github/ESP3DLib/commits?author=eduard-sukharev" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://honuputters.com"><img src="https://avatars.githubusercontent.com/u/4861133?v=4?s=100" width="100px;" alt="Mitch Bradley"/><br /><sub><b>Mitch Bradley</b></sub></a><br /><a href="https://github.com/luc-github/ESP3DLib/issues?q=author%3AMitchBradley" title="Bug reports">🐛</a> <a href="https://github.com/luc-github/ESP3DLib/commits?author=MitchBradley" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://discord.gg/yNwksQvZmQ"><img src="https://avatars.githubusercontent.com/u/12979070?v=4?s=100" width="100px;" alt="makerbase"/><br /><sub><b>makerbase</b></sub></a><br /><a href="#financial-makerbase-mks" title="Financial">💵</a> <a href="https://github.com/luc-github/ESP3DLib/issues?q=author%3Amakerbase-mks" title="Bug reports">🐛</a> <a href="#platform-makerbase-mks" title="Packaging/porting to new platform">📦</a></td>
     </tr>
   </tbody>
 </table>
