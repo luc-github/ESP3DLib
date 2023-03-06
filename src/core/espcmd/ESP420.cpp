@@ -707,8 +707,9 @@ bool Commands::ESP420(const char* cmd_params, level_authenticate_type auth_type,
                 } else {
                     line +=": ";
                 }
-                line +=(ETH.linkUp())?"connected":"disconnected";
-                if(ETH.linkUp()) {
+                line +=(EthConfig::linkUp())?"connected":"disconnected";
+
+                if(EthConfig::linkUp()) {
                     line +=" (";
                     line +=ETH.linkSpeed();
                     line+="Mbps)";
@@ -1426,7 +1427,7 @@ bool Commands::ESP420(const char* cmd_params, level_authenticate_type auth_type,
             }
             line +=notificationsservice.started()?"ON":"OFF";
             if (notificationsservice.started()) {
-                line +="(";
+                line +=" (";
                 line +=notificationsservice.getTypeString();
                 line +=")";
             }
@@ -1491,9 +1492,11 @@ bool Commands::ESP420(const char* cmd_params, level_authenticate_type auth_type,
                 line +=": ";
             }
             line +=esp3d_sensor.started()?"ON":"OFF";
-            line +="(";
-            line +=esp3d_sensor.GetModelString();
-            line +=")";
+            if (esp3d_sensor.started()) {
+                line +=" (";
+                line +=esp3d_sensor.GetCurrentModelString();
+                line +=")";
+            }
             if (json) {
                 line +="\"}";
                 output->print (line.c_str());
@@ -1528,12 +1531,10 @@ bool Commands::ESP420(const char* cmd_params, level_authenticate_type auth_type,
             }
             line +="debug";
             if (json) {
-                line +="\"}";
-                output->print (line.c_str());
+                line +="\",\"value\":\"";
             } else {
-                output->printMSGLine(line.c_str());
+                line +=": ";
             }
-            line="";
 #if ESP_DEBUG_FEATURE == DEBUG_OUTPUT_SERIAL0
             line +="Serial";
 #endif //DEBUG_OUTPUT_SERIAL0
