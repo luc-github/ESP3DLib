@@ -46,7 +46,7 @@ static_assert(false,
 #undef DISABLED
 #undef _BV
 //version
-#define LIB_VERSION "1.0.11"
+#define LIB_VERSION "1.0.12"
 
 //Allow to override the default core used by ESP3DLIB
 #ifndef ESP3DLIB_RUNNING_CORE
