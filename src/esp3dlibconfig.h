@@ -30,6 +30,18 @@
 #endif
 #define MARLIN_HAL_PATH(PATH) HAL_PATH(HALHOME, PATH)
 #define MARLIN_PATH(PATH) ESP_XSTR(SRCHOME/PATH)
+
+#if 0
+#define HAL_INCLUDE MARLIN_HAL_PATH(hal-file.h)
+#define SRC_INCLUDE MARLIN_PATH(src-file.h)
+static_assert(false,
+  " SRCHOME='" ESP_XSTR(SRCHOME) "'"
+  " HALHOME='" ESP_XSTR(HALHOME) "'"
+  " HAL_INCLUDE='" ESP_XSTR(HAL_INCLUDE) "'"
+  " SRC_INCLUDE='" ESP_XSTR(SRC_INCLUDE) "'"
+);
+#endif
+
 #include MARLIN_PATH(inc/MarlinConfigPre.h)
 #undef DISABLED
 #undef _BV
