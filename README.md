@@ -1,4 +1,5 @@
-# ESP3DLib 3.0 for Marlin [<img src="https://img.shields.io/liberapay/patrons/ESP3D.svg?logo=liberapay">](https://liberapay.com/ESP3D)
+# ESP3DLib 3.0 for Marlin   
+[<img src="https://img.shields.io/liberapay/patrons/ESP3D.svg?logo=liberapay">](https://liberapay.com/ESP3D)  [![github-ci](https://github.com/luc-github/ESP3DLib/workflows/build-ci/badge.svg)](https://github.com/luc-github/ESP3DLib/actions/workflows/build-ci.yml)
 
 <img src="https://github.com/luc-github/ESP3DLib/blob/master/images/ESP3D_social_mini.png">
 Library for ESP32 boards using Marlin 2.x : 
