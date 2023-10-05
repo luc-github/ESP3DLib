@@ -1,6 +1,5 @@
 # ESP3DLib 3.0 for Marlin   
-[<img src="https://img.shields.io/liberapay/patrons/ESP3D.svg?logo=liberapay">](https://liberapay.com/ESP3D)  [![github-ci](https://github.com/luc-github/ESP3DLib/workflows/build-ci/badge.svg)](https://github.com/luc-github/ESP3DLib/actions/workflows/build-ci.yml)
-
+[<img src="https://img.shields.io/liberapay/patrons/ESP3D.svg?logo=liberapay">](https://liberapay.com/ESP3D)  
 <img src="https://github.com/luc-github/ESP3DLib/blob/master/images/ESP3D_social_mini.png">
 Library for ESP32 boards using Marlin 2.x : 
 
@@ -13,7 +12,8 @@ Library for ESP32 boards using Marlin 2.x :
 
 The web interface files has it's own repository [ESP3D-WEBUI](https://github.com/luc-github/ESP3D-WEBUI/tree/3.0).
 
-[Latest development version ![Development Version](https://img.shields.io/badge/3.0-yellow?style=plastic) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3DLib/3.0?style=plastic)](https://github.com/luc-github/ESP3DLib/tree/3.0) [![Travis (.org) branch](https://img.shields.io/travis/luc-github/ESP3DLib/devt?style=plastic)](https://travis-ci.org/luc-github/ESP3DLib) [![Release Version](https://img.shields.io/github/v/release/luc-github/ESP3D-WEBUI?color=green&include_prereleases&label=WebUI&style=plastic)](https://github.com/luc-github/ESP3D-WEBUI/tree/3.0) [![Marlin](https://img.shields.io/github/release/MarlinFirmware/Marlin.svg?style=plastic&label=Marlin)](https://github.com/MarlinFirmware/Marlin)    
+[Latest development version ![Development Version](https://img.shields.io/badge/3.0-yellow?style=plastic) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3DLib/3.0?style=plastic)](https://github.com/luc-github/ESP3DLib/tree/3.0) [![github-ci](https://github.com/luc-github/ESP3DLib/workflows/build-ci/badge.svg)](https://github.com/luc-github/ESP3DLib/actions/workflows/build-ci.yml)
+  [![Release Version](https://img.shields.io/github/v/release/luc-github/ESP3D-WEBUI?color=green&include_prereleases&label=WebUI&style=plastic)](https://github.com/luc-github/ESP3D-WEBUI/tree/3.0) [![Marlin](https://img.shields.io/github/release/MarlinFirmware/Marlin.svg?style=plastic&label=Marlin)](https://github.com/MarlinFirmware/Marlin)    
 
 To use ESP3Lib V3 you need an updated version of Marlin which is here: https://github.com/luc-github/Marlin, necessary will be pushed when library V3 is considered as stable enough.   
 
