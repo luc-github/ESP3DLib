@@ -7,26 +7,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v3
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
         with:
-          node-version: '16.x'
-      - name: Install libraries
-        id: setuptools
-        run: npm install
-        continue-on-error: true
+          python-version: "3.x"
+          architecture: "x64"
+      - name: Install platformIO
+        run: bash ./.github/ci/install-platformio.sh
+      - name : Git Marlin
+        id: marlin
+        run : git clone https://github.com/luc-github/Marlin.git Marlin
       - name: Build all files
         id: buildall
-        run: npm run buildall
+        run: cd Marlin && platformio run -e mks_tinybee
         continue-on-error: true
       - name: Failure check
         env:
           STEPS_CONTEXT: ${{ toJson(steps) }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        if: steps.setuptools.outcome == 'failure' || steps.buildall.outcome == 'failure'
+        if: steps.marlin.outcome == 'failure' || steps.buildall.outcome == 'failure'
         run: bash ./.github/ci/final-check.sh "$GITHUB_RUN_ID" "failure"
       - name: Success check
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        if: steps.setuptools.outcome == 'success' && steps.buildall.outcome == 'success'
+        if: steps.marlin.outcome == 'success' && steps.buildall.outcome == 'success'
         run: bash ./.github/ci/final-check.sh "$GITHUB_RUN_ID" "success"
