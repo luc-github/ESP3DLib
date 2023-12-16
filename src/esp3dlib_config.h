@@ -30,7 +30,14 @@
 #define ESP_XSTR_(M) #M
 #define ESP_XSTR(M) ESP_XSTR_(M)
 #endif
-#define MARLIN_PATH(PATH) ESP_XSTR(../../../../../Marlin/src/PATH)
+#ifndef SRCHOME
+#define SRCHOME ../../../../../Marlin/src
+#endif
+#ifndef HALHOME
+#define HALHOME SRCHOME/HAL
+#endif
+#define MARLIN_HAL_PATH(PATH) HAL_PATH(HALHOME, PATH)
+#define MARLIN_PATH(PATH) ESP_XSTR(SRCHOME/PATH)
 #include MARLIN_PATH(inc/MarlinConfig.h)
 
 #undef DISABLED
@@ -43,7 +50,7 @@
 #else
 #define OTASUPPORT
 #define WEBSUPPORT
-#define SHORT_BUILD_VERSION "2.0.9.3+"
+#define SHORT_BUILD_VERSION "2.1.x"
 
 /*********************************************************
  *
