@@ -323,3 +323,26 @@
 #if defined (SD_TIMESTAMP_FEATURE) || defined (FILESYSTEM_TIMESTAMP_FEATURE)
 #define TIMESTAMP_FEATURE
 #endif //SD_TIMESTAMP_FEATURE || FILESYSTEM_TIMESTAMP_FEATURE 
+
+/************************************
+ *
+ * Development settings
+ * Do not modify them for production
+ ************************************/
+
+// Enable log mode
+// Do not do this when connected to printer !!!
+// be noted all upload may failed if enabled
+// LOG_OUTPUT_SERIAL0
+// LOG_OUTPUT_SERIAL1
+// LOG_OUTPUT_SERIAL2
+// LOG_OUTPUT_TELNET
+// LOG_OUTPUT_WEBSOCKET
+//#define ESP_LOG_FEATURE LOG_OUTPUT_TELNET
+
+//#define ESP3D_DEBUG_LEVEL LOG_LEVEL_DEBUG
+
+#ifdef ESP_LOG_FEATURE
+#define LOG_ESP3D_BAUDRATE 115200
+#define LOG_ESP3D_OUTPUT_PORT 8000
+#endif  // ESP_LOG_FEATURE
