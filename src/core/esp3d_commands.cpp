@@ -609,6 +609,7 @@ void ESP3DCommands::execute_internal_command(int cmd, int cmd_params_pos,
       ESP215(cmd_params_pos, msg);
       break;
 #endif  // DISPLAY_TOUCH_DRIVER
+#endif  // DISPLAY_DEVICE    
 #ifdef BUZZER_DEVICE
     // Play sound
     //[ESP250]F=<frequency> D=<duration> [pwd=<user password>]
@@ -616,7 +617,6 @@ void ESP3DCommands::execute_internal_command(int cmd, int cmd_params_pos,
       ESP250(cmd_params_pos, msg);
       break;
 #endif  // BUZZER_DEVICE
-#endif  // DISPLAY_DEVICE
     // Show pins
     //[ESP220][pwd=<user password>]
     case 220:
@@ -880,7 +880,7 @@ bool ESP3DCommands::dispatchSetting(bool json, const char *filter,
       break;
     default:  // String
       if (index == ESP_STA_PASSWORD || index == ESP_AP_PASSWORD ||
-#if ESP3D_NOTIFICATIONS_FEATURE
+#if defined (ESP3D_NOTIFICATIONS_FEATURE)
           index == ESP_NOTIFICATION_TOKEN1 ||
           index == ESP_NOTIFICATION_TOKEN2 ||
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
