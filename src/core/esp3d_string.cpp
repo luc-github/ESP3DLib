@@ -23,6 +23,10 @@
 
 #include "../include/esp3d_config.h"
 
+#if defined(WIFI_FEATURE) || defined(ETH_FEATURE)
+#include "../modules/network/netconfig.h"
+#endif  // WIFI_FEATURE || ETH_FEATURE
+
 #if defined(TIMESTAMP_FEATURE)
 #include "../modules/time/time_service.h"
 #endif  // TIMESTAMP_FEATURE
@@ -180,10 +184,32 @@ const char* esp3d_string::formatBytes(uint64_t bytes) {
   return res.c_str();
 }
 
-bool esp3d_string::isPrintableChar(char ch){
- int c = static_cast<int>(ch);
-if (c==9 || (c >= 32 && c <= 126) || c>=128) {
+bool esp3d_string::isPrintableChar(char ch) {
+  int c = static_cast<int>(ch);
+  if (c == 9 || (c >= 32 && c <= 126) || c >= 128) {
     return true;
   }
   return false;
+}
+
+const char* esp3d_string::expandString(const char* s, bool formatspace) {
+  static String tmp;
+  tmp = s;
+  if (tmp.indexOf("%") != -1) {
+#if defined(WIFI_FEATURE) || defined(ETH_FEATURE)
+    tmp.replace("%ESP_IP%", NetConfig::localIP().c_str());
+    tmp.replace("%ESP_NAME%", NetConfig::hostname());
+#else
+    tmp.replace("%ESP_IP%", "???");
+    tmp.replace("%ESP_NAME%", "???");
+#endif  // WIFI_FEATURE || ETH_FEATURE
+#if defined(TIMESTAMP_FEATURE)
+    String dt = timeService.getCurrentTime();
+    if (formatspace) dt.replace(" ", "\\ ");
+    tmp.replace("%ESP_DATETIME%", dt.c_str());
+#else
+    tmp.replace("%ESP_DATETIME%", "???");
+#endif  // TIMESTAMP_FEATURE
+  }
+  return tmp.c_str();
 }
