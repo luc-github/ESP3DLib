@@ -30,7 +30,14 @@
 #define ESP_XSTR_(M) #M
 #define ESP_XSTR(M) ESP_XSTR_(M)
 #endif
-#define MARLIN_PATH(PATH) ESP_XSTR(../../../../../Marlin/src/PATH)
+#ifndef SRCHOME
+#define SRCHOME ../../../../../Marlin/src
+#endif
+#ifndef HALHOME
+#define HALHOME SRCHOME/HAL
+#endif
+#define MARLIN_HAL_PATH(PATH) HAL_PATH(HALHOME, PATH)
+#define MARLIN_PATH(PATH) ESP_XSTR(SRCHOME/PATH)
 #include MARLIN_PATH(inc/MarlinConfig.h)
 
 #undef DISABLED
@@ -43,7 +50,7 @@
 #else
 #define OTASUPPORT
 #define WEBSUPPORT
-#define SHORT_BUILD_VERSION "2.0.9.3+"
+#define SHORT_BUILD_VERSION "2.1.x"
 
 /*********************************************************
  *
@@ -226,8 +233,8 @@
 #endif //DISABLE_NOTIFICATION_FEATURE
 
 //GCODE_HOST_FEATURE: allow to host gcode files on flash, SD etc..
-//Also used by ESP700
-#define GCODE_HOST_FEATURE
+//Also used by ESP700 do not use it on ESP3DLib
+//#define GCODE_HOST_FEATURE
 
 //Allows to mount /FS and /SD under / for FTP server /WebDav
 #define GLOBAL_FILESYSTEM_FEATURE
@@ -242,28 +249,6 @@
 #endif //WEBDAV_FEATURE
 #endif //DISABLE_WEBDAV_FEATURE
 
-/************************************
- *
- * DEBUG
- *
- * **********************************/
-//Do not do this when connected to printer !!!
-//be noted all upload may failed if enabled
-//DEBUG_OUTPUT_SERIAL0 1
-//DEBUG_OUTPUT_TELNET  4
-//DEBUG_OUTPUT_WEBSOCKET  5
-//#define ESP_DEBUG_FEATURE DEBUG_OUTPUT_SERIAL0
-
-#ifdef ESP_DEBUG_FEATURE
-#define DEBUG_ESP3D_OUTPUT_PORT  8000
-#endif //ESP_DEBUG_FEATURE
-
-/************************************
- *
- * Benchmark report
- *
- * **********************************/
-//#define ESP_BENCHMARK_FEATURE
 
 /************************************
  *
@@ -316,3 +301,33 @@
 #if defined (SD_TIMESTAMP_FEATURE) || defined (FILESYSTEM_TIMESTAMP_FEATURE)
 #define TIMESTAMP_FEATURE
 #endif //SD_TIMESTAMP_FEATURE || FILESYSTEM_TIMESTAMP_FEATURE 
+
+/************************************
+ *
+ * Development settings
+ * Do not modify them for production
+ ************************************/
+
+// Enable log mode
+// Do not do this when connected to printer !!!
+// be noted all upload may failed if enabled
+// LOG_OUTPUT_SERIAL0
+// LOG_OUTPUT_SERIAL1
+// LOG_OUTPUT_SERIAL2
+// LOG_OUTPUT_TELNET
+// LOG_OUTPUT_WEBSOCKET
+//#define ESP_LOG_FEATURE LOG_OUTPUT_TELNET
+
+//#define ESP3D_DEBUG_LEVEL LOG_LEVEL_DEBUG
+
+#ifdef ESP_LOG_FEATURE
+#define LOG_ESP3D_BAUDRATE 115200
+#define LOG_ESP3D_OUTPUT_PORT 8000
+#endif  // ESP_LOG_FEATURE
+
+/************************************
+ *
+ * Benchmark report
+ *
+ * **********************************/
+//#define ESP_BENCHMARK_FEATURE

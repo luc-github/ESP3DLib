@@ -28,14 +28,15 @@
 #include <LittleFS.h>
 #endif //FILESYSTEM_FEATURE
 #include "core/esp3d.h"
-#include "core/esp3doutput.h"
-#include "core/commands.h"
+#include "core/esp3d_commands.h"
+#include "core/esp3d_hal.h"
 #if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
 #include <soc/rtc_wdt.h>
 #endif //CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
 #ifdef SDSUPPORT
 #include "modules/filesystem/esp_sd.h"
 #endif //SDSUPPORT
+
 
 
 Esp3DLib esp3dlib;
@@ -54,7 +55,7 @@ void ESP3DLibTaskfn( void * parameter )
 #endif //#if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
         vTaskDelay(1 / portTICK_RATE_MS);
     }
-    vTaskDelete( Hal::xHandle );
+    vTaskDelete( ESP3DHal::xHandle );
 }
 
 
@@ -74,10 +75,17 @@ void Esp3DLib::init()
 bool Esp3DLib::parse(char * cmd)
 {
     if (myesp3d.started() && esp3d_commands.is_esp_command((uint8_t *)cmd, strlen(cmd))) {
-        //command come from other serial port
-        ESP3DOutput  output(ESP_ECHO_SERIAL_CLIENT);
-        esp3d_commands.process((uint8_t *)cmd, strlen(cmd),& output, LEVEL_ADMIN);
-        return true;
+      //command come from other serial port
+      ESP3DMessage *msg = ESP3DMessageManager::newMsg(
+      ESP3DClientType::echo_serial,ESP3DClientType::command ,(uint8_t *)cmd, 
+      strlen(cmd), ESP3DAuthenticationLevel::admin);
+      if (msg) {
+        // process command
+        esp3d_commands.process(msg);
+      } else {
+        esp3d_log_e("Cannot create message");
+      }
+    return true;
     }
     return false;
 }
@@ -106,14 +114,14 @@ void Esp3DLib::idletask()
                 8192, /* Stack size of task */
                 NULL, /* parameter of the task */
                 ESP3DLIB_RUNNING_PRIORITY, /* priority of the task */
-                &(Hal::xHandle), /* Task handle to keep track of created task */
+                &(ESP3DHal::xHandle), /* Task handle to keep track of created task */
                 ESP3DLIB_RUNNING_CORE    /* Core to run the task */
             );
 #ifdef DISABLE_WDT_ESP3DLIB_TASK
-            esp_task_wdt_delete(Hal::xHandle);
+            esp_task_wdt_delete(ESP3DHal::xHandle);
 #endif //DISABLE_WDT_ESP3DLIB_TASK 
         }
     }
-    Hal::wait (0);  // Yield to other tasks
+    ESP3DHal::wait (0);  // Yield to other tasks
 }
 #endif //ESP3DLIB_ENV
