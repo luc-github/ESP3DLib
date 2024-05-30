@@ -377,6 +377,12 @@ const char *Camera::GetModelString() {
     case CAMERA_MODEL_AI_THINKER:
       return "ESP32 Cam";
       break;
+    case CAMERA_MODEL_XIAO_ESP32S3:
+      return "Xiao ESP32S3";
+      break;
+    case CAMERA_MODEL_UICPAL_ESP32S3:
+      return "UICPAL ESP32S3";
+      break;
     default:
       return "Unknow Camera";
   }
