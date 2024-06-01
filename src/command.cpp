@@ -1642,7 +1642,7 @@ bool COMMAND::execute_internal_command (int cmd, String cmd_params, level_authen
             resp += "0.0.0.0";
         }
 #endif
-        resp += "# hostname:";
+        resp += " # hostname:";
         String defV = DEFAULT_HOSTNAME;
         resp += prefs.getString(HOSTNAME_ENTRY, defV);;
         prefs.end();
