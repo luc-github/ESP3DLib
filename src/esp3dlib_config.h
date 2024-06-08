@@ -38,7 +38,7 @@
 #endif
 #define MARLIN_HAL_PATH(PATH) HAL_PATH(HALHOME, PATH)
 #define MARLIN_PATH(PATH) ESP_XSTR(SRCHOME / PATH)
-#include MARLIN_PATH(inc / MarlinConfig.h)
+#include MARLIN_PATH(inc/MarlinConfig.h)
 
 #undef DISABLED
 #undef _BV
