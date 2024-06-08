@@ -31,13 +31,13 @@
 #define ESP_XSTR(M) ESP_XSTR_(M)
 #endif
 #ifndef SRCHOME
-#define SRCHOME ../../../../../ Marlin / src
+#define SRCHOME ../../../../../Marlin/src
 #endif
 #ifndef HALHOME
-#define HALHOME SRCHOME / HAL
+#define HALHOME SRCHOME/HAL
 #endif
 #define MARLIN_HAL_PATH(PATH) HAL_PATH(HALHOME, PATH)
-#define MARLIN_PATH(PATH) ESP_XSTR(SRCHOME / PATH)
+#define MARLIN_PATH(PATH) ESP_XSTR(SRCHOME/PATH)
 #include MARLIN_PATH(inc/MarlinConfig.h)
 
 #undef DISABLED
