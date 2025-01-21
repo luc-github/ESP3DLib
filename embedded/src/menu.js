@@ -11,7 +11,7 @@ function initMenus() {
     });
 
     document.getElementById("hlpLink").addEventListener("click", function () {
-        window.open("https://github.com/luc-github/ESP3DLib/wiki", "_blank");
+        window.open("https://esp3d.io/ESP3DLib/Version_3.X/documentation/", "_blank");
     });
 }
 

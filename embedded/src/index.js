@@ -350,7 +350,8 @@ function processFWJson(text) {
     }
 
     if (json.WebUpdate == "Enabled") firmware.classList.remove("hide");
-    hostpath = json.HostPath;
+    if (typeof json.HostPath != "undefined") hostpath = json.HostPath;
+    console.log("HostPath: " + hostpath);
     if (json.WiFiMode && json.WebSocketIP) {
         if (isLimitedEnvironment(json.WiFiMode)) {
             let address =
@@ -404,7 +405,9 @@ function startSocket(ip, port, sync) {
                 msg += String.fromCharCode(bytes[i]);
                 if (bytes[i] == 10 || bytes[i] == 13) {
                     wsMsg += msg;
-                    consoleContentUpdate(wsMsg);
+                    if (!wsMsg.startsWith("ESP3D says: command forwarded")) {
+                        consoleContentUpdate(wsMsg);
+                    }
                     wsMsg = "";
                     msg = "";
                 }
@@ -534,6 +537,13 @@ function dirIcon(plus = false) {
 }
 function dispatchFileStatus(jsonresponse) {
     let json;
+    let currentpath = currentPath;
+    if (!currentpath.endsWith("/")) currentpath += "/";
+    currentpath += hostpath;
+    if (!currentpath.endsWith("/")) currentpath += "/";
+    let currentpath2 = currentpath.replaceAll("//", "/");
+    currentpath = currentpath2;
+    console.log("currentpath: " + currentpath);
     let eventslisteners = [];
     let showESP3Dbutton = false;
     try {
@@ -606,7 +616,7 @@ function dispatchFileStatus(jsonresponse) {
         for (let i1 = 0; i1 < json.files.length; i1++) {
             if (String(json.files[i1].size) != "-1") {
                 if (
-                    currentPath == hostpath &&
+                    currentPath == "/" &&
                     (json.files[i1].name == "index.html.gz" ||
                         json.files[i1].name == "index.html")
                 ) {
@@ -660,12 +670,12 @@ function dispatchFileStatus(jsonresponse) {
                             let url = new URL(
                                 "http://" +
                                     window.location.host +
-                                    currentPath +
-                                    "/" +
+                                    currentpath +
                                     eventslisteners[i].target
                             );
                             window.open(url, "_blank");
                         });
+
                     break;
                 case "filedel":
                     document
@@ -768,6 +778,11 @@ function uploadFiles() {
     formData.append("path", currentPath);
     let currentpath = currentPath;
     if (!currentpath.endsWith("/")) currentpath += "/";
+    currentpath += hostpath;
+    if (!currentpath.endsWith("/")) currentpath += "/";
+    let currentpath2 = currentpath.replaceAll("//", "/");
+    currentpath = currentpath2;
+    console.log(currentpath);
     for (let i3 = 0; i3 < files.length; i3++) {
         let file = files[i3];
         let arg = currentpath + file.name + "S";

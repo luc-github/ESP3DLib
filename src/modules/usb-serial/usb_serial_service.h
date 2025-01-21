@@ -18,39 +18,34 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef _SERIAL_SERVICES_H
-#define _SERIAL_SERVICES_H
+#pragma once
+
+#include <esp32_usb_serial.h>
 
 #include "../../core/esp3d_client_types.h"
 #include "../../core/esp3d_message.h"
-
-#if defined(ARDUINO_ARCH_ESP32)
 #include "../../core/esp3d_messageFifo.h"
-#endif  // ARDUINO_ARCH_ESP32
 
-#define ESP3D_SERIAL_BUFFER_SIZE 1024
-#define ESP_SERIAL_PARAM SERIAL_8N1
 
-extern const uint32_t SupportedBaudList[];
-extern const size_t SupportedBaudListSize;
+#define ESP3D_USB_SERIAL_BUFFER_SIZE 1024
 
-class ESP3DSerialService final {
+extern const uint32_t SupportedUsbSerialBaudList[];
+extern const size_t SupportedUsbSerialBaudListSize;
+
+class ESP3DUsbSerialService final {
  public:
-  ESP3DSerialService(uint8_t id);
-  ~ESP3DSerialService();
+  ESP3DUsbSerialService();
+  ~ESP3DUsbSerialService();
   void setParameters();
-  bool begin(uint8_t serialIndex);
+  bool begin();
   bool end();
   void updateBaudRate(uint32_t br);
   void handle();
   bool reset();
   uint32_t baudRate();
-  uint8_t serialIndex() { return _serialIndex; }
   const uint32_t *get_baudratelist(uint8_t *count);
   void flush();
-  #if defined(ARDUINO_ARCH_ESP8266)
   void swap();
-  #endif // ARDUINO_ARCH_ESP8266
   size_t writeBytes(const uint8_t *buffer, size_t size);
   size_t readBytes(uint8_t *sbuf, size_t len);
   inline bool started() { return _started; }
@@ -58,40 +53,35 @@ class ESP3DSerialService final {
   void initAuthentication();
   void setAuthentication(ESP3DAuthenticationLevel auth) { _auth = auth; }
   ESP3DAuthenticationLevel getAuthentication();
-#if defined(ARDUINO_ARCH_ESP32)
-  void receiveCb();
-  static void receiveSerialCb();
-  static void receiveBridgeSerialCb();
-#endif  // ARDUINO_ARCH_ESP32
+  void connectDevice();
+  void setConnected(bool connected);
+  void receiveCb(const uint8_t *data, size_t data_len, void *arg = nullptr);
+  bool isConnected() { return _is_connected; }
+  const char * getVIDString();
+  const char * getPIDString();
+  uint16_t getVID();
+  uint16_t getPID();
+
  private:
   uint32_t _baudRate;
   ESP3DAuthenticationLevel _auth;
-  uint8_t _serialIndex;
   ESP3DClientType _origin;
-  uint8_t _id;
-  int8_t _rxPin;
-  int8_t _txPin;
   bool _started;
   bool _needauthentication;
   uint32_t _lastflush;
-  uint8_t _buffer[ESP3D_SERIAL_BUFFER_SIZE + 1];  // keep space of 0x0 terminal
+  uint8_t
+      _buffer[ESP3D_USB_SERIAL_BUFFER_SIZE + 1];  // keep space of 0x0 terminal
   size_t _buffer_size;
-#if defined(ARDUINO_ARCH_ESP32)
-  SemaphoreHandle_t _mutex;
+  SemaphoreHandle_t _buffer_mutex;
+  SemaphoreHandle_t _device_disconnected_mutex;
+  bool _is_connected;
+  std::unique_ptr<CdcAcmDevice> _vcp_ptr;
+
+  TaskHandle_t _xHandle;
   ESP3DMessageFIFO _messagesInFIFO;
-#endif  // ARDUINO_ARCH_ESP32
-#if defined(ARDUINO_ARCH_ESP8266)
-  void push2buffer(uint8_t *sbuf, size_t len);
-#endif // ARDUINO_ARCH_ESP8266
   void flushBuffer();
   void flushChar(char c);
   void flushData(const uint8_t* data, size_t size, ESP3DMessageType type);
 };
 
-extern ESP3DSerialService esp3d_serial_service;
-
-#if defined(ESP_SERIAL_BRIDGE_OUTPUT)
-extern ESP3DSerialService serial_bridge_service;
-#endif  // ESP_SERIAL_BRIDGE_OUTPUT
-
-#endif  //_SERIAL_SERVICES_H
+extern ESP3DUsbSerialService esp3d_usb_serial_service;

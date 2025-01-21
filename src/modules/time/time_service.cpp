@@ -78,7 +78,6 @@ bool TimeService::isInternetTime(bool readfromsettings) {
 bool TimeService::begin() {
   esp3d_log("Starting TimeService");
   end();
-  String s1, s2, s3, t1;
   updateTimeZone(true);
 #if defined(WIFI_FEATURE)
   // no time server in AP mode
@@ -110,14 +109,14 @@ bool TimeService::begin() {
   if (!isInternetTime(true)) {
     return true;
   }
-  s1 = ESP3DSettings::readString(ESP_TIME_SERVER1);
-  s2 = ESP3DSettings::readString(ESP_TIME_SERVER2);
-  s3 = ESP3DSettings::readString(ESP_TIME_SERVER3);
+  _server[0] = ESP3DSettings::readString(ESP_TIME_SERVER1);
+  _server[1] = ESP3DSettings::readString(ESP_TIME_SERVER2);
+  _server[2] = ESP3DSettings::readString(ESP_TIME_SERVER3);
 #if defined(ARDUINO_ARCH_ESP32)
-  configTzTime(_time_zone.c_str(), s1.c_str(), s2.c_str(), s3.c_str());
+  configTzTime(_time_zone_config.c_str(), _server[0].c_str(),  _server[1].length() > 0 ? _server[1].c_str() : nullptr,  _server[2].length() > 0 ? _server[2].c_str() : nullptr);  
 #endif  // ARDUINO_ARCH_ESP32
 #if defined(ARDUINO_ARCH_ESP8266)
-  configTime(t1.c_str(), s1.c_str(), s2.c_str(), s3.c_str());
+  configTime(_time_zone_config.c_str(), _server[0].c_str(),  _server[1].length() > 0 ? _server[1].c_str() : nullptr,  _server[2].length() > 0 ? _server[2].c_str() : nullptr);
 #endif  // ARDUINO_ARCH_ESP8266
 
   time_t now = time(nullptr);
@@ -181,16 +180,26 @@ bool TimeService::updateTimeZone(bool fromsettings) {
   setTZ(stmp.c_str());
 #endif  // ARDUINO_ARCH_ESP8266
 
+  _time_zone_config = "<";
+  _time_zone_config += _time_zone[0];
+  _time_zone_config += _time_zone[1];
+  _time_zone_config += _time_zone[2];
+  _time_zone_config += _time_zone[4];
+  _time_zone_config += _time_zone[5];
+  _time_zone_config += ">";
+  _time_zone_config += _time_zone[0]=='+' ? "-" : "+";
+  _time_zone_config += &_time_zone[1];
+  esp3d_log("Time zone is %s", _time_zone_config.c_str());
   return true;
 }
 
 const char* TimeService::getCurrentTime() {
   struct tm tmstruct;
+  static char buf[20];
   time_t now;
   // get current time
   time(&now);
   localtime_r(&now, &tmstruct);
-  static char buf[20];
   strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &tmstruct);
   esp3d_log("Time string is %s", buf);
   return buf;

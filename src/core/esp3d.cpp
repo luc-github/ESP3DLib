@@ -28,6 +28,7 @@
 
 #include "../include/esp3d_config.h"
 #include "esp3d_settings.h"
+#include "esp3d_commands.h"
 
 #if COMMUNICATION_PROTOCOL != SOCKET_SERIAL || ESP_SERIAL_BRIDGE_OUTPUT
 #include "../modules/serial/serial_service.h"
@@ -50,14 +51,17 @@
 #ifdef GCODE_HOST_FEATURE
 #include "../modules/gcode_host/gcode_host.h"
 #endif  // GCODE_HOST_FEATURE
-#ifdef ESP_LUA_INTERPRETER_FEATURE
-#include "../modules/lua_interpreter/lua_interpreter_service.h"
-#endif  // #ifdef
 #ifdef SD_UPDATE_FEATURE
 #include "../modules/update/update_service.h"
 #endif  // SD_UPDATE_FEATURE
 #include "../modules/boot_delay/boot_delay.h"
 #include "esp3d_message.h"
+#ifdef ESP_LUA_INTERPRETER_FEATURE
+#include "../modules/lua_interpreter/lua_interpreter_service.h"
+#endif  // ESP_LUA_INTERPRETER_FEATURE
+#if defined(USB_SERIAL_FEATURE)
+#include "../modules/usb-serial/usb_serial_service.h"
+#endif  // USB_SERIAL_FEATURE
 
 bool Esp3D::restart = false;
 
@@ -102,8 +106,21 @@ bool Esp3D::begin() {
     // Restart ESP3D
     restart_now();
   }
+
+  esp3d_commands.getOutputClient(true);
+
+  #if defined(USB_SERIAL_FEATURE)
+  if (esp3d_commands.getOutputClient() == ESP3DClientType::usb_serial) {
+    if (!esp3d_usb_serial_service.begin()) {
+      esp3d_log_e("Error with usb serial service");
+      res = false;
+    }
+  }
+  #endif  // USB_SERIAL_FEATURE
+
   // BT do not start automaticaly so should be OK
 #if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
+
   // Serial service
   if (!esp3d_serial_service.begin(ESP_SERIAL_OUTPUT)) {
     esp3d_log_e("Error with serial service");
@@ -163,6 +180,9 @@ void Esp3D::handle() {
   if (restart) {
     restart_now();
   }
+#if defined(USB_SERIAL_FEATURE)
+  esp3d_usb_serial_service.handle();
+#endif  // USB_SERIAL_FEATURE
 #if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
   esp3d_serial_service.handle();
 #endif  // COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL ==
@@ -182,6 +202,10 @@ void Esp3D::handle() {
 #if defined(GCODE_HOST_FEATURE)
   esp3d_gcode_host.handle();
 #endif  // GCODE_HOST_FEATURE
+
+#ifdef ESP_LUA_INTERPRETER_FEATURE
+  esp3d_lua_interpreter.handle();
+#endif  // ESP_LUA_INTERPRETER_FEATURE
 }
 
 bool Esp3D::started() { return _started; }
@@ -201,6 +225,9 @@ bool Esp3D::end() {
 #if defined(FILESYSTEM_FEATURE)
   ESP_FileSystem::end();
 #endif  // FILESYSTEM_FEATURE
+#if defined(USB_SERIAL_FEATURE)
+  esp3d_usb_serial_service.end();
+#endif  // USB_SERIAL_FEATURE
 #if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
   esp3d_serial_service.end();
 #endif  // COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL ==
@@ -251,7 +278,7 @@ void Esp3D::restart_now() {
 #if defined(FILESYSTEM_FEATURE)
   ESP_FileSystem::end();
 #endif  // FILESYSTEM_FEATURE
-#if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
+#if (COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL) & defined(ARDUINO_ARCH_ESP8266)
   esp3d_serial_service.swap();
 #endif  // COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL ==
         // MKS_SERIAL

@@ -18,8 +18,14 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef _SANITY_ESP3D_H
-#define _SANITY_ESP3D_H
+#pragma once
+
+/**************************
+ * Arduino core version
+ * ***********************/
+#if ESP_ARDUINO_VERSION_MAJOR == 1
+#error "ESP3D does not support Arduino Core 1.x.x"
+#endif
 
 /**************************
  * Settings
@@ -68,7 +74,7 @@
 
 #if COMMUNICATION_PROTOCOL == MKS_SERIAL
 #if defined(PRINTER_HAS_DISPLAY)
-#error MKS serial protocol is not compatible with display output
+#error MKS serial protocol is not compatible with `PRINTER_HAS_DISPLAY`, comment `PRINTER_HAS_DISPLAY` in configuration.h
 #endif  // defined(PRINTER_HAS_DISPLAY)
 #if defined(ESP_SERIAL_BRIDGE_OUTPUT)
 #error MKS serial protocol is not compatible with serial bridge output
@@ -76,10 +82,18 @@
 #endif  // COMMUNICATION_PROTOCOL == MKS_SERIAL
 
 /**************************
+ * USB-Serial
+ * ***********************/
+#if defined(USB_SERIAL_FEATURE) && (!defined(ARDUINO_ARCH_ESP32) || (!defined(CONFIG_IDF_TARGET_ESP32S2) && !defined(CONFIG_IDF_TARGET_ESP32S3)))
+#error USB-Serial is only available for ESP32 S2 and S3
+#endif
+
+
+/**************************
  * Bluetooth
  * ***********************/
-#if defined(BLUETOOTH_FEATURE) && defined(ARDUINO_ARCH_ESP8266)
-#error Bluetooth is not available in ESP8266
+#if (defined(BLUETOOTH_FEATURE) && !defined(ARDUINO_ARCH_ESP32)) || (defined(BLUETOOTH_FEATURE) && (defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3)))  
+#error Bluetooth is only available for ESP32
 #endif
 
 /**************************
@@ -197,4 +211,9 @@
 #error SD_UPDATE_FEATURE is not available because SD_DEVICE is not enabled
 #endif
 
+/**************************
+ * Lua
+ * ***********************/
+#if defined(ESP_LUA_INTERPRETER_FEATURE) && (defined(ARDUINO_ARCH_ESP8266) ||  defined(ARDUINO_ARCH_ESP8285))
+#error ESP_LUA_INTERPRETER_FEATURE is not available for  ESP8266 and ESP8285   
 #endif  // SANITY_CHECK

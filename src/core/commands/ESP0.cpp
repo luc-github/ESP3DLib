@@ -26,15 +26,11 @@ const char* help[] = {
     "[ESP100](SSID) - display/set STA SSID",
     "[ESP101](Password) - set STA password",
 #endif  // WIFI_FEATURE
-#if defined(WIFI_FEATURE) || defined(ETH_FEATURE)
+#if defined(WIFI_FEATURE)
     "[ESP102](Mode) - display/set STA IP mode (DHCP/STATIC)",
     "[ESP103](IP=xxxx MSK=xxxx GW=xxxx) - display/set STA IP/Mask/GW",
-#endif  // WIFI_FEATURE || ETH_FEATURE
-#if defined(WIFI_FEATURE) || defined(BLUETOOTH_FEATURE) || defined(ETH_FEATURE)
     "[ESP104](State) - display/set sta fallback mode which can be BT, SETUP, "
     "OFF",
-#endif  // WIFI_FEATURE || BLUETOOTH_FEATURE || ETH_FEATURE
-#if defined(WIFI_FEATURE)
     "[ESP105](SSID) - display/set AP SSID",
     "[ESP106](Password) - set AP password",
     "[ESP107](IP) - display/set AP IP",
@@ -53,6 +49,11 @@ const char* help[] = {
     "[ESP115](State) - display/set immediate Network state which can be ON, "
     "OFF",
 #endif  // WIFI_FEATURE || ETH_FEATURE || BT_FEATURE
+#if defined(ETH_FEATURE)
+    "[ESP116](Mode) - display/set ETH STA IP mode (DHCP/STATIC)",
+    "[ESP117](IP=xxxx MSK=xxxx GW=xxxx) - display/set ETH STA IP/Mask/GW",
+    "[ESP118](State) - display/set eth sta fallback mode which can be BT, Off",
+#endif  // ETH_FEATURE
 #if defined(HTTP_FEATURE)
     "[ESP120](State) - display/set HTTP state which can be ON, OFF",
     "[ESP121](Port) - display/set HTTP port ",
@@ -116,6 +117,10 @@ const char* help[] = {
     "[ESP250]F=(frequency) D=(duration) - play sound on buzzer",
 #endif  // BUZZER_DEVICE
     "[ESP290](delay in ms) - do a pause",
+#if defined(ESP_LUA_INTERPRETER_FEATURE)
+    "[ESP300]<filename> - execute Lua script",
+    "[ESP301]action=<PAUSE/RESUME/ABORT> - query and control ESP300 execution",
+#endif  // ESP_LUA_INTERPRETER_FEATURE
     "[ESP400] - display ESP3D settings in JSON",
     "[ESP401]P=(position) T=(type) V=(value) - Set specific setting",
 #ifdef SD_UPDATE_FEATURE
@@ -138,7 +143,7 @@ const char* help[] = {
 #endif  // AUTHENTICATION_FEATURE
 #if defined(NOTIFICATION_FEATURE)
     "[ESP600](message) - send notification",
-    "[ESP610]type=(NONE/PUSHOVER/EMAIL/LINE/TELEGRAM/IFTTT/HOMEASSISTANT) "
+    "[ESP610]type=(NONE/PUSHOVER/EMAIL/LINE/TELEGRAM/IFTTT/HOMEASSISTANT/WHATSAPP) "
     "(T1=xxx) (T2=xxx) "
     "(TS=xxx) - display/set Notification settings",
     "[ESP620]URL=http://XXXXXX  - send GET notification",
@@ -174,6 +179,9 @@ const char* help[] = {
     "[ESP900](ENABLE/DISABLE) - display/set serial state",
     "[ESP901]<BAUD RATE> - display/set serial baud rate",
 #endif  // COMMUNICATION_PROTOCOL != SOCKET_SERIAL
+#if defined(USB_SERIAL_FEATURE)
+    "[ESP902]<BAUD RATE> - display/set USB Serial baud rate",
+#endif  // defined(USB_SERIAL_FEATURE)
 #ifdef BUZZER_DEVICE
     "[ESP910](ENABLE/DISABLE) - display/set buzzer state",
 #endif  // BUZZER_DEVICE
@@ -181,6 +189,9 @@ const char* help[] = {
     "[ESP930](ENABLE/DISABLE/CLOSE) - display/set serial bridge state",
     "[ESP931]<BAUD RATE> - display/set serial bridge baud rate",
 #endif  // defined(ESP_SERIAL_BRIDGE_OUTPUT)
+#if defined(USB_SERIAL_FEATURE)
+    "[ESP950]<SERIAL/USB> - display/set client output",
+#endif  // defined(USB_SERIAL_FEATURE)
 #if defined(ARDUINO_ARCH_ESP32) &&                             \
     (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32S2 || \
      CONFIG_IDF_TARGET_ESP32C3)
@@ -192,13 +203,9 @@ const uint cmdlist[] = {
 #if defined(WIFI_FEATURE)
     100, 101,
 #endif  // WIFI_FEATURE
-#if defined(WIFI_FEATURE) || defined(ETH_FEATURE)
+#if defined(WIFI_FEATURE) 
     102, 103,
-#endif  // WIFI_FEATURE || ETH_FEATURE
-#if defined(WIFI_FEATURE) || defined(BLUETOOTH_FEATURE) || defined(ETH_FEATURE)
     104,
-#endif  // WIFI_FEATURE || BLUETOOTH_FEATURE || ETH_FEATURE
-#if defined(WIFI_FEATURE)
     105, 106, 107, 108,
 #endif  // WIFI_FEATURE
 #if defined(WIFI_FEATURE) || defined(BLUETOOTH_FEATURE) || defined(ETH_FEATURE)
@@ -210,6 +217,9 @@ const uint cmdlist[] = {
 #if defined(WIFI_FEATURE) || defined(ETH_FEATURE) || defined(BT_FEATURE)
     112, 114, 115,
 #endif  // WIFI_FEATURE || ETH_FEATURE || BT_FEATURE
+#if defined(ETH_FEATURE) 
+    116, 117, 118,
+#endif  // ETH_FEATURE
 #if defined(HTTP_FEATURE)
     120, 121,
 #endif  // HTTP_FEATURE
@@ -257,7 +267,11 @@ const uint cmdlist[] = {
 #ifdef BUZZER_DEVICE
     250,
 #endif  // BUZZER_DEVICE
-    290, 400, 401,
+    290,
+#if defined(ESP_LUA_INTERPRETER_FEATURE)
+    300, 301,
+#endif  // ESP_LUA_INTERPRETER_FEATURE
+     400, 401,
 #ifdef SD_UPDATE_FEATURE
     402,
 #endif  // SD_UPDATE_FEATURE
@@ -296,13 +310,18 @@ const uint cmdlist[] = {
 #if COMMUNICATION_PROTOCOL != SOCKET_SERIAL
     900, 901,
 #endif  // COMMUNICATION_PROTOCOL != SOCKET_SERIAL
+#if defined(USB_SERIAL_FEATURE)
+    902,
+#endif  // defined(USB_SERIAL_FEATURE)
 #ifdef BUZZER_DEVICE
     910,
-
 #endif  // BUZZER_DEVICE
 #if defined(ESP_SERIAL_BRIDGE_OUTPUT)
     930, 931,
 #endif  // defined(ESP_SERIAL_BRIDGE_OUTPUT)
+#if defined(USB_SERIAL_FEATURE)
+    950,
+#endif  // defined(USB_SERIAL_FEATURE)
 #if defined(ARDUINO_ARCH_ESP32) &&                             \
     (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32S2 || \
      CONFIG_IDF_TARGET_ESP32C3)

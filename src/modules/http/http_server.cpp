@@ -257,7 +257,8 @@ bool HTTP_Server::dispatch(ESP3DMessage* msg) {
   }
   if ((msg->size > 0 && msg->data) || (msg->type == ESP3DMessageType::tail)) {
     if (msg->type == ESP3DMessageType::head ||
-        msg->type == ESP3DMessageType::unique) {
+        msg->type == ESP3DMessageType::unique ||
+        msg->type == ESP3DMessageType::realtimecmd) {
       set_http_headers();
       int code = 200;
       if (msg->request_id.code != 0) {
@@ -289,7 +290,7 @@ bool HTTP_Server::dispatch(ESP3DMessage* msg) {
         _webserver->sendContent("");
       }
     }
-    ESP3DMessageManager::deleteMsg(msg);
+    esp3d_message_manager.deleteMsg(msg);
     return true;
   }
   return false;
@@ -346,13 +347,7 @@ void HTTP_Server::end() {
 void HTTP_Server::handle() {
   if (_started) {
     if (_webserver) {
-#ifdef DISABLE_WDT_CORE_0
-      disableCore0WDT();
-#endif  // DISABLE_WDT_CORE_0
       _webserver->handleClient();
-#ifdef DISABLE_WDT_CORE_0
-      enableCore0WDT();
-#endif  // DISABLE_WDT_CORE_0
     }
   }
 }

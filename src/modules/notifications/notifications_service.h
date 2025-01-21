@@ -54,6 +54,7 @@ class NotificationsService {
   bool sendPushoverMSG(const char* title, const char* message);
   bool sendEmailMSG(const char* title, const char* message);
   bool sendLineMSG(const char* title, const char* message);
+  bool sendWhatsAppMSG(const char* title, const char* message);
   bool sendTelegramMSG(const char* title, const char* message);
   bool sendIFTTTMSG(const char* title, const char* message);
   bool sendHomeAssistantMSG(const char* title, const char* message);

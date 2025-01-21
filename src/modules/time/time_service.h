@@ -44,7 +44,9 @@ class TimeService {
   int _get_time_zone_offset_min();
   bool _started;
   bool _isInternetTime;
+  String _server[3];
   String _time_zone;
+  String _time_zone_config;
 };
 
 extern TimeService timeService;

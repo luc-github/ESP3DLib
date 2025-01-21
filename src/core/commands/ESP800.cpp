@@ -147,7 +147,7 @@ void ESP3DCommands::ESP800(int cmd_params_pos, ESP3DMessage* msg) {
   }
 
   // SD connection
-  if (ESP3DSettings::GetSDDevice() == ESP_DIRECT_SD) {
+  if (ESP3DSettings::GetSDDevice() == ESP_NOT_SHARED_SD) {
     tmpstr = "direct";
   } else if (ESP3DSettings::GetSDDevice() == ESP_SHARED_SD) {
     tmpstr = "shared";

@@ -74,6 +74,10 @@ extern "C" {
 #define LINESERVER "notify-api.line.me"
 #define LINEPORT 443
 
+#define WHATSAPPTIMEOUT 5000
+#define WHATSAPPSERVER "api.callmebot.com"
+#define WHATSAPPPORT 443
+
 #define TELEGRAMTIMEOUT 5000
 #define TELEGRAMSERVER "api.telegram.org"
 #define TELEGRAMPORT 443
@@ -166,6 +170,8 @@ const char* NotificationsService::getTypeString() {
       return "telegram";
     case ESP_IFTTT_NOTIFICATION:
       return "IFTTT";
+    case ESP_WHATS_APP_NOTIFICATION:
+      return "WhatsApp";
     case ESP_HOMEASSISTANT_NOTIFICATION:
       return "HomeAssistant";
     default:
@@ -208,6 +214,9 @@ bool NotificationsService::sendMSG(const char* title, const char* messagetxt) {
         break;
       case ESP_IFTTT_NOTIFICATION:
         return sendIFTTTMSG(title, message.c_str());
+        break;
+      case ESP_WHATS_APP_NOTIFICATION:
+        return sendWhatsAppMSG(title, message.c_str());
         break;
       case ESP_HOMEASSISTANT_NOTIFICATION:
         return sendHomeAssistantMSG(title, message.c_str());
@@ -263,6 +272,48 @@ bool NotificationsService::sendPushoverMSG(const char* title,
   // send query
   Notificationclient.print(postcmd);
   res = Wait4Answer(Notificationclient, "{", "\"status\":1", PUSHOVERTIMEOUT);
+  Notificationclient.stop();
+  return res;
+}
+
+// WhatsApp / CallMeBot
+bool NotificationsService::sendWhatsAppMSG(const char* title,
+                                           const char* message) {
+  String data;
+  String geturl;
+  bool res;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  WiFiClientSecure Notificationclient;
+#pragma GCC diagnostic pop
+  Notificationclient.setInsecure();
+#if defined(ARDUINO_ARCH_ESP8266)
+  BearSSLSetup(Notificationclient);
+#endif  // ARDUINO_ARCH_ESP8266
+  if (!Notificationclient.connect(_serveraddress.c_str(), _port)) {
+    esp3d_log_e("Error connecting  server %s:%d", _serveraddress.c_str(),
+                _port);
+    return false;
+  }
+  // build data for post
+  data = "/whatsapp.php?phone=";
+  data += _token1;
+  data += "&apikey=";
+  data += _token2;
+  data += "&text=";
+  data += esp3d_string::urlEncode(message);
+  // build get query because it only accept GET
+  geturl =
+      "GET https://" + _serveraddress;
+  geturl+= data;
+  geturl+=" HTTP/1.0";
+  Notificationclient.println(geturl.c_str());
+  Notificationclient.println("Host: api.callmebot.com");
+  Notificationclient.println("Connection: close");
+  Notificationclient.println();
+  esp3d_log("Query: %s", geturl.c_str());
+  // send query
+  res = Wait4Answer(Notificationclient, "<b>", "Message queued.", WHATSAPPTIMEOUT);
   Notificationclient.stop();
   return res;
 }
@@ -636,6 +687,12 @@ bool NotificationsService::begin() {
       _token1 = ESP3DSettings::readString(ESP_NOTIFICATION_TOKEN1);
       _port = LINEPORT;
       _serveraddress = LINESERVER;
+      break;
+     case ESP_WHATS_APP_NOTIFICATION:
+      _token1 = ESP3DSettings::readString(ESP_NOTIFICATION_TOKEN1);
+      _token2 = ESP3DSettings::readString(ESP_NOTIFICATION_TOKEN2);
+      _port = WHATSAPPPORT;
+      _serveraddress = WHATSAPPSERVER;
       break;
     case ESP_IFTTT_NOTIFICATION:
       _token1 = ESP3DSettings::readString(ESP_NOTIFICATION_TOKEN1);

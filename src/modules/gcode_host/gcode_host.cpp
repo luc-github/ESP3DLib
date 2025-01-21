@@ -47,6 +47,18 @@ bool GcodeHost::begin() {
   return true;
 }
 
+bool GcodeHost::dispatch(ESP3DMessage* message) { 
+  if (!message || _step == HOST_NO_STREAM) {
+    return false;
+  }
+  if (message->size > 0 && message->data) {
+    push(message->data, message->size);
+    esp3d_message_manager.deleteMsg(message);
+    return true;
+  }
+  return false;
+ }
+
 void GcodeHost::end() {
   _commandNumber = 0;
   _error = ERROR_NO_ERROR;
@@ -69,7 +81,7 @@ bool GcodeHost::push(const uint8_t *sbuf, size_t len) {
   esp3d_log("Push got %d bytes", len);
   for (size_t i = 0; i < len; i++) {
     // it is a line process it
-    if (sbuf[i] == '\n' || sbuf[i] == '\r') {
+    if (sbuf[i] == '\n') {
       flush();
     } else {
       // fill buffer until it is full
@@ -213,6 +225,11 @@ void GcodeHost::endStream() {
   }
 #endif  // SD_DEVICE
   _step = HOST_NO_STREAM;
+  if (!_scriptList.isEmpty()){
+    ScriptEntry scr = _scriptList.pop();
+    processScript(scr.script.c_str(),scr.auth_type);
+  }
+  //TODO: do same for files
 }
 
 void GcodeHost::readNextCommand() {
@@ -246,7 +263,7 @@ void GcodeHost::readNextCommand() {
       } else {
         _processedSize++;
         _currentPosition++;
-        if (!(((char)c == '\n') || ((char)c == '\r'))) {
+        if (!((char)c == '\n')) {
           _currentCommand += (char)c;
         } else {
           processing = false;
@@ -273,7 +290,7 @@ void GcodeHost::readNextCommand() {
       } else {
         _processedSize++;
         _currentPosition++;
-        if (!(((char)c == '\n') || ((char)c == '\r'))) {
+        if (!(char)c == '\n' ) {
           _currentCommand += (char)c;
         } else {
           processing = false;
@@ -313,17 +330,19 @@ void GcodeHost::processCommand() {
     _step = HOST_READ_LINE;
   } else {
     esp3d_log("Command %s is valid", _currentCommand.c_str());
-    String cmd = _currentCommand + "\n";
+    if (!_currentCommand.endsWith("\n")) {
+      _currentCommand += "\n";
+    }
     bool isESPcmd = esp3d_commands.is_esp_command(
         (uint8_t *)_currentCommand.c_str(), _currentCommand.length());
     if (isESPcmd) {
-      ESP3DMessage *msg = ESP3DMessageManager::newMsg(
+      ESP3DMessage *msg = esp3d_message_manager.newMsg(
           ESP3DClientType::no_client, esp3d_commands.getOutputClient(),
           (uint8_t *)_currentCommand.c_str(), _currentCommand.length(), _auth);
       if (msg) {
         // process command
         esp3d_commands.process(msg);
-        esp3d_log("Command is ESP command: %s", cmd.c_str());
+        esp3d_log("Command is ESP command: %s", _currentCommand.c_str());
         _step = HOST_READ_LINE;
       } else {
         esp3d_log_e("Cannot create message");
@@ -331,13 +350,13 @@ void GcodeHost::processCommand() {
       }
 
     } else {
-      ESP3DMessage *msg = ESP3DMessageManager::newMsg(
+      ESP3DMessage *msg = esp3d_message_manager.newMsg(
           ESP3DClientType::stream, esp3d_commands.getOutputClient(),
           (uint8_t *)_currentCommand.c_str(), _currentCommand.length(), _auth);
       if (msg) {
         // process command
         esp3d_commands.process(msg);
-        esp3d_log("Command is GCODE command: %s", cmd.c_str());
+        esp3d_log("Command is GCODE command: %s", _currentCommand.c_str());
         _startTimeOut = millis();
         if (isAckNeeded()) {
           _step = HOST_WAIT4_ACK;
@@ -494,10 +513,10 @@ uint32_t GcodeHost::getCommandNumber(String &response) {
 bool GcodeHost::processScript(const char *line,
                               ESP3DAuthenticationLevel auth_type) {
   if (_step != HOST_NO_STREAM) {
-    esp3d_log("Streaming already in progress");
-    while (_step != HOST_NO_STREAM) {
-      handle();
-    }
+      esp3d_log("Streaming already in progress, put to queue");
+      String s = line;
+      _scriptList.push(line, auth_type);
+      return true;
   }
   _script = line;
   _script.trim();

@@ -22,6 +22,7 @@
 #include <Arduino.h>
 
 #include "../include/esp3d_config.h"
+#include "esp3d_settings.h"
 
 #if defined(WIFI_FEATURE) || defined(ETH_FEATURE)
 #include "../modules/network/netconfig.h"
@@ -169,6 +170,28 @@ const char* esp3d_string::encodeString(const char* s) {
   return tmp.c_str();
 }
 
+// Encode a string to be used in a URL
+const char* esp3d_string::urlEncode(const char* s) {
+  static String encoded;
+  encoded = "";
+  char temp[4];
+  for (size_t i = 0; i < strlen(s); i++) {
+    temp[0] = s[i];
+    if (temp[0] == 32) {  // space
+      encoded.concat('+');
+    } else if ((temp[0] >= 48 && temp[0] <= 57)     /*0-9*/
+               || (temp[0] >= 65 && temp[0] <= 90)  /*A-Z*/
+               || (temp[0] >= 97 && temp[0] <= 122) /*a-z*/
+    ) {
+      encoded.concat(temp[0]);
+    } else {  // character needs encoding
+      snprintf(temp, 4, "%%%02X", temp[0]);
+      encoded.concat(temp);
+    }
+  }
+  return encoded.c_str();
+}
+
 // helper to format size to readable string
 const char* esp3d_string::formatBytes(uint64_t bytes) {
   static String res;
@@ -186,7 +209,7 @@ const char* esp3d_string::formatBytes(uint64_t bytes) {
 
 bool esp3d_string::isPrintableChar(char ch) {
   int c = static_cast<int>(ch);
-  if (c == 9 || (c >= 32 && c <= 126) || c >= 128) {
+  if (c == '\t' || c == '\r' || (c >= ' ' && c <= '~') || c >= 128) {
     return true;
   }
   return false;
@@ -212,4 +235,51 @@ const char* esp3d_string::expandString(const char* s, bool formatspace) {
 #endif  // TIMESTAMP_FEATURE
   }
   return tmp.c_str();
+}
+
+const char* esp3d_string::formatDuration(uint64_t duration) {
+  unsigned long seconds = duration / 1000;
+  unsigned long minutes = seconds / 60;
+  unsigned long hours = minutes / 60;
+  unsigned long days = hours / 24;
+
+  seconds %= 60;
+  minutes %= 60;
+  hours %= 24;
+
+  static String result;
+  bool display = false;
+  result = "";
+  if (days > 0) {
+    result += String(days) + "d ";
+    display = true;
+  }
+  if (hours > 0 || display) {
+    result += String(hours) + "h ";
+    display = true;
+  }
+  if (minutes > 0 || display) {
+    result += String(minutes) + "m ";
+    display = true;
+  }
+  result += String(seconds) + "s";
+
+  return result.c_str();
+}
+
+bool esp3d_string::isRealTimeCommand(char c) {
+  if (ESP3DSettings::GetFirmwareTarget() == GRBL ||
+      ESP3DSettings::GetFirmwareTarget() == GRBLHAL) {
+    // Standard characters
+    if (c == '?' || c == '!' || c == '~' || c == 0x18) {  // 0x18 is  ^X
+      return true;
+    }
+
+    // Range >= 0x80 et <= 0xA4
+    const unsigned char uc = static_cast<unsigned char>(c);
+    if (uc >= 0x80 && uc <= 0xA4) {
+      return true;
+    }
+  }
+  return false;
 }

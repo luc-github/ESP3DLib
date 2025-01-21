@@ -59,7 +59,7 @@ typedef uint ESP3DSettingIndex;
 #define ESP_INTERNET_TIME 120      // 1  byte = flag
 #define ESP_HTTP_PORT 121          // 4  bytes = int
 #define ESP_TELNET_PORT 125        // 4  bytes = int
-// #define FREE 129                      // 1  bytes = flag
+#define ESP_OUTPUT_CLIENT 129      // 1  bytes = flag
 #define ESP_HOSTNAME \
   130  // 33 bytes 32+1 = string  ; warning does not support multibyte char like
        // chinese
@@ -119,7 +119,7 @@ typedef uint ESP3DSettingIndex;
 #define ESP_SETUP 1192          // 1 byte = flag
 // #define FREE 1193                     // 1 byte = flag
 // #define FREE 1194                     // 1 byte = flag
-// #define FREE 1195                     // 1 byte = flag
+#define ESP_ETH_STA_FALLBACK_MODE 1195                     // 1 byte = flag
 #define ESP_FTP_CTRL_PORT 1196          // 4  bytes = int
 #define ESP_FTP_DATA_ACTIVE_PORT 1200   // 4  bytes = int
 #define ESP_FTP_DATA_PASSIVE_PORT 1204  // 4  bytes = int
@@ -133,9 +133,14 @@ typedef uint ESP3DSettingIndex;
 #define ESP_BOOT_RADIO_STATE 1221       // 1 byte = flag
 #define ESP_STA_FALLBACK_MODE 1222      // 1 byte = flag
 #define ESP_SERIAL_BRIDGE_ON 1223       // 1 byte = flag
-// #define FREE 1224                     // 1 byte = flag
+#define ESP_ETH_STA_IP_MODE  1224       // 1 byte = flag
 #define ESP_SERIAL_BRIDGE_BAUD 1225  // 4  bytes= int
 #define ESP_TIME_ZONE 1229           // 7 bytes 6+1 = string
+#define ESP_ETH_STA_IP_VALUE 1237       // 4  bytes xxx.xxx.xxx.xxx
+#define ESP_ETH_STA_MASK_VALUE 1240     // 4  bytes xxx.xxx.xxx.xxx
+#define ESP_ETH_STA_GATEWAY_VALUE 1244  // 4  bytes xxx.xxx.xxx.xxx
+#define ESP_ETH_STA_DNS_VALUE     1248  // 4  bytes xxx.xxx.xxx.xxx
+#define ESP_USB_SERIAL_BAUD_RATE   1252  // 4  bytes= int
 
 // Hidden password
 #define HIDDEN_PASSWORD "********"
@@ -156,6 +161,7 @@ typedef uint ESP3DSettingIndex;
 #define USE_SERIAL_0 1
 #define USE_SERIAL_1 2
 #define USE_SERIAL_2 3
+#define USE_USB_SERIAL -1
 
 // Serial service ID
 #define MAIN_SERIAL 1
@@ -182,7 +188,7 @@ typedef uint ESP3DSettingIndex;
 
 // SD connection
 #define ESP_NO_SD 0
-#define ESP_DIRECT_SD 1
+#define ESP_NOT_SHARED_SD 1
 #define ESP_SHARED_SD 2
 
 // SD Device type
@@ -248,6 +254,7 @@ typedef uint ESP3DSettingIndex;
 #define ESP_TELEGRAM_NOTIFICATION 4
 #define ESP_IFTTT_NOTIFICATION 5
 #define ESP_HOMEASSISTANT_NOTIFICATION 6
+#define ESP_WHATS_APP_NOTIFICATION 7
 
 // SENSOR
 #define NO_SENSOR_DEVICE 0
@@ -313,14 +320,18 @@ typedef uint ESP3DSettingIndex;
 #define MODE_ETH_CLOCK_GPIO16_OUT 2
 #define MODE_ETH_CLOCK_GPIO17_OUT 3
 
-// Ethernet type (Check ETH.h eth_phy_type_t)
+// Ethernet type (Check ETH.h eth_phy_type_t because it enum with #ifdef CONFIG_....) 
 #define TYPE_ETH_PHY_LAN8720 0
 #define TYPE_ETH_PHY_TLK110 1
 #define TYPE_ETH_PHY_RTL8201 2
 #define TYPE_ETH_PHY_DP83848 3
-#define TYPE_ETH_PHY_DM9051 4
-#define TYPE_ETH_PHY_KSZ8041 5
-#define TYPE_ETH_PHY_KSZ8081 6
+#define TYPE_ETH_PHY_KSZ8041 4
+#define TYPE_ETH_PHY_KSZ8081 5
+#define TYPE_ETH_PHY_DM9051 6
+#define TYPE_ETH_PHY_W5500 7
+#define TYPE_ETH_PHY_KSZ8851 8
+
+
 
 // Host path
 #define ESP3D_HOST_PATH "/"

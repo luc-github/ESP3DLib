@@ -32,6 +32,20 @@
 #endif  // TIMESTAMP_FEATURE
 #define COMMAND_ID 400
 
+#ifndef STRINGIFY
+#define STRINGIFY(x) #x
+#endif  // STRINGIFY
+#define STRING(x) STRINGIFY(x)
+
+#if defined(USB_SERIAL_FEATURE)
+const char* OutputClientsLabels[] = {
+    "serial port",
+    "usb port",
+};
+const char* OutputClientsValues[] = {"1",
+                                     "2"};
+#endif  // USB_SERIAL_FEATURE
+
 const char* YesNoLabels[] = {"no", "yes"};
 const char* YesNoValues[] = {"0", "1"};
 const char* RadioModeLabels[] = {"none"
@@ -91,15 +105,28 @@ const char* FallbackValues[] = {"0"
 #endif  // BLUETOOTH_FEATURE
 };
 
+const char* EthFallbackValues[] = {"0"
+#ifdef BLUETOOTH_FEATURE
+                                   ,
+                                   "3"
+#endif  // BLUETOOTH_FEATURE
+};
+const char* EthFallbackLabels[] = {"none"
+#ifdef BLUETOOTH_FEATURE
+                                   ,
+                                   "bt"
+#endif  // BLUETOOTH_FEATURE
+};
+
 const char* FirmwareLabels[] = {"Unknown", "Grbl", "Marlin", "Smoothieware",
                                 "Repetier"};
 
 const char* FirmwareValues[] = {"0", "10", "20", "40", "50"};
 #ifdef NOTIFICATION_FEATURE
 const char* NotificationsLabels[] = {
-    "none", "pushover", "email", "line", "telegram", "ifttt", "home-assistant"};
+    "none", "pushover", "email", "line", "telegram", "ifttt", "home-assistant","WhatsApp"};
 
-const char* NotificationsValues[] = {"0", "1", "2", "3", "4", "5", "6"};
+const char* NotificationsValues[] = {"0", "1", "2", "3", "4", "5", "6", "7"};
 #endif  // NOTIFICATION_FEATURE
 
 const char* IpModeLabels[] = {"static", "dhcp"};
@@ -108,9 +135,13 @@ const char* IpModeValues[] = {"0", "1"};
 const char* SupportedApChannelsStr[] = {"1", "2", "3",  "4",  "5",  "6",  "7",
                                         "8", "9", "10", "11", "12", "13", "14"};
 
+
+/// Note Currently the Serial and USB Serial baud rate list is the same
+// if this change this part need to be updated
 const char* SupportedBaudListSizeStr[] = {
     "9600",   "19200",  "38400",  "57600",   "74880",   "115200", "230400",
     "250000", "500000", "921600", "1000000", "1958400", "2000000"};
+
 
 #ifdef SENSOR_DEVICE
 
@@ -204,6 +235,34 @@ void ESP3DCommands::ESP400(int cmd_params_pos, ESP3DMessage* msg) {
   dispatchSetting(json, "network/network", ESP_BOOT_RADIO_STATE, "radio_boot",
                   YesNoValues, YesNoLabels, sizeof(YesNoValues) / sizeof(char*),
                   -1, -1, -1, NULL, true, target, requestId);
+#if defined(ETH_FEATURE)
+  // Ethernet STA IP mode
+  dispatchSetting(json, "network/eth-sta", ESP_ETH_STA_IP_MODE, "ip mode",
+                  IpModeValues, IpModeLabels,
+                  sizeof(IpModeLabels) / sizeof(char*), -1, -1, -1, nullptr,
+                  true, target, requestId);
+  // Ethernet STA static IP
+  dispatchSetting(json, "network/eth-sta", ESP_ETH_STA_IP_VALUE, "ip", nullptr,
+                  nullptr, -1, -1, -1, -1, nullptr, true, target, requestId);
+
+  // Ethernet STA static Gateway
+  dispatchSetting(json, "network/eth-sta", ESP_ETH_STA_GATEWAY_VALUE, "gw",
+                  nullptr, nullptr, -1, -1, -1, -1, nullptr, true, target,
+                  requestId);
+  // Ethernet STA static Mask
+  dispatchSetting(json, "network/eth-sta", ESP_ETH_STA_MASK_VALUE, "msk",
+                  nullptr, nullptr, -1, -1, -1, -1, nullptr, true, target,
+                  requestId);
+  // Ethernet STA static DNS
+  dispatchSetting(json, "network/eth-sta", ESP_ETH_STA_DNS_VALUE, "DNS",
+                  nullptr, nullptr, -1, -1, -1, -1, nullptr, true, target,
+                  requestId);
+  // Ethernet Sta fallback mode
+  dispatchSetting(json, "network/eth-sta", ESP_ETH_STA_FALLBACK_MODE,
+                  "sta fallback mode", EthFallbackValues, EthFallbackLabels,
+                  sizeof(EthFallbackValues) / sizeof(char*), -1, -1, -1,
+                  nullptr, true, target, requestId);
+#endif  // ETH_FEATURE
 #ifdef WIFI_FEATURE
   // STA SSID network/sta
   dispatchSetting(json, "network/sta", ESP_STA_SSID, "SSID", nullptr, nullptr,
@@ -214,7 +273,7 @@ void ESP3DCommands::ESP400(int cmd_params_pos, ESP3DMessage* msg) {
                   nullptr, 64, 8, 0, -1, nullptr, true, target, requestId);
 
 #endif  // WIFI_FEATURE
-#if defined(WIFI_FEATURE) || defined(ETH_FEATURE)
+#if defined(WIFI_FEATURE)
   // STA IP mode
   dispatchSetting(json, "network/sta", ESP_STA_IP_MODE, "ip mode", IpModeValues,
                   IpModeLabels, sizeof(IpModeLabels) / sizeof(char*), -1, -1,
@@ -233,15 +292,15 @@ void ESP3DCommands::ESP400(int cmd_params_pos, ESP3DMessage* msg) {
   dispatchSetting(json, "network/sta", ESP_STA_DNS_VALUE, "DNS", nullptr,
                   nullptr, -1, -1, -1, -1, nullptr, true, target, requestId);
 
-#endif  // WIFI_FEATURE || ETH_FEATURE
+#endif  // WIFI_FEATURE
 
-#if defined(WIFI_FEATURE) || defined(ETH_FEATURE) || defined(BT_FEATURE)
+#if defined(WIFI_FEATURE)
   // Sta fallback mode
   dispatchSetting(json, "network/sta", ESP_STA_FALLBACK_MODE,
                   "sta fallback mode", FallbackValues, FallbackLabels,
                   sizeof(FallbackValues) / sizeof(char*), -1, -1, -1, nullptr,
                   true, target, requestId);
-#endif  // WIFI_FEATURE || ETH_FEATURE || BT_FEATURE
+#endif  // WIFI_FEATURE
 #if defined(WIFI_FEATURE)
   // AP SSID network/ap
   dispatchSetting(json, "network/ap", ESP_AP_SSID, "SSID", nullptr, nullptr, 32,
@@ -460,7 +519,20 @@ void ESP3DCommands::ESP400(int cmd_params_pos, ESP3DMessage* msg) {
                   true, target, requestId);
 #endif  // FIXED_FW_TARGET
 #if COMMUNICATION_PROTOCOL == RAW_SERIAL || COMMUNICATION_PROTOCOL == MKS_SERIAL
-  // Baud Rate
+#if defined(USB_SERIAL_FEATURE)
+  dispatchSetting(json, "system/system", ESP_OUTPUT_CLIENT, "output",
+                  OutputClientsValues, OutputClientsLabels,
+                  sizeof(OutputClientsValues) / sizeof(char*), -1, -1, -1,
+                  nullptr, true, target, requestId);
+  // Usb-Serial Baud Rate
+  dispatchSetting(json, "system/system", ESP_USB_SERIAL_BAUD_RATE,
+                  "usb-serial baud", SupportedBaudListSizeStr,
+                  SupportedBaudListSizeStr,
+                  sizeof(SupportedBaudListSizeStr) / sizeof(char*), -1, -1, -1,
+                  nullptr, true, target, requestId);
+
+#endif  // defined(USB_SERIAL_FEATURE)
+  // Serial Baud Rate
   dispatchSetting(json, "system/system", ESP_BAUD_RATE, "baud",
                   SupportedBaudListSizeStr, SupportedBaudListSizeStr,
                   sizeof(SupportedBaudListSizeStr) / sizeof(char*), -1, -1, -1,

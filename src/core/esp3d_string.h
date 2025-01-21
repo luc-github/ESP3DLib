@@ -22,6 +22,7 @@
 #define _ESP3D_STRING_H
 #include <time.h>
 namespace esp3d_string {
+const char* formatDuration(uint64_t duration);
 const char* getTimeString(time_t time, bool isGMT);
 const char* generateUUID(const char* seed);
 const char* getContentType(const char* filename);
@@ -29,6 +30,8 @@ const char* encodeString(const char* s);
 const char* formatBytes(uint64_t bytes);
 bool isPrintableChar(char c);
 const char* expandString(const char* s, bool formatspace = false);
+const char * urlEncode(const char* s);
+bool isRealTimeCommand(char c);
 }  // namespace esp3d_string
 
 #endif  //_ESP3D_STRING_H

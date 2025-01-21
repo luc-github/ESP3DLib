@@ -53,14 +53,10 @@ class ESP3DCommands {
   void ESP100(int cmd_params_pos, ESP3DMessage* msg);
   void ESP101(int cmd_params_pos, ESP3DMessage* msg);
 #endif  // WIFI_FEATURE
-#if defined(WIFI_FEATURE) || defined(ETH_FEATURE)
+#if defined(WIFI_FEATURE)
   void ESP102(int cmd_params_pos, ESP3DMessage* msg);
   void ESP103(int cmd_params_pos, ESP3DMessage* msg);
-#endif  // WIFI_FEATURE ||ETH_FEATURE
-#if defined(WIFI_FEATURE) || defined(BLUETOOTH_FEATURE) || defined(ETH_FEATURE)
   void ESP104(int cmd_params_pos, ESP3DMessage* msg);
-#endif  // WIFI_FEATURE || BLUETOOTH_FEATURE || ETH_FEATURE
-#if defined(WIFI_FEATURE)
   void ESP105(int cmd_params_pos, ESP3DMessage* msg);
   void ESP106(int cmd_params_pos, ESP3DMessage* msg);
   void ESP107(int cmd_params_pos, ESP3DMessage* msg);
@@ -77,6 +73,11 @@ class ESP3DCommands {
   void ESP114(int cmd_params_pos, ESP3DMessage* msg);
   void ESP115(int cmd_params_pos, ESP3DMessage* msg);
 #endif  // WIFI_FEATURE || BLUETOOTH_FEATURE || ETH_FEATURE
+#if defined(ETH_FEATURE)
+  void ESP116(int cmd_params_pos, ESP3DMessage* msg);
+  void ESP117(int cmd_params_pos, ESP3DMessage* msg);
+  void ESP118(int cmd_params_pos, ESP3DMessage* msg);
+#endif  // ETH_FEATURE
 #if defined(HTTP_FEATURE)
   void ESP120(int cmd_params_pos, ESP3DMessage* msg);
   void ESP121(int cmd_params_pos, ESP3DMessage* msg);
@@ -131,6 +132,10 @@ class ESP3DCommands {
 #endif  // SENSOR_DEVICE
   void ESP220(int cmd_params_pos, ESP3DMessage* msg);
   void ESP290(int cmd_params_pos, ESP3DMessage* msg);
+#if defined(ESP_LUA_INTERPRETER_FEATURE)
+  void ESP300(int cmd_params_pos, ESP3DMessage* msg);
+  void ESP301(int cmd_params_pos, ESP3DMessage* msg);
+#endif  // ESP_LUA_INTERPRETER_FEATURE
   void ESP400(int cmd_params_pos, ESP3DMessage* msg);
   void ESP401(int cmd_params_pos, ESP3DMessage* msg);
 #if defined(WIFI_FEATURE)
@@ -175,6 +180,10 @@ class ESP3DCommands {
   void ESP900(int cmd_params_pos, ESP3DMessage* msg);
   void ESP901(int cmd_params_pos, ESP3DMessage* msg);
 #endif  // COMMUNICATION_PROTOCOL != SOCKET_SERIAL
+#if defined(USB_SERIAL_FEATURE)
+  void ESP902(int cmd_params_pos, ESP3DMessage* msg);
+  void ESP950(int cmd_params_pos, ESP3DMessage* msg);
+#endif  // defined(USB_SERIAL_FEATURE)
 #if defined(ESP_SERIAL_BRIDGE_OUTPUT)
   void ESP930(int cmd_params_pos, ESP3DMessage* msg);
   void ESP931(int cmd_params_pos, ESP3DMessage* msg);
@@ -218,7 +227,6 @@ class ESP3DCommands {
                        bool isFirst = false);
   bool dispatchAuthenticationError(ESP3DMessage* msg, uint cmdid, bool json);
   bool formatCommand(char* cmd, size_t len);
-  bool isRealTimeCommand(char* cmd, size_t len);
   ESP3DClientType getOutputClient(bool fromSettings = false);
   void setOutputClient(ESP3DClientType output_client) {
     _output_client = output_client;
