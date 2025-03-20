@@ -67,7 +67,7 @@ bool Esp3DLib::parse(char *cmd) {
   if (myesp3d.started() &&
       esp3d_commands.is_esp_command((uint8_t *)cmd, strlen(cmd))) {
     // command come from other serial port
-    ESP3DMessage *msg = ESP3DMessageManager::newMsg(
+    ESP3DMessage *msg = esp3d_message_manager.newMsg(
         ESP3DClientType::echo_serial, ESP3DClientType::command, (uint8_t *)cmd,
         strlen(cmd), ESP3DAuthenticationLevel::admin);
     if (msg) {
