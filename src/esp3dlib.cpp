@@ -31,7 +31,7 @@
 #include "core/esp3d_commands.h"
 #include "core/esp3d_hal.h"
 #if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
-#include <soc/rtc_wdt.h>
+#include <rtc_wdt.h>
 #endif  // CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
 #ifdef SDSUPPORT
 #include "modules/filesystem/esp_sd.h"
