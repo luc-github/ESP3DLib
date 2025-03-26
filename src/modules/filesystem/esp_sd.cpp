@@ -24,45 +24,6 @@
 
 #include "esp_sd.h"
 
-#define ESP_MAX_SD_OPENHANDLE 4
-#if (SD_DEVICE == ESP_SD_NATIVE) && defined(ARDUINO_ARCH_ESP8266)
-#define FS_NO_GLOBALS
-#include <SD.h>
-File tSDFile_handle[ESP_MAX_SD_OPENHANDLE];
-#elif ((SD_DEVICE == ESP_SDFAT) || (SD_DEVICE == ESP_SDFAT2)) && \
-    defined(ARDUINO_ARCH_ESP8266)
-#define FS_NO_GLOBALS
-#define NO_GLOBAL_SD
-#include <SdFat.h>
-#if SDFAT_FILE_TYPE == 1
-typedef File32 File;
-#elif SDFAT_FILE_TYPE == 2
-typedef ExFile File;
-#elif SDFAT_FILE_TYPE == 3
-typedef FsFile File;
-#else  // SDFAT_FILE_TYPE
-#error Invalid SDFAT_FILE_TYPE
-#endif  // SDFAT_FILE_TYPE
-File tSDFile_handle[ESP_MAX_SD_OPENHANDLE];
-#elif ((SD_DEVICE == ESP_SDFAT) || (SD_DEVICE == ESP_SDFAT2)) && \
-    defined(ARDUINO_ARCH_ESP32)
-#include <SdFat.h>
-#if (SD_DEVICE == ESP_SDFAT2)
-#if SDFAT_FILE_TYPE == 1
-typedef File32 File;
-#elif SDFAT_FILE_TYPE == 2
-typedef ExFile File;
-#elif SDFAT_FILE_TYPE == 3
-typedef FsFile File;
-#else  // SDFAT_FILE_TYPE
-#error Invalid SDFAT_FILE_TYPE
-#endif  // SDFAT_FILE_TYPE
-#endif
-File tSDFile_handle[ESP_MAX_SD_OPENHANDLE];
-#else
-#include <FS.h>
-File tSDFile_handle[ESP_MAX_SD_OPENHANDLE];
-#endif
 
 #if defined(ESP3DLIB_ENV)
 #include "../../include/Marlin/cardreader.h"
