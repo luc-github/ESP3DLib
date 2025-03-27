@@ -106,7 +106,9 @@ void Esp3DLib::idletask() {
           ESP3DLIB_RUNNING_CORE /* Core to run the task */
       );
 #ifdef DISABLE_WDT_ESP3DLIB_TASK
-      esp_task_wdt_delete(ESP3DHal::xHandle);
+    if (esp_task_wdt_status(NULL) == ESP_OK) {
+          esp_task_wdt_delete(ESP3DHal::xHandle);
+    }
 #endif  // DISABLE_WDT_ESP3DLIB_TASK
     }
   }
