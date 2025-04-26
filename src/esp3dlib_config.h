@@ -208,6 +208,15 @@
 #define ESP_SD_CS_PIN SDSS
 #endif  // SDSS
 
+// Keep compatibility with Marlin 2.0.9 and older
+#if defined(SD_SS_PIN) && (SD_SS_PIN >= 0)
+#if defined(ESP_SD_CS_PIN) 
+#undef ESP_SD_CS_PIN
+#endif  // ESP_SD_CS_PIN  
+
+#define ESP_SD_CS_PIN SD_SS_PIN
+#endif  // SDSS
+
 #if defined(SD_SCK_PIN) && (SD_SCK_PIN >= 0)
 #define ESP_SD_SCK_PIN SD_SCK_PIN
 #endif  // SD_SCK_PIN
