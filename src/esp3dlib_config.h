@@ -213,7 +213,6 @@
 #if defined(ESP_SD_CS_PIN) 
 #undef ESP_SD_CS_PIN
 #endif  // ESP_SD_CS_PIN  
-
 #define ESP_SD_CS_PIN SD_SS_PIN
 #endif  // SDSS
 
