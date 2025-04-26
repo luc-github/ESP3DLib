@@ -40,6 +40,10 @@
 #define MARLIN_PATH(PATH) ESP_XSTR(SRCHOME/PATH)
 #include MARLIN_PATH(inc/MarlinConfig.h)
 
+#if defined(HAS_STATUS_MESSAGE)
+#define PRINTER_HAS_DISPLAY 1
+#endif  // HAS_STATUS_MESSAGE
+
 #undef DISABLED
 #undef _BV
 #undef SPI_FULL_SPEED
@@ -73,7 +77,7 @@
 #endif
 
 #define SDSUPPORT
-// #define HAS_DISPLAY
+// #define PRINTER_HAS_DISPLAY
 // #define HAS_SERIAL_DISPLAY "M118 P1 "
 #define GLOBAL_FILESYSTEM_FEATURE
 // #define DISABLE_WDT_ESP3DLIB_TASK
@@ -295,9 +299,21 @@
 #endif  // NOTIFICATION_TITLE
 #endif  // NOTIFICATION_FEATURE
 
-#if defined(SD_TIMESTAMP_FEATURE) || defined(FILESYSTEM_TIMESTAMP_FEATURE)
+/************************************
+ *
+ * Sanity checks
+ * Do not modify
+ ************************************/
+
+ #if defined(ESP_GOT_DATE_TIME_HOOK) || defined(SD_TIMESTAMP_FEATURE) || \
+ defined(FILESYSTEM_TIMESTAMP_FEATURE)
 #define TIMESTAMP_FEATURE
 #endif  // SD_TIMESTAMP_FEATURE || FILESYSTEM_TIMESTAMP_FEATURE
+
+#if defined(PRINTER_HAS_DISPLAY)
+#define HAS_SERIAL_DISPLAY ""
+#endif  // PRINTER_HAS_DISPLAY
+
 
 /************************************
  *
