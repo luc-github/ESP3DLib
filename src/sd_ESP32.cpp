@@ -66,7 +66,7 @@ int8_t ESP_SD::card_status(bool forcemount)
     #ifdef IS_SD_INSERTED
       if (!IS_SD_INSERTED() || !card.isMounted()) {
     #else
-      if (!card.isInserted() || !card.isMounted()) {
+      if (!card.isSDCardInserted() || !card.isMounted()) {
     #endif
         return 0;    //No sd
     }
