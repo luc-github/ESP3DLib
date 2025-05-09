@@ -63,7 +63,11 @@ int8_t ESP_SD::card_status(bool forcemount)
     if(!card.isMounted() || forcemount) {
         card.mount();
     }
-    if (!IS_SD_INSERTED() || !card.isMounted()) {
+    #ifdef IS_SD_INSERTED
+      if (!IS_SD_INSERTED() || !card.isMounted()) {
+    #else
+      if (!card.isInserted() || !card.isMounted()) {
+    #endif
         return 0;    //No sd
     }
     if ( card.isPrinting() || card.isFileOpen() ) {
