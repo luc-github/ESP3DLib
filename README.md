@@ -21,7 +21,7 @@ Library for ESP32 boards using Marlin 2.x :
 ![Development](https://img.shields.io/badge/dynamic/json?label=Development&query=$.devt&color=green&url=https://raw.githubusercontent.com/luc-github/ESP3DLib/refs/heads/3.0.beta1/info.json)
 [![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3DLib/3.0?style=plastic)](https://github.com/luc-github/ESP3DLib/tree/3.0)  
 ![Release Version](https://img.shields.io/github/v/release/luc-github/ESP3D-WEBUI?color=green&include_prereleases&label=WebUI&style=plastic)
-[![Marlin](https://img.shields.io/badge/Marlin-2.1.x-orange.svg?style=flat-square)](https://github.com/luc-github/Marlin/tree/ESP3DLibV3.0) 
+[![Marlin](https://img.shields.io/badge/Marlin-2.1.x-orange.svg?style=plastic)](https://github.com/luc-github/Marlin/tree/ESP3DLibV3.0) 
 
 :warning:Currently the development version need special version of Marlin which may not sync with latest version of Marlin yet : https://github.com/luc-github/Marlin/tree/ESP3DLibV3.0
 
