@@ -1,4 +1,4 @@
-# ESP3DLib 1.0 Marlin version [<img src="https://img.shields.io/liberapay/patrons/ESP3D.svg?logo=liberapay">](https://liberapay.com/ESP3D)
+# ESP3DLib ![Version](https://img.shields.io/badge/dynamic/json?label=Version&query=$.version&url=https://raw.githubusercontent.com/luc-github/ESP3DLib/refs/heads/master/info.json)  for Marlin 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-8-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
@@ -14,9 +14,14 @@ Library for ESP32 boards using Marlin 2.x :
 [MKS Tinybee](https://github.com/makerbase-mks/MKS-TinyBee)
 
 
-[Current version: ![Current Version](https://img.shields.io/badge/ESPDLib-1.0-green?style=plastic) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3DLib/master?style=plastic)](https://github.com/luc-github/ESP3DLib/tree/master) [![Release Version](https://img.shields.io/github/v/release/luc-github/ESP3D-WEBUI?color=green&label=WebUI&style=plastic)](https://github.com/luc-github/ESP3D-WEBUI/tree/2.1/languages) [![Marlin](https://img.shields.io/github/release/MarlinFirmware/Marlin.svg?style=plastic&label=Marlin)](https://github.com/MarlinFirmware/Marlin)  
+![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3DLib/master?style=plastic)
+[![Version](https://img.shields.io/badge/dynamic/json?label=ESP3D-WEBUI%20Packages&query=$.version&url=https://raw.githubusercontent.com/luc-github/ESP3D-WEBUI/refs/heads/2.1/info.json)](https://github.com/luc-github/ESP3D-WEBUI/tree/2.1/languages) 
+[![Marlin](https://img.shields.io/github/release/MarlinFirmware/Marlin.svg?style=plastic&label=Marlin)](https://github.com/MarlinFirmware/Marlin)  
 
-[Development version: ![Development Version](https://img.shields.io/badge/ESPDLib-3.0-yellow?style=plastic) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3DLib/3.0?style=plastic)](https://github.com/luc-github/ESP3DLib/tree/3.0)  [![Release Version](https://img.shields.io/github/v/release/luc-github/ESP3D-WEBUI?color=green&include_prereleases&label=WebUI&style=plastic)](https://github.com/luc-github/ESP3D-WEBUI/tree/3.0) [![Project Page ESP3D 3.0](https://img.shields.io/badge/Project%20page-ESP3D%203.0-blue?style=plastic)](https://github.com/users/luc-github/projects/1/views/1) [![Marlin](https://img.shields.io/badge/Marlin-2.0.9.3(luc)-yellow?style=plastic)](https://github.com/luc-github/Marlin/tree/ESP3DLibV3.0)
+![Development](https://img.shields.io/badge/dynamic/json?label=Development&query=$.devt&color=green&url=https://raw.githubusercontent.com/luc-github/ESP3DLib/refs/heads/3.0.beta1/info.json)
+[![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3DLib/3.0?style=plastic)](https://github.com/luc-github/ESP3DLib/tree/3.0)  
+![Release Version](https://img.shields.io/github/v/release/luc-github/ESP3D-WEBUI?color=green&include_prereleases&label=WebUI&style=plastic)
+[![Marlin](https://img.shields.io/badge/Marlin-2.1.x-orange.svg?style=flat-square)](https://github.com/luc-github/Marlin/tree/ESP3DLibV3.0) 
 
 :warning:Currently the development version need special version of Marlin which may not sync with latest version of Marlin yet : https://github.com/luc-github/Marlin/tree/ESP3DLibV3.0
 
