@@ -1,5 +1,5 @@
-# ESP3DLib 3.0 for Marlin   
-[<img src="https://img.shields.io/liberapay/patrons/ESP3D.svg?logo=liberapay">](https://liberapay.com/ESP3D)  
+# ESP3DLib  ![Development](https://img.shields.io/badge/dynamic/json?label=Development&query=$.devt&color=green&url=https://raw.githubusercontent.com/luc-github/ESP3DLib/refs/heads/3.0.beta1/info.json) for Marlin   
+
 <img src="https://github.com/luc-github/ESP3DLib/blob/master/images/ESP3D_social_mini.png">
 Library for ESP32 boards using Marlin 2.x : 
 
@@ -12,8 +12,9 @@ Library for ESP32 boards using Marlin 2.x :
 
 The web interface files has it's own repository [ESP3D-WEBUI](https://github.com/luc-github/ESP3D-WEBUI/tree/3.0).
 
-[Latest development version ![Development Version](https://img.shields.io/badge/3.0-yellow?style=plastic) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3DLib/3.0?style=plastic)](https://github.com/luc-github/ESP3DLib/tree/3.0) [![github-ci](https://github.com/luc-github/ESP3DLib/workflows/build-ci/badge.svg)](https://github.com/luc-github/ESP3DLib/actions/workflows/build-ci.yml)
-  [![Release Version](https://img.shields.io/github/v/release/luc-github/ESP3D-WEBUI?color=green&include_prereleases&label=WebUI&style=plastic)](https://github.com/luc-github/ESP3D-WEBUI/tree/3.0) [![Marlin](https://img.shields.io/github/release/MarlinFirmware/Marlin.svg?style=plastic&label=Marlin)](https://github.com/MarlinFirmware/Marlin)    
+[![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3DLib/3.0.beta1?style=plastic)](https://github.com/luc-github/ESP3DLib/tree/3.0.beta1) 
+[![github-ci](https://github.com/luc-github/ESP3DLib/workflows/build-ci/badge.svg)](https://github.com/luc-github/ESP3DLib/actions/workflows/build-ci.yml)
+[![Marlin](https://img.shields.io/badge/Marlin-2.1.x-orange.svg?style=plastic)](https://github.com/luc-github/Marlin/tree/ESP3DLibV3.0) 
 
 To use ESP3Lib V3 you need an updated version of Marlin which is here: https://github.com/luc-github/Marlin, necessary will be pushed when library V3 is considered as stable enough.   
 
