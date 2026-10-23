@@ -496,7 +496,21 @@ ESP_SDFile ESP_SDFile::openNextFile() {
     esp3d_log("openNextFile failed");
     return ESP_SDFile();
   }
-  ESP3D_File tmp = tSDFile_handle[_index].openNextFile();
+  ESP3D_File& dir = tSDFile_handle[_index];
+  ESP3D_File tmp = dir.openNextFile();
+  // SdFat stops at a long name entry whose checksum doesn't match the short name
+  // that follows it, e.g. a bootloader renaming FIRMWARE.BIN to FIRMWARE.CUR.
+  // Skip such entries and stop only at the end of the directory or on an error.
+  while (!tmp && !ESP3D_SD_Card.sdErrorCode()) {
+    // The entry SdFat stopped at is the last one it read
+    const uint64_t pos = dir.curPosition();
+    uint8_t entry[32];
+    if (pos < sizeof(entry) || !dir.seekSet(pos - sizeof(entry)) ||
+        dir.read(entry, sizeof(entry)) != sizeof(entry) || entry[0] == 0x00) {
+      break;  // End of directory (free entry) or a read error
+    }
+    tmp = dir.openNextFile();
+  }
   if (tmp) {
     char tmps[255];
     tmp.getName(tmps, 254);
