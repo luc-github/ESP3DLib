@@ -37,7 +37,7 @@ typedef struct {
 class CardReader {
  public:
   static card_flags_t flag;  // Flags (above)
-  static void mount();
+  static void mount(const bool alert = true);
   static void release();
   static bool isMounted() { return flag.mounted; }
 
