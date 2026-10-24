@@ -25,6 +25,7 @@
 #include <Arduino.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
+#include "freertos/queue.h"
 
 #include "../../core/esp3d_commands.h"
 #include "../../core/esp3d_message.h"
@@ -42,7 +43,11 @@ Serial_2_Socket::Serial_2_Socket() {
   if (_txBufferMutex == NULL) {
     esp3d_log_e("Serial2Socket: Failed to create TX mutex");
   }
-  
+  _txQueue = (void*)xQueueCreate(S2S_TXQUEUESIZE, sizeof(ESP3DMessage *));
+  if (_txQueue == NULL) {
+    esp3d_log_e("Serial2Socket: Failed to create TX queue");
+  }
+
   end();
 }
 
@@ -175,7 +180,7 @@ size_t Serial_2_Socket::write(const uint8_t *buffer, size_t size) {
   // Check if buffer is full and needs flushing
   if (_TXbufferSize + size > S2S_TXBUFFERSIZE) {
     esp3d_log_d("Serial2Socket: buffer full, flush it");
-    flush(false); // Use flush without mutex since we already have it
+    queueTXbuffer(); // We already have the mutex
   }
   
   // Add data to buffer and flush on newline
@@ -184,13 +189,13 @@ size_t Serial_2_Socket::write(const uint8_t *buffer, size_t size) {
     _TXbufferSize++;
     if (buffer[i] == (const uint8_t)'\n') {
       esp3d_log_d("S2S: %s TXSize: %d", (const char *)_TXbuffer, _TXbufferSize);
-      flush(false); // Use flush without mutex since we already have it
+      queueTXbuffer(); // We already have the mutex
     }
   }
   
   // Check if we need to flush based on time
   if (_TXbufferSize > 0 && ((millis() - _lastflush) > S2S_FLUSHTIMEOUT)) {
-    flush(false); // Use flush without mutex since we already have it
+    queueTXbuffer(); // We already have the mutex
   }
   
   // Release the mutex at the end
@@ -286,7 +291,16 @@ int Serial_2_Socket::read(void) {
   return v;
 }
 
-void Serial_2_Socket::handle() { handle_flush(); }
+// Called from the ESP3D task. write() runs in the caller's task (Marlin's
+// loop), which must not wait on network clients, so it only queues messages.
+void Serial_2_Socket::handle() {
+  handle_flush();
+  ESP3DMessage *msg;
+  while (_txQueue != NULL &&
+         xQueueReceive((QueueHandle_t)_txQueue, &msg, 0) == pdTRUE) {
+    esp3d_commands.process(msg);
+  }
+}
 
 void Serial_2_Socket::handle_flush() {
   if (_TXbufferSize > 0 && _started && !_paused) {
@@ -299,33 +313,32 @@ void Serial_2_Socket::handle_flush() {
 }
 
 void Serial_2_Socket::flush(bool useMutex) {
-
-  // Process buffer if there's data and we're not paused
-  if (_TXbufferSize > 0 && _started && !_paused) {
-     // Protect TX buffer access with mutex if requested
-    if (useMutex && _txBufferMutex != NULL) {
-    if (xSemaphoreTake((SemaphoreHandle_t)_txBufferMutex, pdMS_TO_TICKS(100)) != pdTRUE) {
-      esp3d_log_e("Serial2Socket: Failed to take mutex for flush");
-      return;
-    }
+  if (useMutex && _txBufferMutex != NULL &&
+      xSemaphoreTake((SemaphoreHandle_t)_txBufferMutex, pdMS_TO_TICKS(100)) != pdTRUE) {
+    esp3d_log_e("Serial2Socket: Failed to take mutex for flush");
+    return;
   }
+  queueTXbuffer();
+  if (useMutex && _txBufferMutex != NULL) {
+    xSemaphoreGive((SemaphoreHandle_t)_txBufferMutex);
+  }
+}
+
+// Move the TX buffer into a message for handle() to process.
+// The caller holds the TX mutex. If the queue is full, the output is dropped.
+void Serial_2_Socket::queueTXbuffer() {
+  if (_TXbufferSize > 0 && _started && !_paused) {
     ESP3DMessage *msg = esp3d_message_manager.newMsg(
         ESP3DClientType::socket_serial, ESP3DClientType::all_clients, _TXbuffer,
         _TXbufferSize, _auth);
-    
-    // Reset buffer before processing
     _lastflush = millis();
     _TXbufferSize = 0;
-    
-    // Release mutex if we took it
-    if (useMutex && _txBufferMutex != NULL) {
-      xSemaphoreGive((SemaphoreHandle_t)_txBufferMutex);
-    }
-    
     if (msg) {
-      // process command
       msg->type = ESP3DMessageType::unique;
-      esp3d_commands.process(msg);
+      if (_txQueue == NULL ||
+          xQueueSend((QueueHandle_t)_txQueue, &msg, 0) != pdTRUE) {
+        esp3d_message_manager.deleteMsg(msg);
+      }
     } else {
       esp3d_log_e("Cannot create message");
     }
