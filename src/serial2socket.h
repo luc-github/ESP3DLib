@@ -67,9 +67,13 @@ public:
     bool attachWS(void * web_socket);
     bool detachWS();
 private:
+    void send_buffer();
     uint32_t _lastflush;
     void * _web_socket;
+    void * _TXmutex;
+    volatile bool _flushrequested;
     uint8_t _TXbuffer[TXBUFFERSIZE];
+    uint8_t _TXsendbuffer[TXBUFFERSIZE];
     uint16_t _TXbufferSize;
     uint8_t _RXbuffer[RXBUFFERSIZE];
     uint16_t _RXbufferSize;
