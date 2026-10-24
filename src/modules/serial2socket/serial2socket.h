@@ -27,6 +27,7 @@
 #define S2S_TXBUFFERSIZE 512
 #define S2S_RXBUFFERSIZE 256
 #define S2S_FLUSHTIMEOUT 500
+#define S2S_TXQUEUESIZE 32
 
 class ESP3DMessage;  // forward declaration
 
@@ -65,6 +66,8 @@ class Serial_2_Socket : public Stream {
   ESP3DAuthenticationLevel _auth;
   void* _rxBufferMutex; // Opaque pointer for RX buffer mutex
   void* _txBufferMutex; // Opaque pointer for TX buffer mutex
+  void* _txQueue;       // Opaque pointer for queue of TX messages
+  void queueTXbuffer();
   uint32_t _lastflush;
   uint8_t _TXbuffer[S2S_TXBUFFERSIZE+1];
   uint16_t _TXbufferSize;

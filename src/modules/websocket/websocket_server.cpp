@@ -367,7 +367,14 @@ void WebSocket_Server::flushTXbuffer(void) {
   if (_started) {
     if ((_TXbufferSize > 0) && (_websocket_server->connectedClients() > 0)) {
       if (_websocket_server) {
-        _websocket_server->broadcastBIN(_TXbuffer, _TXbufferSize);
+        for (uint8_t num = 0; num < WEBSOCKETS_SERVER_CLIENT_MAX; num++) {
+          // A client that stops reading would stall every later send, so drop it
+          if (_websocket_server->clientIsConnected(num) &&
+              !_websocket_server->sendBIN(num, _TXbuffer, _TXbufferSize)) {
+            esp3d_log_e("WS send failed, disconnect %d", num);
+            _websocket_server->disconnect(num);
+          }
+        }
         esp3d_log("WS Broadcast bin port %d: %d bytes", port(), _TXbufferSize);
       }
       // refresh timout
