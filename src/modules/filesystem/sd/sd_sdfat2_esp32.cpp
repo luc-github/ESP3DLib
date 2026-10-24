@@ -500,10 +500,17 @@ ESP_SDFile ESP_SDFile::openNextFile() {
   ESP3D_File tmp = dir.openNextFile();
   // SdFat stops at a long name entry whose checksum doesn't match the short name
   // that follows it, e.g. a bootloader renaming FIRMWARE.BIN to FIRMWARE.CUR.
-  // Skip such entries and stop only at the end of the directory or on an error.
+  // Skip such entries and stop only at the end of the directory or on an error,
+  // or if the position did not advance.
+  uint64_t lastPos = UINT64_MAX;
   while (!tmp && !ESP3D_SD_Card.sdErrorCode()) {
     // The entry SdFat stopped at is the last one it read
     const uint64_t pos = dir.curPosition();
+    // No progress since last attempt: end of cluster chain, stop here
+    if (pos == lastPos) {
+      break;
+    }
+    lastPos = pos;
     uint8_t entry[32];
     if (pos < sizeof(entry) || !dir.seekSet(pos - sizeof(entry)) ||
         dir.read(entry, sizeof(entry)) != sizeof(entry) || entry[0] == 0x00) {
