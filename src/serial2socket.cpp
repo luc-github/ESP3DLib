@@ -26,12 +26,16 @@
 #include "wificonfig.h"
 #include <WebSocketsServer.h>
 #include <WiFi.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
 Serial_2_Socket Serial2Socket;
 
 
 Serial_2_Socket::Serial_2_Socket()
 {
     _web_socket = NULL;
+    _TXmutex = xSemaphoreCreateMutex();
+    _flushrequested = false;
     _TXbufferSize = 0;
     _RXbufferSize = 0;
     _RXbufferpos = 0;
@@ -111,20 +115,22 @@ size_t Serial_2_Socket::write(const uint8_t *buffer, size_t size)
         return 0;
     }
 #if defined(ENABLE_SERIAL2SOCKET_OUT)
-    if (_TXbufferSize==0) {
-        _lastflush = millis();
+    //This runs in the caller's task (Marlin's loop), so only buffer here:
+    //sending can wait seconds on a client that doesn't read.
+    //handle_flush() sends from the ESP3DLib task.
+    //Output that doesn't fit is dropped.
+    if (xSemaphoreTake((SemaphoreHandle_t)_TXmutex, pdMS_TO_TICKS(10)) != pdTRUE) {
+        return size;
     }
-    //send full line
-    if (_TXbufferSize + size > TXBUFFERSIZE) {
-        flush();
+    if (_TXbufferSize + size <= TXBUFFERSIZE) {
+        if (_TXbufferSize==0) {
+            _lastflush = millis();
+        }
+        memcpy(&_TXbuffer[_TXbufferSize], buffer, size);
+        _TXbufferSize += size;
     }
-    //need periodic check to force to flush in case of no end
-    for (int i = 0; i < size; i++) {
-        _TXbuffer[_TXbufferSize] = buffer[i];
-        _TXbufferSize++;
-    }
+    xSemaphoreGive((SemaphoreHandle_t)_TXmutex);
     log_i("[SOCKET]buffer size %d",_TXbufferSize);
-    handle_flush();
 #endif
     return size;
 }
@@ -178,24 +184,41 @@ int Serial_2_Socket::read(void)
     }
 }
 
+//Called from the ESP3DLib task
 void Serial_2_Socket::handle_flush()
 {
     if (_TXbufferSize > 0) {
-        if ((_TXbufferSize>=TXBUFFERSIZE) || ((millis()- _lastflush) > FLUSHTIMEOUT)) {
+        if (_flushrequested || (_TXbufferSize>=TXBUFFERSIZE/2) || ((millis()- _lastflush) > FLUSHTIMEOUT)) {
             log_i("[SOCKET]need flush, buffer size %d",_TXbufferSize);
-            flush();
+            send_buffer();
         }
     }
 }
+
+//May be called from any task, so only ask the ESP3DLib task to send
 void Serial_2_Socket::flush(void)
 {
-    if (_TXbufferSize > 0) {
-        log_i("[SOCKET]flush data, buffer size %d",_TXbufferSize);
-        ((WebSocketsServer *)_web_socket)->broadcastBIN(_TXbuffer,_TXbufferSize);
-        //refresh timout
-        _lastflush = millis();
-        //reset buffer
-        _TXbufferSize = 0;
+    _flushrequested = true;
+}
+
+void Serial_2_Socket::send_buffer()
+{
+    if (!_web_socket || xSemaphoreTake((SemaphoreHandle_t)_TXmutex, pdMS_TO_TICKS(10)) != pdTRUE) {
+        return;
+    }
+    uint16_t size = _TXbufferSize;
+    memcpy(_TXsendbuffer, _TXbuffer, size);
+    _TXbufferSize = 0;
+    _flushrequested = false;
+    xSemaphoreGive((SemaphoreHandle_t)_TXmutex);
+    log_i("[SOCKET]flush data, buffer size %d",size);
+    WebSocketsServer * ws = (WebSocketsServer *)_web_socket;
+    for (uint8_t num = 0; num < WEBSOCKETS_SERVER_CLIENT_MAX; num++) {
+        //A client that stops reading would stall every later send, so drop it
+        if (ws->clientIsConnected(num) && !ws->sendBIN(num, _TXsendbuffer, size)) {
+            log_i("[SOCKET]send failed, disconnect %d",num);
+            ws->disconnect(num);
+        }
     }
 }
 
